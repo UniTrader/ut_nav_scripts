@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<!--replace sel="/*" xsi:noNamespaceSchemaLocation="http://utnas/~unitrader/XRebirthxsds/aiscripts.xsd"-->
+<!--replace sel="/*" -->
   <aiscript xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="move.gate" xsi:noNamespaceSchemaLocation="http://utnas/~unitrader/XRebirthxsds/aiscripts.xsd">
     <!--
 
@@ -15,7 +15,16 @@
     </params>
     <interrupts>
       <handler ref="TargetInvalidHandler"/>
-      
+      <handler>
+        <conditions>
+          <event_game_loaded/>
+          <check_value value="not $nav_redirect?"/>
+        </conditions>
+        <actions>
+          <set_value name="$nav_redirect"/>
+          <abort_called_scripts resume="move"/>
+        </actions>
+      </handler>
     </interrupts>
     <attention min="unknown">
       <actions>
