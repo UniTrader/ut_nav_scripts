@@ -46,12 +46,12 @@
       </do_if>
       
       <!-- HACK for FoO - Albion Gate: Ignore the Big Asteroid when aquiring Safe Pos -->
-      <do_if value="$gate.zone.macro.ismacro.{'Cluster_T_Sector01_Zone001_macro'}">
+      <!--do_if value="$gate.zone.macro.ismacro.{'Cluster_T_Sector01_Zone001_macro'}">
         <find_object name="$ignoredobject" space="$gate.zone" macro="macro.landmarks_unique_the_mace_macro"/>
       </do_if>
-      <do_else>
+      <do_else-->
         <set_value name="$ignoredobject" exact="this.ship"/>
-      </do_else>
+      <!--/do_else-->
       
       <!-- Dont abort Path on first move_to, but for each one after that for fluid movement (except it is currently just flying to a safepos, indicated by this$mayabortpath)-->
       <set_value name="$continuepath" exact="not this.$mayabortpath?"/>
