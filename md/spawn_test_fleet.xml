@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<mdscript xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Spawn_test_fleet" xsi:noNamespaceSchemaLocation="http://utnas/~unitrader/XRebirthxsds/md.xsd">
+  <cues>
+    <cue name="Spawn" checkinterval="10s">
+      <conditions>
+        <cue_is_complete cue="md.Setup.Start"/>
+      </conditions>
+      <actions>
+        <do_all exact="10">
+          <create_ship name="$Testship" zone="player.zone">
+            <select size="[class.ship_xl,class_ship_l].random"/>
+            <pilot macro="character_boron_generic_01_macro">
+              <owner exact=" faction.player"/>
+              <skills>
+                <skill type="boarding" exact="15"/>
+                <skill type="engineering" exact="15"/>
+                <skill type="management" exact="15"/>
+                <skill type="morale" exact="15"/>
+              </skills>
+            </pilot>
+            <loadout>
+              <level exact="1"/>
+            </loadout>
+            <safepos object="player.ship" radius="5km"/>
+          </create_ship>
+        </do_all>
+      </actions>
+    </cue>
+  </cues>
+</mdscript>
