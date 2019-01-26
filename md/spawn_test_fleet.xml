@@ -8,7 +8,7 @@
       <actions>
         <do_all exact="10">
           <create_ship name="$Testship" zone="player.zone">
-            <select size="[class.ship_xl,class_ship_l].random"/>
+            <select size="[class.ship_xl,class.ship_l].random"/>
             <pilot macro="character_boron_generic_01_macro">
               <owner exact=" faction.player"/>
               <skills>
