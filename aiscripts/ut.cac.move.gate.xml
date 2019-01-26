@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
-<aiscript name="ut.cac.move.gate" version="30" priority="10" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://utnas/~unitrader/XRebirthxsds/aiscripts.xsd">
+<aiscript name="ut.cac.move.gate" version="001" priority="10" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://utnas/~unitrader/XRebirthxsds/aiscripts.xsd">
   <!--
 
  rewritten from scratch by UniTrader
@@ -23,9 +23,6 @@
   </params>
   <interrupts>
   </interrupts>
-  <patch sinceversion="30">
-    <create_group groupname="$passage_group"/>
-  </patch>
   <attention min="unknown">
     <actions>
       <!-- first decode the $params to the Variables -->
