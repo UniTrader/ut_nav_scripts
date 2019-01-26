@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<aiscript name="ut.cac.move.dock" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://utnas/~unitrader/XRebirthxsds/aiscripts.xsd">
+  <!--
+
+ rewritten from scratch by UniTrader
+  
+Script to Dock or Park an Object
+
+  -->
+  <params>
+    <param name="params" default="false" comment="pass a single Table filled with the wanted param Values here to make calls via list possible (always has priority)"/>
+    <param name="destination" default="null" comment="Object to Dock at, specifying a Dock here is planned"/>
+    <param name="tradeoffer" default="null" comment="Tredeoffer for which a fitting Dock should be preffered (only applies to bigships)"/>
+  </params>
+  <init>
+  </init>
+  <attention min="unknown">
+    <actions>
+      <label name="docking"/>
+      <run_script name="'move.dockat'" result="$dockresult" chance="0"/>
+      <label name="parking"/>
+      <label name="wait for parking slot"/>
+      <wait chance="0"/>
+      <move_to object="this.ship" usehighways="false" destination="$destination.zone" finishonapproach="false" abortpath="this.$mayabortpath?" chance="0"/>
+      <wait max="1min" chance="0"/>
+      <wait max="5min" chance="0"/>
+      <label name="park"/>
+      <move_to object="this.ship" usehighways="false" destination="$destination.zone" finishonapproach="false" abortpath="this.$mayabortpath?" chance="0"/>
+      <move_strafe object="this.ship" destination="$destination.zone" forcerotation="true" abortpath="false" chance="0"/>
+      <move_to object="this.ship" usehighways="false" destination="$destination.zone" forcerotation="true" reverse="true" abortpath="false" chance="0"/>
+      <move_to object="this.ship" usehighways="false" destination="$destination.zone" forcerotation="true" abortpath="false" chance="0"/>
+      <label name="finish"/>
+      <do_if value="$docking_coordinator">
+        <remove_value name="$docking_coordinator.$park_queue"/>
+      </do_if>
+      <run_script name="'ut.cac.move.dock2'" result="$retvar">
+        <param name="destination" value="$destination"/>
+        <param name="tradeoffer" value="$tradeoffer"/>
+      </run_script>
+      <return value="$retvar"/>
+    </actions>
+  </attention>
+</aiscript>
