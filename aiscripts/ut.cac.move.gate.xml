@@ -136,7 +136,7 @@
           </conditions>
           <actions>
             <do_if value="event.object == this.ship">
-              <set_avoid_collisions object="this.ship" enabled="true" comment="re-enable Collision avoidance since we are no longer in queue"/>
+              <set_avoid_collisions object="this.ship" bigobjects="true" smallobjects="true" comment="re-enable Collision avoidance since we are no longer in queue"/>
               <set_value name="$continuepath" exact="false" comment="disable soft-advancing queue because we just got kicked back"/>
             </do_if>
             <do_elseif value="$continuepath != 2">
@@ -147,7 +147,7 @@
         </interrupt>
       </move_to>
       <set_value name="$continuepath" exact="2" comment="re-enable soft-advancing queue and also set it persistent"/>
-      <set_avoid_collisions object="this.ship" enabled="false" comment="disable collision avoidance while in queue to avoid other ships pushing us out and delaying everything"/>
+      <set_avoid_collisions object="this.ship" bigobjects="false" smallobjects="false" comment="disable collision avoidance while in queue to avoid other ships pushing us out and delaying everything"/>
       <do_if value="$queue_position == 1">
         <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Reached Wait Pos in front of queue - Flying into Gate now.'.[this.knownname,this.container.knownname,global.$gate_queue,$gate]"/>
         <resume label="pass gate"/>
@@ -252,7 +252,7 @@
           </on_attentionchange>
         </wait>
       </do_if>
-      <set_avoid_collisions object="this.ship" enabled="true" comment="restore collision avoidance behavior after Gate Passage"/>
+      <set_avoid_collisions object="this.ship" bigobjects="true" smallobjects="true" comment="restore collision avoidance behavior after Gate Passage"/>
       
       <!-- unlock Gate (Vanilla) and remove ourselves from the Waiting List, signal the next to go/prepare (UT CAC) -->
       <request_gate ship="this.ship" gate="$gate" unlock="true" result="$result"/>
@@ -288,7 +288,7 @@
         <!-- HACK for FoO - AL Gate - ignore the big rock instead of the current ship for safepos AND dont avoid collissions to avoid needless tours -->
         <do_if value="this.zone.macro.ismacro.{'Cluster_T_Sector01_Zone001_macro'}">
           <find_object name="$ignoredobject" space="this.zone" macro="macro.landmarks_unique_the_mace_macro"/>
-          <set_avoid_collisions object="this.ship" enabled="false"/>
+          <set_avoid_collisions object="this.ship" bigobjects="false" smallobjects="false"/>
         </do_if>
         <do_else>
           <set_value name="$ignoredobject" exact="this.ship"/>
@@ -362,6 +362,6 @@
     <!-- remove from Passage Group -->
     <remove_from_group group="$passage_group" object="this.ship"/>
     <!-- restore collision avoidance behavior -->
-    <set_avoid_collisions object="this.ship" enabled="true"/>
+    <set_avoid_collisions object="this.ship" bigobjects="true" smallobjects="true"/>
   </on_abort>
 </aiscript>
