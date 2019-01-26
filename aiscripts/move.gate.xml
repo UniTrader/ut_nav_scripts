@@ -1,52 +1,17 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<!--replace sel="/*" -->
-  <aiscript xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="move.gate" xsi:noNamespaceSchemaLocation="http://utnas/~unitrader/XRebirthxsds/aiscripts.xsd">
-    <!--
-
-  Move Gate
-  by Adrian
-  
-  Generic routine for moving through specific gate.
-
-  -->
-    <params>
-      <param name="gate" comment="Gate to use. Has to be a jump gate or a highway entry gate."/>
-      <param name="debugchance" default="0"/>
-    </params>
-    <interrupts>
-      <handler ref="TargetInvalidHandler"/>
-      <handler>
-        <conditions>
-          <event_game_loaded/>
-          <check_value value="not $nav_redirect?"/>
-        </conditions>
-        <actions>
-          <set_value name="$nav_redirect"/>
-          <abort_called_scripts resume="move"/>
-        </actions>
-      </handler>
-    </interrupts>
-    <attention min="unknown">
-      <actions>
-        <label name="check"/>
-        <label name="move"/>
-        <run_script name="'ut.cac.move.gate.wrapper'">
+<replace sel="/aiscript/attention/actions/do_if[run_script[@name='&apos;move.generic&apos;']]">
+      <do_if value="(this.zone != $gate.zone) or this.ship.isclass.ship_xl or this.ship.isclass.ship_l">
+        <do_if value="this.ship.isclass.ship_xl or this.ship.isclass.ship_l">
+          <set_value name="$bigship"/>
+        </do_if>
+        <run_script name="if $bigship then 'ut.cac.move.gate.wrapper' else 'move.generic'" >
+          <param name="destination" value="$gate.zone"/>
           <param name="gate" value="$gate"/>
+          <param name="endintargetzone" value="true"/>
+          <param name="debugchance" value="$debugchance"/>
         </run_script>
-        <!-- move to the front of the gate  -->
-        <move_to object="this.ship" destination="$gate" forceposition="false" forcerotation="true" travel="true" chance="0"/>
-        <wait min="5s" max="10s" chance="0"/>
-        <move_to object="this.ship" destination="$gate" uselocalhighways="not this.ship.isclass.[class.ship_xl, class.ship_l]" finishonapproach="true" forceposition="false" forcerotation="true" travel="true" chance="0"/>
-        <move_to object="this.ship" destination="$gatedestination" uselocalhighways="false" abortpath="true" forcesteering="false" forceposition="false" travel="true" chance="0"/>
-        <move_gate object="this.ship" gate="$gate" abortpath="false" chance="0"/>
-        <move_to object="this.ship" destination="$gatedestination" uselocalhighways="false" abortpath="false" forcesteering="false" forceposition="false" travel="false" chance="0"/>
-        <wait chance="0"/>
-        <wait exact="200ms" chance="0"/>
-        <move_to object="this.ship" destination="this.zone" uselocalhighways="false" finishonapproach="false" abortpath="true" forceposition="false" chance="0"/>
-      </actions>
-    </attention>
-    <on_abort>
-      <request_gate ship="this.ship" gate="$gate" unlock="true" result="$result"/>
-    </on_abort>
-  </aiscript>
-<!--/replace-->
+        <do_if value="$bigship">
+          <return/>
+        </do_if>
+      </do_if>
+</replace>
