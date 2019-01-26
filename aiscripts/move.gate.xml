@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--replace sel="/*" xsi:noNamespaceSchemaLocation="http://utnas/~unitrader/XRebirthxsds/aiscripts.xsd"-->
+  <aiscript xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="move.gate" xsi:noNamespaceSchemaLocation="http://utnas/~unitrader/XRebirthxsds/aiscripts.xsd">
+    <!--
+
+  Move Gate
+  by Adrian
+  
+  Generic routine for moving through specific gate.
+
+  -->
+    <params>
+      <param name="gate" comment="Gate to use. Has to be a jump gate or a highway entry gate."/>
+      <param name="debugchance" default="0"/>
+    </params>
+    <interrupts>
+      <handler ref="TargetInvalidHandler"/>
+      
+    </interrupts>
+    <attention min="unknown">
+      <actions>
+        <label name="check"/>
+        <label name="move"/>
+        <run_script name="'ut.cac.move.gate.wrapper'">
+          <param name="gate" value="$gate"/>
+        </run_script>
+        <!-- move to the front of the gate  -->
+        <move_to object="this.ship" destination="$gate" forceposition="false" forcerotation="true" travel="true" chance="0"/>
+        <wait min="5s" max="10s" chance="0"/>
+        <move_to object="this.ship" destination="$gate" uselocalhighways="not this.ship.isclass.[class.ship_xl, class.ship_l]" finishonapproach="true" forceposition="false" forcerotation="true" travel="true" chance="0"/>
+        <move_to object="this.ship" destination="$gatedestination" uselocalhighways="false" abortpath="true" forcesteering="false" forceposition="false" travel="true" chance="0"/>
+        <move_gate object="this.ship" gate="$gate" abortpath="false" chance="0"/>
+        <move_to object="this.ship" destination="$gatedestination" uselocalhighways="false" abortpath="false" forcesteering="false" forceposition="false" travel="false" chance="0"/>
+        <wait chance="0"/>
+        <wait exact="200ms" chance="0"/>
+        <move_to object="this.ship" destination="this.zone" uselocalhighways="false" finishonapproach="false" abortpath="true" forceposition="false" chance="0"/>
+      </actions>
+    </attention>
+    <on_abort>
+      <request_gate ship="this.ship" gate="$gate" unlock="true" result="$result"/>
+    </on_abort>
+  </aiscript>
+<!--/replace-->

@@ -11,8 +11,10 @@
  Script now Assumes we are nearby the Gate on Script Start - if not it may delay  the Passage of others
 
   -->
+<!-- ToDo: ADD/RESEARCH THIS FROM VANILLA:
+        <include_interrupt_actions ref="NPCUseCase_NavApproachJumpGate" /> 
+  -->
   <params>
-    <param name="params" default="false" comment="pass a single Table filled with the wanted param Values here to make calls via list possible (always has priority)"/>
     <param name="gate" default="false" comment="Gate to go through (Must be in the same Zone)"/>
     <param name="cleargate" default="true" comment="Clear the Gate after Passage?"/>
     
@@ -25,19 +27,6 @@
   </interrupts>
   <attention min="unknown">
     <actions>
-      <!-- first decode the $params to the Variables -->
-      <do_if value="$params">
-        <do_if value="$params.$gate?">
-          <set_value name="$gate" exact="$params.$gate"/>
-        </do_if>
-        <do_if value="$params.$cleargate?">
-          <set_value name="$cleargate" exact="$params.$cleargate"/>
-        </do_if>
-        <do_if value="$params.$formationlist?">
-          <set_value name="$formationlist" exact="$params.$formationlist"/>
-        </do_if>
-      </do_if>
-      
       <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Script started with Params:\n$gate: %3 ; $cleargate: %4 $formationlist: %5'.[this.name,this.container.name,$gate,$cleargate,@$formationlist]"/>
       
       <label name="start"/>
