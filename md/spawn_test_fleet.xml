@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <mdscript xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Spawn_test_fleet" xsi:noNamespaceSchemaLocation="http://utnas/~unitrader/XRebirthxsds/md.xsd">
   <cues>
-    <cue name="Spawn" checkinterval="10s">
+    <cue name="Spawn" checktime="5ss" checkinterval="10s">
       <conditions>
         <cue_is_complete cue="md.Setup.Start"/>
       </conditions>
