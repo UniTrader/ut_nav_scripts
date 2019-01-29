@@ -11,33 +11,496 @@ Script to Dock or Park an Object
     <param name="params" default="false" comment="pass a single Table filled with the wanted param Values here to make calls via list possible (always has priority)"/>
     <param name="destination" default="null" comment="Object to Dock at, specifying a Dock here is planned"/>
     <param name="tradeoffer" default="null" comment="Tredeoffer for which a fitting Dock should be preffered (only applies to bigships)"/>
+    <param name="direct_parking" default="false" comment="NYI - direct Parking without moving to approach pos first"/>
   </params>
   <init>
   </init>
   <attention min="unknown">
     <actions>
-      <label name="docking"/>
-      <run_script name="'move.dockat'" result="$dockresult" chance="0"/>
-      <label name="parking"/>
-      <label name="wait for parking slot"/>
-      <wait chance="0"/>
-      <move_to object="this.ship" usehighways="false" destination="$destination.zone" finishonapproach="false" abortpath="this.$mayabortpath?" chance="0"/>
-      <wait max="1min" chance="0"/>
-      <wait max="5min" chance="0"/>
-      <label name="park"/>
-      <move_to object="this.ship" usehighways="false" destination="$destination.zone" finishonapproach="false" abortpath="this.$mayabortpath?" chance="0"/>
-      <move_strafe object="this.ship" destination="$destination.zone" forcerotation="true" abortpath="false" chance="0"/>
-      <move_to object="this.ship" usehighways="false" destination="$destination.zone" forcerotation="true" reverse="true" abortpath="false" chance="0"/>
-      <move_to object="this.ship" usehighways="false" destination="$destination.zone" forcerotation="true" abortpath="false" chance="0"/>
-      <label name="finish"/>
-      <do_if value="$docking_coordinator">
-        <remove_value name="$docking_coordinator.$park_queue"/>
+      <!-- first decode the $params to the Variables -->
+      <do_if value="$params">
+        <do_if value="$params.$destination?">
+          <set_value name="$destination" exact="$params.$destination"/>
+        </do_if>
       </do_if>
-      <run_script name="'ut.cac.move.dock2'" result="$retvar">
+      
+      <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Script started with Params: $destination: %3'.[this.name,this.container.name,$destination]"/>
+      
+      <!-- Verify Input and Situation -->
+<!-- => no Movement out of Zone
+      => 
+      -->
+      <do_if value="not $destination.exists">
+        <debug_text filter="error" text="'%1 %2 Destination not given or non-existent - Abort'.[this.name,this.container.name]"/>
+        <return value="false"/>
+      </do_if>
+      <do_if value="$destination.zone != this.zone and this.ship.distanceto.{$destination} gt 50km">
+        <debug_text filter="error" text="'%1 %2 Destination Zone ( %3 ) not current Zone ( %4 ) or at least nearby - Abort'.[this.name,this.container.name,$destination.zone.knownname,this.zone.knownname]"/>
+        <return value="false"/>
+      </do_if>
+      
+      <!-- Check if Destination can be docked at.. -->
+      
+      <set_command_action commandaction="commandaction.docking" param="$destination"/>
+      <do_if value="this.$ut_cac?"><set_value name="this.$ut_cac.$isactive"/></do_if>
+      
+      
+      <!-- leave formation (if there is any) as that would block our movement (from move.dockat)-->
+      <leave_formation object="this.ship" />
+      
+      <do_if value="not (this.ship.isclass.ship_xl or this.ship.isclass.ship_l)" comment="use this part if the Ship can Dock internally - preffered over external Parking">
+        <resume label="docking"/>
+      </do_if>
+      <do_else>
+        <resume label="parking"/>
+      </do_else>
+      
+      
+      <!-- ############################################################################ -->
+      <!-- ############################################################################ -->
+      <!-- Movement Steps for Docking-->
+      <label name="docking"/>
+      
+      <!-- for now simply passing on to Vanilla -->
+      <run_script name="'move.dockat'" result="$dockresult">
         <param name="destination" value="$destination"/>
-        <param name="tradeoffer" value="$tradeoffer"/>
       </run_script>
-      <return value="$retvar"/>
+      
+      
+      <resume label="finish"/>
+      
+      <!-- Movement Steps for parking -->
+      <label name="parking"/>
+      
+      <!-- prepare global coordination Vars -->
+      <do_if value="not global.$parking_queue?">
+        <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Creating Park Queue GV'.[this.name,this.container.name]"/>
+        <set_value name="global.$parking_queue" exact="table[]"/>
+      </do_if>
+      <do_if value="not global.$parking_queue.{$destination}?">
+        <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Creating Park Queue Destination List for %3'.[this.name,this.container.name,$destination.name]"/>
+        <set_value name="global.$parking_queue.{$destination}" exact="[]"/>
+      </do_if>
+      <find_tradeoffer_parking_slot name="$parkingslots" object="$destination" includeoccupied="true" refobject="this.ship" multiple="true" />
+      <do_all exact="$parkingslots.count" counter="$i" reverse="true">
+        <!-- simple filter for Trade Offers using the same Parking Slot - shold be good enough for CVs (enables usage of the unlimited Trade Dock Queue on CVs) -->
+        <do_if value="$i gt 1 and $parkingslots.{$i}.component == $parkingslots.{$i - 1}.component">
+          <remove_value name="$parkingslots.{$i}"/>
+          <continue/>
+        </do_if>
+        <do_if value="not global.$parking_queue.{$parkingslots.{$i}.component}?">
+          <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Creating Park Queue Park Slot List'.[this.name,this.container.name]"/>
+          <set_value name="global.$parking_queue.{$parkingslots.{$i}.component}" exact="[]"/>
+        </do_if>
+        <!-- check if the  first entry of each queue is valid (should eventually sort out any issues after 2 ships attempt to dock, so not checking all every time ) -->
+        <do_elseif value="global.$parking_queue.{$parkingslots.{$i}.component}.count and ( (not global.$parking_queue.{$parkingslots.{$i}.component}.{1}.exists) or global.$parking_queue.{$parkingslots.{$i}.component}.{1}.sector != $destination.sector)">
+          <debug_text filter="error" text="'%1 %2 Removing Invalid Entry %3 from Parkingspot Queue of %4'.[this.name,this.container.name,global.$parking_queue.{$parkingslots.{$i}.component}.{1},$destination]"/>
+          <remove_value name="global.$parking_queue.{$parkingslots.{$i}.component}.{1}"/>
+        </do_elseif>
+      </do_all>
+      
+      <do_if value="$parkingslots.count == 0">
+        <debug_text filter="error" text="'%1 %2 Destination has no parking Slots - Abort'.[this.name,this.container.name]"/>
+        <return value="false"/>
+      </do_if>
+      
+      <!-- check Entries in Queue if they are valid -->
+      <do_all exact="global.$parking_queue.{$destination}.count" counter="$i">
+        <do_if value="not global.$parking_queue.{$destination}.{$i}.exists or global.$parking_queue.{$destination}.{$i}.sector != $destination.sector">
+          <debug_text filter="error" text="'%1 %2 Removing Invalid Entry %3 from Queue of %4'.[this.name,this.container.name,global.$parking_queue.{$destination}.{$i},$destination]"/>
+          <remove_value name="global.$parking_queue.{$destination}.{$i}"/>
+        </do_if>
+      </do_all>
+      
+      <!-- sort into queue -->
+      <do_if value="not global.$parking_queue.{$destination}.indexof.{this.ship}">
+        <append_to_list name="global.$parking_queue.{$destination}" exact="this.ship"/>
+      </do_if>
+      
+      
+      <do_while value="global.$parking_queue.{$destination}.indexof.{this.ship}" comment="exit from loop is done via resume label=*** - regular exit is an Error">
+        <do_if value="@global.$parking_queue.{$destination}.{1} == this.ship">
+          <!-- try to park at any Slot -->
+          <do_all exact="$parkingslots.count" counter="$i">
+            <do_if value="global.$parking_queue.{$parkingslots.{$i}.component}.count == 0">
+              <append_to_list name="global.$parking_queue.{$parkingslots.{$i}.component}" exact="this.ship"/>
+              <set_value name="$parkingslot" exact="$parkingslots.{$i}"/>
+              <remove_value name="global.$parking_queue.{$destination}.{1}"/>
+              <signal_objects object="$destination" param="'parking queue update'"/>
+              <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Parking on free Slot: %3'.[this.name,this.container.name,$parkingslot.component.name]"/>
+              <resume label="park exec"/>
+            </do_if>
+          </do_all>
+          <!-- try to sort into wait queue for any slot -->
+          <do_all exact="$parkingslots.count" counter="$i">
+            <do_if value="global.$parking_queue.{$parkingslots.{$i}.component}.count == 1">
+              <append_to_list name="global.$parking_queue.{$parkingslots.{$i}.component}" exact="this.ship"/>
+              <set_value name="$parkingslot" exact="$parkingslots.{$i}"/>
+              <remove_value name="global.$parking_queue.{$destination}.{1}"/>
+              <signal_objects object="$destination" param="'parking queue update'"/>
+              <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Waiting for Slo to be freed: %3'.[this.name,this.container.name,$parkingslot.component.name]"/>
+              <resume label="park prep"/>
+            </do_if>
+          </do_all>
+          <!-- maybe add a Check here so we can put multiple Ships into the same Trade Dock Queue? like if there is only one Dock or the Ware Exchange is quite quick -->
+          <do_if value="$parkingslots.count == 1">
+            <append_to_list name="global.$parking_queue.{$parkingslots.{1}.component}" exact="this.ship"/>
+            <set_value name="$parkingslot" exact="$parkingslots.{1}"/>
+            <remove_value name="global.$parking_queue.{$destination}.{1}"/>
+            <signal_objects object="$destination" param="'parking queue update'"/>
+            <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Sorting in Queue for Slot: %3'.[this.name,this.container.name,$parkingslot.component.name]"/>
+            <resume label="park prep"/>
+          </do_if>
+        </do_if>
+        <!-- complete previous idle movement while waiting if interrupted --> 
+        <do_if value="this.ship.numwaypoints gt 1">
+          <wait>
+            <interrupt>
+              <conditions>
+                <check_any>
+                  <event_object_approaching_waypoint object="this.ship"/><!-- lastwaypoint="true" -->
+                  <event_object_signalled object="$destination" param="'parking queue update'"/>
+                </check_any>
+                <set_value name="$eventname" exact="event.name"/>
+              </conditions>
+            </interrupt>
+          </wait>
+          <do_if value="$eventname? and $eventname == 'event_object_signalled'">
+            <remove_value name="$eventname"/>
+            <continue/>
+          </do_if>
+          <remove_value name="$eventname"/>
+        </do_if>
+        <!-- some random idle movement while waiting -->
+        <create_random_position_outside_boundingbox name="$safepos" component="$destination" mindistance="this.ship.size" maxdistance="this.ship.size + $destination.size"/>
+        <get_safe_pos result="$safepos" allowyaxis="true" radius="this.ship.size" zone="this.zone" value="$safepos"/>
+        <move_to object="this.ship" destination="this.zone" uselocalhighways="false" finishonapproach="true">
+          <position value="$safepos"/>
+          <interrupt>
+            <conditions>
+              <event_object_signalled object="$destination" param="'parking queue update'"/>
+            </conditions>
+          </interrupt>
+        </move_to>
+      </do_while>
+      <!-- loop ended without jumping to park prep or park exec - so ship got thrown out of the queue - restart! -->
+      <debug_text filter="error" text="'%1 %2 Ship got removed from Destination Queue - restarting!!!'.[this.name,this.container.name]"/>
+      <resume label="parking"/>
+      
+      <!--  prepare Parking - calculate and move to approach pos (prepared for a queue per parkingslot, but not used yet) -->
+      <!-- opposed to Vanilla Waiting pos is below the parking Pos and all Ships move/Strafe upwards when moving on in the queue (EXPERIMENTAL!!!) -->
+      <label name="park prep"/>
+      <!-- save Approach and Park Pos in a Var to prevent the Ship from changing Parking direction -->
+      <get_trade_parking_pos ship="this.ship" tradedock="if true then $parkingslot else 'park prep 1'" space="$destination.zone" approach="true" position="$approachpos" rotation="$parkrot" quadrant="$approachquad"/>
+      <get_trade_parking_pos ship="this.ship" tradedock="if true then $parkingslot else 'park prep 2'" space="$destination.zone" approach="false" position="$parkpos" rotation="$parkrot" quadrant="$quadrant"/>
+      <do_if value="$approachquad != $quadrant">
+        <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Ship decided for a 180° turn on Parking prep'.[this.name,this.container.name]"/>
+      </do_if>
+      <do_if value="$destination.isclass.ship" comment="save Position of destination Ship for which the trade parking pos was calculated (in case the Ship gets moved for some reason) - this is a workaround..(also disable the colli response for the destination)">
+        <set_value name="$destination_position" exact="$destination.position"/>
+        <set_value name="$destination_rotation" exact="$destination.rotation"/>
+        <disable_collision_response object="$destination"/>
+      </do_if>
+      <remove_value name="$approachquad"/>
+      
+      
+      <do_if value="false" comment="Vanilla-like approach. Not implemented yet, but will be if issues with the new method arise for certain Objects">
+      
+      </do_if>
+      <do_else>
+        <do_while value="@global.$parking_queue.{$parkingslot.component}.{1} != this.ship">
+          <!-- first ship and current Ship only have to be accounted for in half! therefor starting with zero minus  half height of each to counter the full addition of their height in the next loop! -->
+          <do_if value="global.$parking_queue.{$parkingslot.component}.indexof.{this.ship} == 0">
+            <debug_text filter="error" text="'%1 %2 Ship got removed from Trade Port Queue - restarting!!!'.[this.name,this.container.name]"/>
+            <remove_value name="$sorted_in_approach_queue"/>
+            <remove_value name="$parkingslot"/>
+            <resume label="parking"/>
+          </do_if>
+          <set_value name="$approach_offset_y" exact="0 - (global.$parking_queue.{$parkingslot.component}.{1}.height + this.ship.height )"/>
+          <do_all exact="global.$parking_queue.{$parkingslot.component}.indexof.{this.ship}" counter="$i">
+            <set_value name="$approach_offset_y" operation="add" exact="global.$parking_queue.{$parkingslot.component}.{$i}.height * 2"/>
+          </do_all>
+          <transform_position name="$waitpos" refposition="$approachpos" refrotation="$parkrot" >
+            <position x="0m" y="0m - $approach_offset_y" z="0m"/>
+          </transform_position>
+          <do_if value="$sorted_in_approach_queue?" comment="when we are sorted into the Queue we just have to strafe upwards">
+            <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Vertical Parking - move up'.[this.name,this.container.name]"/>
+            <set_avoid_collisions object="this.ship" bigobjects="true" smallobjects="false" />
+            <do_if value="not ( this.race == race.xenon or this.race == race.drone)" comment="Computer Races sync the Move perfectly, and a bit earlier than non-computer Races">
+              <wait min="( global.$parking_queue.{$parkingslot.component}.indexof.{this.ship}  * 3s )" max="( global.$parking_queue.{$parkingslot.component}.indexof.{this.ship} * 3s ) + 2s" profile="inversebell" comment="to de-perfect-sync when the queue moves">
+                <interrupt>
+                  <conditions>
+                    <check_any>
+                      <check_all>
+                        <event_object_signalled object="$destination" param="'parking queue update'"/>
+                        <check_value value="event.param2 != null"/>
+                      </check_all>
+                      <event_object_signalled object="$parkingslot.component" param="'parking queue update'"/>
+                    </check_any>
+                    <set_value name="$interrupted"/>
+                  </conditions>
+                  <actions>
+                    <do_if value="event.object == $destination">
+                      <!-- someone just changed the parking queue - lets check if there is currently an empty parkslot and use it instead of the one we are currently waiting for -->
+                      <do_if value="global.$parking_queue.{$destination}.count == 0 and global.$parking_queue.{event.param2.component}.count == 0">
+                        <remove_value name="global.$parking_queue.{$parkingslot.component}.{global.$parking_queue.{$parkingslot.component}.indexof.{this.ship}}"/>
+                        <remove_value name="$sorted_in_approach_queue"/>
+                        <set_value name="$parkingslot" exact="event.param2"/>
+                        <resume label="park prep"/>
+                      </do_if>
+                    </do_if>
+                  </actions>
+                </interrupt>
+              </wait>
+              <do_if value="$interrupted?">
+                <remove_value name="$interrupted"/>
+                <continue/>
+              </do_if>
+            </do_if>
+            <move_strafe object="this.ship" destination="$destination.zone" forcerotation="true" abortpath="false">
+              <position value="$waitpos" />
+              <rotation value="$parkrot" />
+              <interrupt>
+                <conditions>
+                  <check_any>
+                    <check_all>
+                      <event_object_signalled object="$destination" param="'parking queue update'"/>
+                      <check_value value="event.param2 != null"/>
+                    </check_all>
+                    <event_object_signalled object="$parkingslot.component" param="'parking queue update'"/>
+                  </check_any>
+                  <set_value name="$interrupted"/>
+                </conditions>
+                <actions>
+                  <do_if value="event.object == $destination">
+                    <!-- someone just changed the parking queue - lets check if there is currently an empty parkslot and use it instead of the one we are currently waiting for -->
+                    <do_if value="global.$parking_queue.{$destination}.count == 0 and global.$parking_queue.{event.param2.component}.count == 0">
+                      <remove_value name="global.$parking_queue.{$parkingslot.component}.{global.$parking_queue.{$parkingslot.component}.indexof.{this.ship}}"/>
+                      <remove_value name="$sorted_in_approach_queue"/>
+                      <set_value name="$parkingslot" exact="event.param2"/>
+                      <resume label="park prep"/>
+                    </do_if>
+                  </do_if>
+                </actions>
+              </interrupt>
+            </move_strafe>
+            <do_if value="$interrupted?">
+              <remove_value name="$interrupted"/>
+              <continue/>
+            </do_if>
+            <wait max="10min" comment="time as fallback in case something goes wrong">
+              <interrupt>
+                <conditions>
+                  <check_any>
+                    <check_all>
+                      <event_object_signalled object="$destination" param="'parking queue update'"/>
+                      <check_value value="event.param2 != null"/>
+                    </check_all>
+                    <event_object_signalled object="$parkingslot.component" param="'parking queue update'"/>
+                  </check_any>
+                  <set_value name="$interrupted"/>
+                </conditions>
+                <actions>
+                  <do_if value="event.object == $destination">
+                    <!-- someone just changed the parking queue - lets check if there is currently an empty parkslot and use it instead of the one we are currently waiting for -->
+                    <do_if value="global.$parking_queue.{$destination}.count == 0 and global.$parking_queue.{event.param2.component}.count == 0">
+                      <remove_value name="global.$parking_queue.{$parkingslot.component}.{global.$parking_queue.{$parkingslot.component}.indexof.{this.ship}}"/>
+                      <remove_value name="$sorted_in_approach_queue"/>
+                      <set_value name="$parkingslot" exact="event.param2"/>
+                      <resume label="park prep"/>
+                    </do_if>
+                  </do_if>
+                </actions>
+              </interrupt>
+            </wait>
+            <do_if value="$interrupted?">
+              <remove_value name="$interrupted"/>
+              <continue/>
+            </do_if>
+          </do_if>
+          <do_else>
+            <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Vertical Parking - sorting in queue'.[this.name,this.container.name]"/>
+            <move_to object="this.ship" destination="$destination.zone" uselocalhighways="false" forcerotation="true" abortpath="true">
+              <position value="$waitpos" />
+              <rotation value="$parkrot" />
+              <interrupt>
+                <conditions>
+                  <check_any>
+                    <check_all>
+                      <event_object_signalled object="$destination" param="'parking queue update'"/>
+                      <check_value value="event.param2 != null"/>
+                    </check_all>
+                    <event_object_signalled object="$parkingslot.component" param="'parking queue update'"/>
+                  </check_any>
+                  <set_value name="$interrupted"/>
+                </conditions>
+                <actions>
+                  <do_if value="event.object == $destination">
+                    <!-- someone just changed the parking queue - lets check if there is currently an empty parkslot and use it instead of the one we are currently waiting for -->
+                    <do_if value="global.$parking_queue.{$destination}.count == 0 and global.$parking_queue.{event.param2.component}.count == 0">
+                      <remove_value name="global.$parking_queue.{$parkingslot.component}.{global.$parking_queue.{$parkingslot.component}.indexof.{this.ship}}"/>
+                      <remove_value name="$sorted_in_approach_queue"/>
+                      <set_value name="$parkingslot" exact="event.param2"/>
+                      <resume label="park prep"/>
+                    </do_if>
+                  </do_if>
+                </actions>
+              </interrupt>
+            </move_to>
+            <do_if value="$interrupted?">
+              <remove_value name="$interrupted"/>
+              <continue/>
+            </do_if>
+            <set_value name="$sorted_in_approach_queue"/>
+            <!-- is we are second in queue and first is still busy approaching - try to get him yielding his queue position(additional checks in signal handler) -->
+            <do_if value="global.$parking_queue.{$parkingslot.component}.indexof.{this.ship} == 2">
+              <signal_objects object="global.$parking_queue.{$parkingslot.component}.{1}" param="'park queue swap request'" param2="this.ship"/>
+            </do_if>
+          </do_else>
+        </do_while>
+      </do_else>
+      
+      <!-- Execute parking - at this point the parking slot is set in stone! -->
+      <label name="park exec"/>
+      <!-- if we jumped directly here and dont have an approach/park pos get it now -->
+      <do_if value="not $approachpos? or not $parkpos? or not $parkrot?">
+        <get_trade_parking_pos ship="this.ship" tradedock="if true then $parkingslot else 'park prep 1'" space="$destination.zone" approach="true" position="$approachpos" rotation="$parkrot" quadrant="$approachquad"/>
+        <get_trade_parking_pos ship="this.ship" tradedock="if true then $parkingslot else 'park prep 2'" space="$destination.zone" approach="false" position="$parkpos" rotation="$parkrot" quadrant="$quadrant"/>
+        <do_if value="$approachquad != $quadrant">
+          <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Ship decided for a 180° turn on Parking exec'.[this.name,this.container.name]"/>
+        </do_if>
+        <do_if value="$destination.isclass.ship" comment="save Position of destination Ship for which the trade parking pos was calculated (in case the Ship gets moved for some reason) - this is a workaround.. (also disable the collission response for the destination)">
+          <set_value name="$destination_position" exact="$destination.position"/>
+          <set_value name="$destination_rotation" exact="$destination.rotation"/>
+          <disable_collision_response object="$destination"/>
+        </do_if>
+        <remove_value name="$approachquad"/>
+      </do_if>
+      
+      <connect_to_trade_location ship="this.ship" tradedock="if true then $parkingslot else 'park 1'" result="$success" />
+      <do_while value="not $success">
+        <disconnect_from_trade_location ship="this.ship" comment="Ships which couldnt connect complain that they are still connected to the Station they wanted to connect to unsuccesfully - attempting to fix it"/>
+        <!-- check regulary if our parking Spot still works -->
+        <do_if value="not $parkingslot.component.isoperational">
+          <remove_value name="$parkingslot"/>
+          <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Parking Slot non-operational - restarting (Connect Case)'.[this.name,this.container.name]"/>
+          <resume label="parking" />
+        </do_if>
+        <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Waiting for Parking Slot to be freed'.[this.name,this.container.name]"/>
+        <wait max="5min">
+          <interrupt>
+            <conditions>
+              <check_any>
+                <event_object_signalled object="$parkingslot.component" param="'parking queue update'"/>
+                <event_object_signalled object="$destination" param="'parking queue update'"/>
+              </check_any>
+            </conditions>
+          </interrupt>
+        </wait>
+        <connect_to_trade_location ship="this.ship" tradedock="if true then $parkingslot else 'Final move 1'" result="$success" />
+      </do_while>
+      <do_if value="not $sorted_in_approach_queue? " comment="we are not sorted into the Queue or the Station is incompatible with it - vanilla approach">
+        <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Vanilla-like Parking - Flying to Approach Pos'.[this.name,this.container.name]"/>
+        <!-- Signal Followers where we attempt to Park so they can wait nearby - also in Update Case when Parkpos changed-->
+        <signal_objects object="this.ship" param="'travel dockat'" param2="[$destination,$parkingslot,$approachpos]" param3="null" comment="not waiting - no prep group needed"/>
+        <move_to object="this.ship" destination="$destination.zone" uselocalhighways="false" finishonapproach="false" abortpath="true">
+          <!-- NOTE: finishonapproach currently causes problems with position jumping for the next move_to unless there is a <wait /> -->
+          <position value="$approachpos" />
+          <rotation value="$parkrot" />
+          <interrupt comment="swap Queue Position with another Ship if its earlier ready to park">
+            <conditions>
+              <event_object_signalled object="this.ship" param="'park queue swap request'"/>
+              <check_value value="global.$parking_queue.{$parkingslot.component}.{2} == event.param2"/>
+              <check_value value="this.ship.distanceto.{$parkingslot.component} gt 5km"/>
+            </conditions>
+            <actions>
+              <disconnect_from_trade_location ship="this.ship" />
+              <set_value name="global.$parking_queue.{$parkingslot.component}.{1}" exact="event.param2"/>
+              <set_value name="global.$parking_queue.{$parkingslot.component}.{2}" exact="this.ship"/>
+              <signal_objects object="$parkingslot.component" param="'parking queue update'" param2="$parkingslot"/>
+              <resume label="park prep"/>
+            </actions>
+          </interrupt>
+        </move_to>
+      </do_if>
+      <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Parking - last Step'.[this.name,this.container.name]"/>
+      <set_avoid_collisions object="this.ship" bigobjects="false" smallobjects="false"/>
+      <do_if value="($quadrant == quadrant.left) or ($quadrant == quadrant.right)">
+        <move_strafe object="this.ship" destination="$destination.zone" forcerotation="true" abortpath="false">
+          <position value="$parkpos" />
+          <rotation value="$parkrot" />
+        </move_strafe>
+      </do_if>
+      <do_else>
+        <do_if value="$sorted_in_approach_queue?">
+          <move_strafe object="this.ship" destination="$destination.zone" forcerotation="true" abortpath="false">
+            <position value="$approachpos" />
+            <rotation value="$parkrot" />
+          </move_strafe>
+        </do_if>
+        <do_if value="$quadrant == quadrant.back">
+          <move_to object="this.ship" destination="$destination.zone" uselocalhighways="false" forcerotation="true" reverse="true" abortpath="false">
+            <position value="$parkpos" />
+            <rotation value="$parkrot" />
+          </move_to>
+        </do_if>
+        <do_else>
+          <move_to object="this.ship" destination="$destination.zone" uselocalhighways="false" forcerotation="true" abortpath="false">
+            <position value="$parkpos" />
+            <rotation value="$parkrot" />
+          </move_to>
+        </do_else>
+      </do_else>
+      <set_avoid_collisions object="this.ship" bigobjects="true" smallobjects="false"/>
+      <do_if value="$destination_position? and $destination.distanceto.{$destination_position} gt 50m">
+        <debug_text filter="error" text="'%1 %2 Destination was moved during Approach - forcing it back to original!!'.[this.name,this.container.name]"/>
+        <warp object="$destination" zone="this.zone">
+          <position value="$destination_position"/>
+          <rotation value="$destination_rotation"/>
+        </warp>
+      </do_if>
+      
+      <!-- check regulary if our parking Spot still works -->
+      <do_if value="not $parkingslot.component.isoperational">
+        <remove_value name="$parkingslot"/>
+        <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Parking Slot non-operational - restarting (finish Case)'.[this.name,this.container.name]"/>
+        <resume label="parking" />
+      </do_if>
+      
+      <!-- Just to be safe - Force final Position -->
+      <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Forcing Position'.[this.name,this.container.name]"/>
+      <warp object="this.ship" zone="$destination.zone">
+        <position value="$parkpos"/>
+        <rotation value="$parkrot"/>
+      </warp>
+      
+      
+      <!-- Signal next Ship in Queue to move to Advance -->
+      <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Sending Parking Queue Update'.[this.name,this.container.name]"/>
+      <signal_objects object="$parkingslot.component" param="'parking queue update'" param2="$parkingslot"/>
+      <signal_objects object="$destination" param="'parking queue update'" param2="$parkingslot" delay="1s"/>
+      
+      
+      <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Parking done'.[this.name,this.container.name]"/>
+      
+      <label name="finish"/>
+      <set_avoid_collisions object="this.ship" bigobjects="true" smallobjects="false"/>
+      <return value="true"/>
     </actions>
   </attention>
+  <on_abort>
+    <!-- Notify everyone that the Queue just changed -->
+    <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Sending Parking Queue Update (Abort Case)'.[this.name,this.container.name]"/>
+    <signal_objects object="$parkingslot.component" param="'parking queue update'" param2="$parkingslot"/>
+    <signal_objects object="$destination" param="'parking queue update'" param2="$parkingslot" delay="1s"/>
+    <disconnect_from_trade_location ship="this.ship" />
+    <set_avoid_collisions object="this.ship" bigobjects="true" smallobjects="false"/>
+    <!-- clear queues -->
+    <do_if value="global.$parking_queue.{$destination}.indexof.{this.ship}">
+      <remove_value name="global.$parking_queue.{$destination}.{global.$parking_queue.{$destination}.indexof.{this.ship}}"/>
+    </do_if>
+    <do_if value="$parkingslot.component? and global.$parking_queue.{$parkingslot.component}.indexof.{this.ship}">
+      <remove_value name="global.$parking_queue.{$parkingslot.component}.{global.$parking_queue.{$parkingslot.component}.indexof.{this.ship}}"/>
+    </do_if>
+  </on_abort>
 </aiscript>

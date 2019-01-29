@@ -23,10 +23,10 @@
       <stop_boost object="this.ship" chance="$stopboost * 100"/>
       
       <do_if value="$stopshoot">
-        <stop_shooting object="this.ship" slot="tag.primary_slot" />
-        <stop_shooting object="this.ship" slot="tag.secondary_slot" />
+        <stop_shooting object="this.ship" primary="true"/>
+        <stop_shooting object="this.ship" primary="false"/>
         <!--stop_attack object="this.ship" target="?????"/-->
-        <activate_battlestate object="this.ship" state="battlestate_jumpprep" comment="no green alert?"/>
+        <!--<activate_battlestate object="this.ship" state="battlestate_jumpprep" comment="no green alert?"/>-->
       </do_if>
       
       <!-- stop_observation object="this.ship" target="$target" /-->
@@ -84,7 +84,7 @@
         <!--stop_shooting object="this.ship" slot="tag.primary_slot" />
         <stop_shooting object="this.ship" slot="tag.secondary_slot" /-->
         <!--stop_attack object="this.ship" target="?????"/-->
-        <activate_battlestate object="this.ship" state="battlestate_jumpprep" comment="no green alert?"/>
+        <!--<activate_battlestate object="this.ship" state="battlestate_jumpprep" comment="no green alert?"/>-->
       </do_if>
       
       <!-- stop_observation object="this.ship" target="$target" /-->

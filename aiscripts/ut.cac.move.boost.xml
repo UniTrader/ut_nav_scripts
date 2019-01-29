@@ -335,7 +335,7 @@
           <wait sinceversion="30" resume="true">
             <interrupt>
               <conditions>
-                <event_object_arrived_at_waypoint object="this.ship" lastwaypoint="true"/>
+                <event_object_arrived_at_waypoint object="this.ship"/><!-- lastwaypoint="true" -->
               </conditions>
             </interrupt>
           </wait>
@@ -345,8 +345,8 @@
             <interrupt>
               <conditions>
                 <check_any>
-                  <event_object_approaching_waypoint object="this.ship" lastwaypoint="true"/>
-                  <event_object_arrived_at_waypoint object="this.ship" lastwaypoint="true"/>
+                  <event_object_approaching_waypoint object="this.ship"/><!-- lastwaypoint="true" -->
+                  <event_object_arrived_at_waypoint object="this.ship"/><!-- lastwaypoint="true" -->
                 </check_any>
               </conditions>
             </interrupt>
@@ -432,11 +432,11 @@
         <precache_hint zone="$targetzone"/>
       </do_if>
       
-      <set_avoid_collisions object="this.ship" enabled="false"/>
+      <set_avoid_collisions object="this.ship" bigobjects="false" smallobjects="false"/>
       <do_if value="not ( this.race == race.xenon or this.race == race.drone)" comment="Computer Races sync the Start perfectly, and a bit earlier than non-computer Races">
         <wait min="100ms" max="2s" profile="inversebell" sinceversion="30" comment="to de-perfect-sync Ships in Group Boosts"/>
       </do_if>
-      <move_to object="this.ship" destination="$targetzone" usehighways="false" forceposition="false" boost="true" abortpath="$abortpath">
+      <move_to object="this.ship" destination="$targetzone" uselocalhighways="false" forceposition="false" boost="true" abortpath="$abortpath">
         <position value="$targetpos" />
         <interrupt_after_time time="100ms"/>
       </move_to>
@@ -446,8 +446,8 @@
           <interrupt>
             <conditions>
               <check_any>
-               <event_object_approaching_waypoint object="this.ship" lastwaypoint="true"/>
-                <event_object_arrived_at_waypoint object="this.ship" lastwaypoint="true"/>
+               <event_object_approaching_waypoint object="this.ship"/><!-- lastwaypoint="true" -->
+                <event_object_arrived_at_waypoint object="this.ship"/><!-- lastwaypoint="true" -->
               </check_any>
             </conditions>
             <actions>
@@ -467,7 +467,7 @@
           </interrupt>
         </wait>
       </do_while>
-      <set_avoid_collisions object="this.ship" enabled="true"/>
+      <set_avoid_collisions object="this.ship" bigobjects="true" smallobjects="false"/>
       <!-- wait till we are almost there - event_approaching_waypoint usually triggers too early, instead wait till 2-5 seconds before estimated arrival  -->
       <do_if value="@$temp_object.exists">
         <destroy_object object="$temp_object" explosion="false"/>
@@ -483,7 +483,7 @@
               <conditions>
                 <check_any>
                   <event_object_changed_zone object="this.ship" zone="$targetzone"/>
-                  <event_object_arrived_at_waypoint object="this.ship" lastwaypoint="true"/>
+                  <event_object_arrived_at_waypoint object="this.ship"/><!-- lastwaypoint="true" -->
                 </check_any>
               </conditions>
             </interrupt>
@@ -510,7 +510,7 @@
               <conditions>
                 <check_any>
                   <event_object_changed_zone object="this.ship" zone="$targetzone"/>
-                  <event_object_arrived_at_waypoint object="this.ship" lastwaypoint="true"/>
+                  <event_object_arrived_at_waypoint object="this.ship"/><!-- lastwaypoint="true" -->
                 </check_any>
               </conditions>
             </interrupt>
@@ -545,6 +545,6 @@
       </do_if>
     </do_if>
     <signal_objects object="this.ship" param="'travel aborted'"/>
-    <set_avoid_collisions object="this.ship" enabled="true"/>
+    <set_avoid_collisions object="this.ship" bigobjects="true" smallobjects="false"/>
   </on_abort>
 </aiscript>

@@ -203,7 +203,7 @@ with a given Rotation or Orientation
         <wait sinceversion="30">
           <interrupt>
             <conditions>
-              <event_object_arrived_at_waypoint object="this.ship" lastwaypoint="true"/>
+              <event_object_arrived_at_waypoint object="this.ship"/><!-- lastwaypoint="true" -->
             </conditions>
           </interrupt>
         </wait>

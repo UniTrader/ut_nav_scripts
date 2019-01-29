@@ -148,7 +148,7 @@ ToDo:
           <do_all exact="$beacons.count">
             <set_value name="$beacon" exact="$beacons.random"/>
             <find_object name="$enemy" space="$beacon.zone" knownto="this.owner" >
-              <match_relation object="this.ship" comparison="le" relation="kill"/>
+              <match_relation_to object="this.ship" comparison="le" relation="kill"/>
               <match_size min="100m"/>
             </find_object>
             <!-- get the first beacon without enemies nearby (fallback in case there are enemies everywhere is the last one checked ) -->
@@ -191,7 +191,7 @@ ToDo:
               <set_value name="$distance" exact="$destination.distanceto.{$beacons.{$i}}"/>
               <set_value name="$nearbeacon"/>
               <find_object name="$enemy" space="$beacons.{$i}.zone" knownto="this.owner" >
-                <match_relation object="this.ship" comparison="le" relation="kill"/>
+                <match_relation_to object="this.ship" comparison="le" relation="kill"/>
                 <match_size min="100m"/>
               </find_object>
               <do_if value="not $enemy.exists">
@@ -256,7 +256,7 @@ ToDo:
       <do_if value="$type == 'object'">
         <set_value name="$beacon" exact="$destination"/>
         <find_object name="$enemy" space="$beacon.zone" knownto="this.owner" >
-          <match_relation object="this.ship" comparison="le" relation="kill"/>
+          <match_relation_to object="this.ship" comparison="le" relation="kill"/>
           <match_size min="100m"/>
         </find_object>
         <do_if value="not $enemy.exists">
@@ -407,11 +407,12 @@ ToDo:
       <do_if value="not ( this.race == race.xenon or this.race == race.drone)" comment="Computer Races sync the Start perfectly, and a bit earlier than non-computer Races">
         <wait min="100ms" max="3s" sinceversion="30" comment="de-perfect perfect synchromisation"/>
       </do_if>
-      <jump result="$firstresult" object="this.ship" zone="$beacon.zone" ignorefuel="$ignorefuel" commandaction="false" >
+      <!-- ToDo: Implement alternate Jump method if this doesnt get re-introduced -->
+      <!--jump result="$firstresult" object="this.ship" zone="$beacon.zone" ignorefuel="$ignorefuel" commandaction="false" >
         <safepos allowyaxis="true" value="$beacon.position" radius="this.ship.size"/>
         <orientation refobject="$beacon" orientation="look_away"/>
         <interrupt_after_time time="0s"/>
-      </jump>
+      </jump-->
       <set_value name="$result" exact="@$firstresult"/>
       <do_if value="$jumpdrive.cooldowntimeleft">
         <debug_text filter="error" text="'%1 %2 JD Charge failure detected - doing fallback warp and skip all movement stuff during Jump'.[this.name,this.container.name]"/>
@@ -428,9 +429,9 @@ ToDo:
           <interrupt>
             <conditions>
               <check_any>
-                <event_object_jump_completed object="this.ship"/>
+                <!--event_object_jump_completed object="this.ship"/-->
                 <event_object_changed_zone object="this.ship" zone="$beacon.zone" comment="workaround because jump_completed doesnt seem to trigger"/>
-                <event_object_jump_aborted object="this.ship"/>
+                <!--event_object_jump_aborted object="this.ship"/-->
               </check_any>
             </conditions>
             <actions>
@@ -452,9 +453,9 @@ ToDo:
             <interrupt>
               <conditions>
                 <check_any>
-                  <event_object_jump_completed object="this.ship"/>
+                  <!--event_object_jump_completed object="this.ship"/-->
                   <event_object_changed_zone object="this.ship" zone="$beacon.zone" comment="workaround because jump_completed doesnt seem to trigger"/>
-                  <event_object_jump_aborted object="this.ship"/>
+                  <!--event_object_jump_aborted object="this.ship"/-->
                 </check_any>
               </conditions>
               <actions>
@@ -537,7 +538,7 @@ ToDo:
   <on_abort>
     <!-- Abort Jump -->
     <do_if value="event.name != 'event_object_destroyed'">
-      <abort_jump object="this.ship" />
+      <!--abort_jump object="this.ship" /-->
     </do_if>
     <!-- remove Effect -->
     <do_if value="$slowcharge?">

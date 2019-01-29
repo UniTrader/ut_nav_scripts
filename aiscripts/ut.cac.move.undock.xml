@@ -114,7 +114,7 @@ Script to Dock or Park an Object
             </do_else>
           </do_elseif>
         </do_if>
-        <set_avoid_collisions object="this.ship" enabled="false"/>
+        <set_avoid_collisions object="this.ship" bigobjects="false" smallobjects="false"/>
         <do_if value="($quadrant == quadrant.left) or ($quadrant == quadrant.right)">
           <move_strafe object="this.ship" destination="$undockfrom.zone" abortpath="false" finishonapproach="true">
             <position value="$undockpos"/>
@@ -154,9 +154,9 @@ Script to Dock or Park an Object
         <!-- Removed because of restructure: move out of the Way of the next ship if someone is waiting, then Signal Dock is free -->
         <do_if value="false" comment="$undockfrom.exists and $undockfrom.tradenpc.exists and $undockfrom.tradenpc.$park_queue? and $undockfrom.tradenpc.$park_queue.{$freeslot.component}?">
           <get_safe_pos result="$safepos" object="this.ship" zone="this.zone" radius="this.ship.size" directionobject="this.ship" direction="$unparkquadrants.{1}" direction2="$unparkquadrants.{2}" ignored="$undockfrom" min="this.ship.size + $undockfrom.tradenpc.$park_queue.{$freeslot.component}.size"/>
-          <move_to destination="this.zone" object="this.ship" usehighways="false" forceposition="false" abortpath="false" finishonapproach="true"/>
+          <move_to destination="this.zone" object="this.ship" uselocalhighways="false" forceposition="false" abortpath="false" finishonapproach="true"/>
         </do_if>
-        <set_avoid_collisions object="this.ship" enabled="true" />
+        <set_avoid_collisions object="this.ship" bigobjects="true" smallobjects="false"/>
         
         <!-- just in case, move to a safepos -->
         <!--Don't ignore this ship. Use it to avoid finding a safepos in the parking position.-->
@@ -170,11 +170,11 @@ Script to Dock or Park an Object
           <get_safe_pos object="this.ship" radius="this.ship.size * 1.5" zone="this.zone" directionobject="this.ship" direction="$unparkquadrants.{1}" direction2="$unparkquadrants.{2}" angle="45deg" result="$safepos"/>
         </do_else>
         <set_value name="this.$mayabortpath" comment="tell following movement Script that the remainder of the Path is irrelevant"/>
-        <move_to destination="this.zone" object="this.ship" usehighways="false" forceposition="false" abortpath="false" finishonapproach="true">
+        <move_to destination="this.zone" object="this.ship" uselocalhighways="false" forceposition="false" abortpath="false" finishonapproach="true">
           <position value="$safepos"/>
           <interrupt>
             <conditions>
-              <event_object_approaching_waypoint object="this.ship" lastwaypoint="false"/>
+              <event_object_approaching_waypoint object="this.ship"/><!-- lastwaypoint="false" -->
             </conditions>
             <actions>
               <remove_value name="this.$mayabortpath"/>
@@ -198,7 +198,7 @@ Script to Dock or Park an Object
     <!-- Signal next Ship in Queue to move to prep Pos -->
     <signal_objects object="$freeslot.component" param="'parking queue update'" param2="$freeslot"/>
     <signal_objects object="$undockfrom" param="'parking queue update'" param2="$freeslot" delay="1s"/>
-    <set_avoid_collisions object="this.ship" enabled="true" />
+    <set_avoid_collisions object="this.ship" bigobjects="true" smallobjects="false" />
     <clear_collision_filter object="this.ship"/>
     <!-- clear queues -->
     <do_if value="global.$parking_queue.{$undockfrom}.indexof.{this.ship}">

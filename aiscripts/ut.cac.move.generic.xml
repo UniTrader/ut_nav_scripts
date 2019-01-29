@@ -20,31 +20,6 @@
     <param name="endintargetspace" default="false" comment="complete this script if we have the correct Space context, no matter where (may be Cluster, Sector or Zone, will resolve to Zone if an Object is the destination)"/>
     <param name="exitonneworder" default="false" comment="Exit immediately when receiving a new Order. If set to a Number of 2 or greater this is the Number of Orders the this.{$orderlist} has to contain before aborting (since 1 is always this Script)"/>
   </params>
-  <init>
-    <!-- first turn params param into the real params -->
-    <do_if value="$params.$destination?">
-      <set_value name="$destination" exact="$params.$destination"/>
-    </do_if>
-    <do_if value="$params.$position?">
-      <set_value name="$position" exact="$params.$position"/>
-    </do_if>
-    <do_if value="$params.$rotation?">
-      <set_value name="$rotation" exact="$params.$rotation"/>
-    </do_if>
-    <do_if value="$params.$lookat?">
-      <set_value name="$lookat" exact="$params.$lookat"/>
-    </do_if>
-    <do_if value="$params.$endintargetspace?">
-      <set_value name="$endintargetspace" exact="$params.$endintargetspace"/>
-    </do_if>
-    <do_if value="$params.$exitonneworder?">
-      <set_value name="$exitonneworder" exact="$params.$exitonneworder"/>
-    </do_if>
-    <!-- confirm that Destination is Valid - will be re-checked and exited in beginning of main Script -->
-    <do_if value="not $destination.exists">
-      <debug_text filter="general" text="'%1 %2 Destination not existent: %3 %4'.[this.name,this.container.name,@$destination,@$destination.knownname]"/>
-    </do_if>
-  </init>
   <interrupts>
     <library>
       <handler name="ut_cac_follow_signalling" comment="Handler for Navigation Signals provided by this Script for usage in Follow and Escort Scripts">
@@ -206,6 +181,31 @@
     </handler>
     <handler ref="ut_cac_exitonneworder"/>
   </interrupts>
+  <init>
+    <!-- first turn params param into the real params -->
+    <do_if value="$params.$destination?">
+      <set_value name="$destination" exact="$params.$destination"/>
+    </do_if>
+    <do_if value="$params.$position?">
+      <set_value name="$position" exact="$params.$position"/>
+    </do_if>
+    <do_if value="$params.$rotation?">
+      <set_value name="$rotation" exact="$params.$rotation"/>
+    </do_if>
+    <do_if value="$params.$lookat?">
+      <set_value name="$lookat" exact="$params.$lookat"/>
+    </do_if>
+    <do_if value="$params.$endintargetspace?">
+      <set_value name="$endintargetspace" exact="$params.$endintargetspace"/>
+    </do_if>
+    <do_if value="$params.$exitonneworder?">
+      <set_value name="$exitonneworder" exact="$params.$exitonneworder"/>
+    </do_if>
+    <!-- confirm that Destination is Valid - will be re-checked and exited in beginning of main Script -->
+    <do_if value="not $destination.exists">
+      <debug_text filter="general" text="'%1 %2 Destination not existent: %3 %4'.[this.name,this.container.name,@$destination,@$destination.knownname]"/>
+    </do_if>
+  </init>
   <attention min="unknown">
     <actions>
       <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Script started with Params:\n$destination: %3 , $position: %4 , $rotation: %5 , $lookat: %6  , $endintargetspace: %7'.[this.name,this.container.name,$destination.knownname,$position,$rotation,$lookat,$endintargetspace]"/>
@@ -513,7 +513,7 @@
             <conditions>
               <check_any>
                 <event_object_changed_zone object="$destination"/>
-                <event_object_arrived_at_waypoint object="$destination" lastwaypoint="false"/>
+                <event_object_arrived_at_waypoint object="$destination"/><!-- lastwaypoint="false"-->
               </check_any>
             </conditions>
           </interrupt>
