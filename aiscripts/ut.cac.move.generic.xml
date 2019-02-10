@@ -123,7 +123,7 @@
           </do_elseif>
           <do_elseif value="event.param == 'travel gate prep'">
             <!-- interrupt with Gate Passage script -->
-            <run_interrupt_script name="'ut.cac.move.gate2'" abortscripts="true" resume="start">
+            <run_interrupt_script name="'ut.cac.move.gate'" abortscripts="true" resume="start">
               <param name="gate" value="event.param2.{1}"/>
               <param name="queue_position" value="event.param2.{2}"/>
               <param name="passage_group" value="event.param3"/>
@@ -447,7 +447,7 @@
               <!-- JUMP!! -->
               <debug_text filter="error" text="'%1 %2 Warping to %3 as fallback - should not happen yet!!!'.[this.name,this.container.name,this.$waypoint.knownname]"/>
               <warp object="this.ship" sector="this.waypoint"><safepos/></warp>
-              <do_if value="false">
+              <do_if value="false" comment="disabled for X4">
               <run_script name="'ut.cac.move.jump'" result="$result">
                 <param name="destination" value="this.$waypoint"/>
               </run_script>
@@ -461,6 +461,7 @@
           <do_elseif value="this.$waypoint.isclass.gate or this.$waypoint.isclass.highwayentrygate">
             
             <!-- Jump to Gate sector -->
+            <do_if value="false" comment="disabled for X4">
             <find_object name="$beacon" space="this.$waypoint.zone" class="class.jumpbeacon" knownto="this.owner" checkoperational="true" chance="@this.$ut_cac.$insectorjump * 100" comment="if beacon is in Target Zone consider IS-Jump"/>
             <do_if value="this.sector != this.$waypoint.sector or @$beacon.exists">
               <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Jumping to nearest Jumpbeacon to %3 for gate passage'.[this.name,this.container.name,this.$waypoint.knownname]"/>
@@ -471,6 +472,7 @@
                 <debug_text filter="error" text="'Move Gate - Jump Failed! Destination: %1 / %2 Current Sector/Zone: %3 / %4 - restarting'.[@this.$waypoint.sector.name,this.$waypoint.name,this.sector.name,this.zone.name]"/>
                 <resume label="start"/>
               </do_if>
+            </do_if>
             </do_if>
             
             <!-- Boost to Gate Position -->
@@ -489,7 +491,7 @@
             
             <!-- Move through Gate -->
             <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 moving through Gate in %3'.[this.name,this.container.name,this.$waypoint.zone.knownname]"/>
-            <run_script name="'ut.cac.move.gate2'">
+            <run_script name="'ut.cac.move.gate'">
               <param name="gate" value="this.$waypoint"/>
             </run_script>
             <do_if value="not this.ship.hascontext.{this.$waypoint.destination}">
@@ -500,6 +502,7 @@
           <do_elseif value="this.$waypoint.isclass.zone">
             <!-- next is the Target Zone/Sector - First jump to the closest Beacon (if necesary), then go to Fine Movement for the Destination (with Boosting) -->
             <!-- ToDo: check ii we could save a bit time with IS-Jumping-->
+            <do_if value="false" comment="disabled for X4">
             <do_if value="this.$waypoint.sector != this.sector or @this.$ut_cac.$insectorjump">
               <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Last Waypoint, Jumping to closest Zone %3'.[this.name,this.container.name,this.$waypoint.knownname]"/>
               <run_script name="'ut.cac.move.jump'" result="$result">
@@ -509,6 +512,7 @@
                 <debug_text filter="error" text="'Move Zone - Jump Failed! Destination: %1 / %2 Current Sector/Zone: %3 / %4 - restarting'.[@this.$waypoint.sector.name,this.$waypoint.name,this.sector.name,this.zone.name]"/>
                 <resume label="start"/>
               </do_if>
+            </do_if>
             </do_if>
             <resume label="fine movement"/>
             <return/>
