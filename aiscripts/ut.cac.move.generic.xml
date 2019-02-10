@@ -351,7 +351,7 @@
               <do_if value="$highways.{$i}.issuperhighway and $highways.{$i}.origin.sector == $waypoints.{$id}">
                 <set_value name="$gate" exact="$highways.{$i}.entry"/>
                 <debug_text filter="general" text="'Replaced Sector with Entrygate:'"/>
-                <debug_text filter="general" text="'Gate Search: Original: %1 // %2 ; Search1: %3 // %4 // %5 ; Search2: %6 // %7 // %8'.[$gate.class,$gate.knownname,$search1.class,$search1.knownnanme,$search1 == $gate,$search2.class,$search2.knownnanme,$search2 == $gate]"/>
+                <debug_text filter="general" text="'Gate Search: Original: %1 // %2 ; Search1: %3 // %4 // %5 ; Search2: %6 // %7 // %8'.[$gate.class,$gate.knownname,@$search1.class,@$search1.knownname,@$search1 == $gate,@$search2.class,@$search2.knownname,@$search2 == $gate]"/>
                 <set_value name="$waypoints.{$id}" exact="$gate"/>
                 <break/>
               </do_if>
@@ -360,13 +360,13 @@
           <do_elseif value="$waypoints.{$id}.isclass.sector and $waypoints.{$id+1}.isclass.gate">
             <do_if value="$waypoints.{$id} == $waypoints.{$id+1}.sector">
                 <debug_text filter="general" text="'Removing Sector because next Entry is a Gate in there'"/>
-                <debug_text filter="general" text="'Sector: %1 // %2 ; Gate: %3 // %4 // %5'.[$waypoints.{$id}.class,$waypoints.{$id}.knownname,$waypoints.{$id+1}.class,$waypoints.{$id+1}.knownnanme]"/>
+                <debug_text filter="general" text="'Sector: %1 // %2 ; Gate: %3 // %4 // %5'.[$waypoints.{$id}.class,$waypoints.{$id}.knownname,$waypoints.{$id+1}.class,$waypoints.{$id+1}.knownname,$waypoints.{$id+1}.sector.knownname]"/>
                 <remove_value name="$waypoints.{$id}"/>
                 <set_value name="$id" operation="subtract" comment="just removed an entry - dont advance"/>
             </do_if>
             <do_else>
                 <debug_text filter="error" text="'Next Gate not Contained in Sector - will still remove the Sector, but will send the ship through half the galaxy in Slowmo!!!'"/>
-                <debug_text filter="error" text="'Sector: %1 // %2 ; Gate: %3 // %4 // %5'.[$waypoints.{$id}.class,$waypoints.{$id}.knownname,$waypoints.{$id+1}.class,$waypoints.{$id+1}.knownnanme]"/>
+                <debug_text filter="error" text="'Sector: %1 // %2 ; Gate: %3 // %4 // %5'.[$waypoints.{$id}.class,$waypoints.{$id}.knownname,$waypoints.{$id+1}.class,$waypoints.{$id+1}.knownname,$waypoints.{$id+1}.sector.knownname]"/>
                 <remove_value name="$waypoints.{$id}"/>
                 <set_value name="$id" operation="subtract" comment="just removed an entry - dont advance"/>
             </do_else>
@@ -374,12 +374,12 @@
           <do_elseif value="$waypoints.{$id}.isclass.gate and $waypoints.{$id+1}.isclass.gate">
             <do_if value="$waypoints.{$id}.gate == $waypoints.{$id+1}">
                 <debug_text filter="general" text="'Two connected Gates - removing Exit'"/>
-                <debug_text filter="general" text="'Start: %1 // %2 ; Destination: %3 // %4 // %5'.[$waypoints.{$id}.class,$waypoints.{$id}.knownname,$waypoints.{$id+1}.class,$waypoints.{$id+1}.knownnanme]"/>
+                <debug_text filter="general" text="'Start: %1 // %2 ; Destination: %3 // %4 // %5'.[$waypoints.{$id}.class,$waypoints.{$id}.knownname,$waypoints.{$id+1}.class,$waypoints.{$id+1}.knownname,$waypoints.{$id+1}.sector.knownname]"/>
                 <remove_value name="$waypoints.{$id+1}"/>
             </do_if>
             <do_else>
                 <debug_text filter="error" text="'Two unconnected Gates - doing nothing!!'"/>
-                <debug_text filter="error" text="'Gate1: %1 // %2 ; Gate2: %3 // %4 // %5'.[$waypoints.{$id}.class,$waypoints.{$id}.knownname,$waypoints.{$id+1}.class,$waypoints.{$id+1}.knownnanme]"/>
+                <debug_text filter="error" text="'Gate1: %1 // %2 ; Gate2: %3 // %4 // %5'.[$waypoints.{$id}.class,$waypoints.{$id}.knownname,$waypoints.{$id+1}.class,$waypoints.{$id+1}.knownname,$waypoints.{$id+1}.sector.knownname]"/>
             </do_else>
           </do_elseif>
           <set_value name="$id" operation="add"/>
