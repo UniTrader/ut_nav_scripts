@@ -328,7 +328,7 @@
         <set_value name="$waypoints.{$waypoints.count}" exact="$targetspace"/>
         
         <!-- For Testing: print the full Path to Debuglog -->
-        <do_if value="true or @this.$debug">
+        <do_if value="@this.$debug">
           <set_value name="$LogMessage" exact="'%1 %2 Jump Path:'.[this.name,this.container.name]"/>
           <do_all exact="$waypoints.count" counter="$i">
             <set_value name="$LogMessage" exact="'%1\n%2 - %3 // %4 // %5 // %6'.[$LogMessage,$i,$waypoints.{$i}.class,$waypoints.{$i}.knownname,@$waypoints.{$i}.cluster.knownname,@$waypoints.{$i}.sector.knownname]"/>
@@ -350,8 +350,8 @@
             <do_all exact="$highways.count" counter="$i">
               <do_if value="$highways.{$i}.issuperhighway and $highways.{$i}.origin.sector == $waypoints.{$id}">
                 <set_value name="$gate" exact="$highways.{$i}.entry"/>
-                <debug_text filter="general" text="'Replaced Sector with Entrygate:'"/>
-                <debug_text filter="general" text="'Gate Search: Original: %1 // %2 ; Search1: %3 // %4 // %5 ; Search2: %6 // %7 // %8'.[$gate.class,$gate.knownname,@$search1.class,@$search1.knownname,@$search1 == $gate,@$search2.class,@$search2.knownname,@$search2 == $gate]"/>
+                <debug_text filter="general" chance="@this.$debug * 100" text="'Replaced Sector with Entrygate:'"/>
+                <debug_text filter="general" chance="@this.$debug * 100" text="'Gate Search: Original: %1 // %2 ; Search1: %3 // %4 // %5 ; Search2: %6 // %7 // %8'.[$gate.class,$gate.knownname,@$search1.class,@$search1.knownname,@$search1 == $gate,@$search2.class,@$search2.knownname,@$search2 == $gate]"/>
                 <set_value name="$waypoints.{$id}" exact="$gate"/>
                 <break/>
               </do_if>
@@ -359,8 +359,8 @@
           </do_if>
           <do_elseif value="$waypoints.{$id}.isclass.sector and $waypoints.{$id+1}.isclass.gate">
             <do_if value="$waypoints.{$id} == $waypoints.{$id+1}.sector">
-                <debug_text filter="general" text="'Removing Sector because next Entry is a Gate in there'"/>
-                <debug_text filter="general" text="'Sector: %1 // %2 ; Gate: %3 // %4 // %5'.[$waypoints.{$id}.class,$waypoints.{$id}.knownname,$waypoints.{$id+1}.class,$waypoints.{$id+1}.knownname,$waypoints.{$id+1}.sector.knownname]"/>
+                <debug_text filter="general" chance="@this.$debug * 100" text="'Removing Sector because next Entry is a Gate in there'"/>
+                <debug_text filter="general" chance="@this.$debug * 100" text="'Sector: %1 // %2 ; Gate: %3 // %4 // %5'.[$waypoints.{$id}.class,$waypoints.{$id}.knownname,$waypoints.{$id+1}.class,$waypoints.{$id+1}.knownname,$waypoints.{$id+1}.sector.knownname]"/>
                 <remove_value name="$waypoints.{$id}"/>
                 <set_value name="$id" operation="subtract" comment="just removed an entry - dont advance"/>
             </do_if>
@@ -373,8 +373,8 @@
           </do_elseif>
           <do_elseif value="$waypoints.{$id}.isclass.gate and $waypoints.{$id+1}.isclass.gate">
             <do_if value="$waypoints.{$id} == $waypoints.{$id+1}.exit">
-                <debug_text filter="general" text="'Two connected Gates - removing Exit'"/>
-                <debug_text filter="general" text="'Start: %1 // %2 //%3 ; Destination: %4 // %5 // %6'.[$waypoints.{$id}.class,$waypoints.{$id}.knownname,$waypoints.{$id}.sector.knownname,$waypoints.{$id+1}.class,$waypoints.{$id+1}.knownname,$waypoints.{$id+1}.sector.knownname]"/>
+                <debug_text filter="general" chance="@this.$debug * 100" text="'Two connected Gates - removing Exit'"/>
+                <debug_text filter="general" chance="@this.$debug * 100" text="'Start: %1 // %2 //%3 ; Destination: %4 // %5 // %6'.[$waypoints.{$id}.class,$waypoints.{$id}.knownname,$waypoints.{$id}.sector.knownname,$waypoints.{$id+1}.class,$waypoints.{$id+1}.knownname,$waypoints.{$id+1}.sector.knownname]"/>
                 <remove_value name="$waypoints.{$id+1}"/>
             </do_if>
             <do_else>
@@ -413,7 +413,7 @@
           </do_if>
         
         <!-- For Testing: print the full Path to Debuglog -->
-        <do_if value="true or @this.$debug">
+        <do_if value="@this.$debug">
           <set_value name="$LogMessage" exact="'%1 %2 Jump Path cleared:'.[this.name,this.container.name]"/>
           <do_all exact="$waypoints.count" counter="$i">
             <set_value name="$LogMessage" exact="'%1\n%2 - %3 // %4 // %5 // %6'.[$LogMessage,$i,$waypoints.{$i}.class,$waypoints.{$i}.knownname,@$waypoints.{$i}.cluster.knownname,@$waypoints.{$i}.sector.knownname]"/>
