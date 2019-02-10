@@ -374,12 +374,12 @@
           <do_elseif value="$waypoints.{$id}.isclass.gate and $waypoints.{$id+1}.isclass.gate">
             <do_if value="$waypoints.{$id} == $waypoints.{$id+1}">
                 <debug_text filter="general" text="'Two connected Gates - removing Exit'"/>
-                <debug_text filter="general" text="'Start: %1 // %2 ; Destination: %3 // %4 // %5'.[$waypoints.{$id}.class,$waypoints.{$id}.knownname,$waypoints.{$id+1}.class,$waypoints.{$id+1}.knownname,$waypoints.{$id+1}.sector.knownname]"/>
+                <debug_text filter="general" text="'Start: %1 // %2 //%3 ; Destination: %4 // %5 // %6'.[$waypoints.{$id}.class,$waypoints.{$id}.knownname,$waypoints.{$id}.sector.knownname,$waypoints.{$id+1}.class,$waypoints.{$id+1}.knownname,$waypoints.{$id+1}.sector.knownname]"/>
                 <remove_value name="$waypoints.{$id+1}"/>
             </do_if>
             <do_else>
                 <debug_text filter="error" text="'Two unconnected Gates - doing nothing!!'"/>
-                <debug_text filter="error" text="'Gate1: %1 // %2 ; Gate2: %3 // %4 // %5'.[$waypoints.{$id}.class,$waypoints.{$id}.knownname,$waypoints.{$id+1}.class,$waypoints.{$id+1}.knownname,$waypoints.{$id+1}.sector.knownname]"/>
+                <debug_text filter="error" text="'Gate1: %1 // %2 //%3 ; Gate2: %4 // %5 // %6'.[$waypoints.{$id}.class,$waypoints.{$id}.knownname,$waypoints.{$id}.sector.knownname,$waypoints.{$id+1}.class,$waypoints.{$id+1}.knownname,$waypoints.{$id+1}.sector.knownname]"/>
             </do_else>
           </do_elseif>
           <set_value name="$id" operation="add"/>
