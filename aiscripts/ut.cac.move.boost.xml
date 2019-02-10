@@ -106,8 +106,7 @@
       <!-- also consider adding a Sector-to-Sector-Boost here (with Context Switch) -->
       
       <!-- check if we *CAN* Boost -->
-      <find_object_component class="class.enginebooster" object="this.ship" name="$booster" />
-      <do_if value="not $booster.exists">
+      <do_if value="this.ship.boost.available">
         <debug_text filter="error" text="'%1 %2 Ship has no engine booster. Flight from %3(%4) to %5(%6) will take a looong time!'.[this.name,this.container.name , this.zone.knownname, this.sector.knownname, $destination.zone.knownname, $destination.sector.knownname]" />
       </do_if>
       
@@ -130,7 +129,7 @@
           <create_position_outside_boundingbox name="$position" component="$destination" distance="0m">
             <position object="this.ship"/>
           </create_position_outside_boundingbox>
-          <create_object name="$temp_object" macro="macro.props_wps_nav_beacon_macro" sector="$destination">
+          <create_object name="$temp_object" macro="macro.eq_arg_resourceprobe_01_macro" sector="$destination">
             <position value="$position"/>
           </create_object>
         <set_value name="$targetzone" exact="$temp_object.zone"/>
@@ -232,15 +231,15 @@
         
         <!-- figure out an arrival position in the target zone -->
           <!-- HACK for FoO - AL Gate - ignore the Big Rock there (coordinate checks are for Escorts/Followers which are only given Zone Coordinates as Target)-->
-        <do_if value="$targetzone.macro.ismacro.{'Cluster_T_Sector01_Zone001_macro'} and ( $destination.isclass.gate or ( $position.x gt 30km and $position.z lt -20km and $position.y gt -10km and $position.y lt 10km ) )">
+        <!--do_if value="$targetzone.macro.ismacro.{'Cluster_T_Sector01_Zone001_macro'} and ( $destination.isclass.gate or ( $position.x gt 30km and $position.z lt -20km and $position.y gt -10km and $position.y lt 10km ) )">
           <find_object name="$ignoredobject" space="$targetzone" macro="macro.landmarks_unique_the_mace_macro"/>
           <get_safe_pos result="$targetpos" allowyaxis="true" zone="$targetzone" value="$position" min="2km" max="5km" radius="this.ship.size * 2" ignored="$ignoredobject"/>
         </do_if>
-        <do_else>
+        <do_else-->
           <get_zone_exit_pos zone="$targetzone" destination="this.ship" position="$targetpos" radius="this.ship.size * 2" >
             <position object="$targetzone" value="$position"/>
           </get_zone_exit_pos>
-        </do_else>
+        <!--/do_else-->
         <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Calculated Params for IS-Boost:\nstartpos: %3 startrot: %4\ntargetzone:%5 targetpos: %6 position: %7 Targetpos Distance to Destination: %8'.[this.name,this.container.name,@$startpos,@$startrot,$targetzone.knownname,$targetpos,$position,@$destination.distanceto.{$targetpos}]"/>
       </do_if>
       <do_else>
@@ -251,12 +250,12 @@
         
         <!-- create boost Target Pos -->
         <do_if value="$position">
-          <do_if value="$targetzone.macro.ismacro.{'Cluster_T_Sector01_Zone001_macro'} and ( $destination.isclass.gate or ( $position.x gt 30km and $position.z lt -20km and $position.y gt -10km and $position.y lt 10km ) )">
+          <!--do_if value="$targetzone.macro.ismacro.{'Cluster_T_Sector01_Zone001_macro'} and ( $destination.isclass.gate or ( $position.x gt 30km and $position.z lt -20km and $position.y gt -10km and $position.y lt 10km ) )">
             <find_object name="$ignoredobject" space="$targetzone" macro="macro.landmarks_unique_the_mace_macro"/>
           </do_if>
-          <do_else>
+          <do_else-->
             <set_value name="$ignoredobject" exact="this.ship"/>
-          </do_else>
+          <!--/do_else-->
           <get_safe_pos result="$targetpos" allowyaxis="true" zone="this.zone" value="$position" radius="this.ship.size * 2" ignored="$ignoredobject" min="this.ship.size" max="10km"/>
         </do_if>
         <do_else>

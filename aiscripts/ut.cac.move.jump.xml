@@ -67,7 +67,7 @@ ToDo:
         </do_if>
         <do_else>
           <!-- Criminal Factions prefer random Jumps to surprise (is a bit hacky because it doesnt take EXP into account)-->
-          <do_if value="this.owner == faction.enemy or this.owner == faction.smuggler or this.owner == faction.criminal or this.owner == faction.sovereignsyndicate or this.owner == faction.hereticvanguards or this.owner == faction.reivers">
+          <do_if value="this.owner == faction.smuggler or this.owner == faction.criminal "><!--or this.owner == faction.enemy or this.owner == faction.sovereignsyndicate or this.owner == faction.hereticvanguards or this.owner == faction.reivers-->
             <set_value name="$type" exact="'random'"/>
           </do_if>
           <!-- Police Factions always prefer Beacon Jumps because they guarantee arrival time, also Inexpierienced Captains use this as default mode of operation (or player ones if not told otherwise)-->
@@ -109,7 +109,7 @@ ToDo:
       </do_if>
       
       <!-- check if we really can do this Jump -->
-      <find_object_component name="$jumpdrive" object="this.ship" class="class.jumpdrive" checkoperational="false"/>
+      <!--find_object_component name="$jumpdrive" object="this.ship" class="class.jumpdrive" checkoperational="false"/-->
       <do_if value="$jumpdrive == null">
         <debug_text filter="error" text="'%1 %2 No Jumpdrive - aborting!'.[this.name,this.container.name]"/>
         <return value="false"/>
@@ -126,12 +126,12 @@ ToDo:
       </do_if>
       
       <!-- save the slow charge effect in a var for later use -->
-      <do_if value="$jumpdrive.macro.ismacro.props_surf_ar_jumpdrive_macro">
+      <!--do_if value="$jumpdrive.macro.ismacro.props_surf_ar_jumpdrive_macro">
         <set_value name="$slowchargeeffect" exact ="'jump_activation_jumpdrive_slow'"/>
       </do_if>
       <do_elseif value="$jumpdrive.macro.ismacro.props_surf_ar_jumpdrive_l_macro">
         <set_value name="$slowchargeeffect" exact ="'jump_activation_jumpdrive_l_slow'"/>
-      </do_elseif>
+      </do_elseif-->
       
       <!-- get the Object which acts as Jump Beacon -->
       <do_if value="$type == 'beacon' or $type == 'auto'">
@@ -139,12 +139,12 @@ ToDo:
         <do_if value="$destination.isclass.sector">
           <!-- just passing through the Cluster -->
           <!-- find a random beacon were are no Enemies nearby -->
-          <find_object name="$beacons" space="$destination" knownto="this.owner" checkoperational="true" multiple="true">
+          <!--find_object name="$beacons" space="$destination" knownto="this.owner" checkoperational="true" multiple="true">
             <match_any>
               <match class="class.jumpbeacon"/>
               <match_child class="class.jumpbeacon" checkoperational="true"/>
             </match_any>
-          </find_object>
+          </find_object-->
           <do_all exact="$beacons.count">
             <set_value name="$beacon" exact="$beacons.random"/>
             <find_object name="$enemy" space="$beacon.zone" knownto="this.owner" >
@@ -159,12 +159,12 @@ ToDo:
           </do_all>
           <!-- we dont know any beacons in the Destination Sector - lock onto a random one -->
           <do_if value="not @$beacon.exists">
-            <find_object name="$beacon" space="$destination" checkoperational="true">
+            <!--find_object name="$beacon" space="$destination" checkoperational="true">
               <match_any>
                 <match class="class.jumpbeacon"/>
                 <match_child class="class.jumpbeacon" checkoperational="true"/>
               </match_any>
-            </find_object>
+            </find_object-->
             <set_known object="@$beacon" known="true"/>
             <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Selected Beacon in %3 randomly because we dont know about any beacons (Passing Case)'.[this.name,this.container.name,@$beacon.zone.knownname]"/>
           </do_if>
@@ -173,18 +173,18 @@ ToDo:
           </do_else>
         </do_if>
         <!-- we got a Jumpbeacon directly as Input - Use it -->
-        <do_elseif value="$destination.isclass.jumpbeacon">
+        <do_elseif value="@$destination.isclass.jumpbeacon">
           <set_value name="$beacon" exact="$destination"/>
           <set_value name="$type" exact="'beacon'"/>
         </do_elseif>
         <do_else>
           <!-- final Cluster on Path - jump to the closest beacon, but also watch for enemies -->
-          <find_object name="$beacons" space="$destination.sector"  knownto="this.owner" checkoperational="true" multiple="true">
+          <!--find_object name="$beacons" space="$destination.sector"  knownto="this.owner" checkoperational="true" multiple="true">
             <match_any>
               <match class="class.jumpbeacon"/>
               <match_child class="class.jumpbeacon" checkoperational="true"/>
             </match_any>
-          </find_object>
+          </find_object-->
           <set_value name="$distance" exact="1e12m"/>
           <do_all exact="$beacons.count" counter="$i">
             <do_if value="$destination.distanceto.{$beacons.{$i}} lt $distance"/>
@@ -207,12 +207,12 @@ ToDo:
           </do_elseif>
           <!-- we dont know any beacons in the Destination Sector - lock onto a random one -->
           <do_if value="not @$beacon.exists">
-            <find_object name="$beacon" space="$destination.sector" class="class.jumpbeacon" checkoperational="true">
+            <!--find_object name="$beacon" space="$destination.sector" class="class.jumpbeacon" checkoperational="true">
               <match_any>
                 <match class="class.jumpbeacon"/>
                 <match_child class="class.jumpbeacon" checkoperational="true"/>
               </match_any>
-            </find_object>
+            </find_object-->
             <set_known object="@$beacon" known="true"/>
             <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Selected Beacon in %3 randomly because we dont know about any beacons (Final Approach Case)'.[this.name,this.container.name,@$beacon.zone.knownname]"/>
           </do_if>
@@ -278,11 +278,11 @@ ToDo:
       <!-- if leader is already jumping try to keep up if possible or just exit -->
       <do_if value="$leader_ready">
         <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Leader already jumping, performing fast jump'.[this.name,this.container.name]"/>
-        <do_if value="this.ship.cargo.{ware.fuelcells}.count lt this.ship.jumpcostto.{$destination}">
+        <!--do_if value="this.ship.cargo.{ware.fuelcells}.count lt this.ship.jumpcostto.{$destination}"-->
           <!-- not enough fuel, give up-->
           <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Not enough Fuel, give up'.[this.name,this.container.name]"/>
           <return/>
-        </do_if>
+        <!--/do_if-->
         <do_if value="$jumpdrive.cooldowntimeleft gt 0">
           <!-- not cooled down, give up-->
           <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Not cooled Down, give up'.[this.name,this.container.name]"/>
@@ -310,7 +310,7 @@ ToDo:
       <wait min="100ms" max="200ms"/>
       
       <!-- Slow Jumpdrive Charge in case we dont have enough Fuel - fuel check and refueling are somewhere else -->
-      <do_if value="this.ship.cargo.{ware.fuelcells}.count lt this.ship.jumpcostto.{$destination}">
+      <!--do_if value="this.ship.cargo.{ware.fuelcells}.count lt this.ship.jumpcostto.{$destination}"-->
         <!-- not enough fuel, don't use fuel and delay the jump -->
         <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Not enough Fuel, slow charge'.[this.name,this.container.name]"/>
         <set_value name="$ignorefuel" exact="true"/>
@@ -320,7 +320,7 @@ ToDo:
           <set_value name="$slowcharge"/>
         </do_if>
         <wait min="590s" max="610s"/>
-      </do_if>
+      <!--/do_if-->
       
       <!-- slow charge jump effects - will be removed just before firing up the JD - now also used during cooldown -->
       <do_if value="$slowchargeeffect? and not $slowcharge?">
@@ -473,13 +473,13 @@ ToDo:
         <do_if value="$result">
           <!--debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Sucessfully Jumped'.[this.name,this.container.name]"/-->
           <debug_text filter="general" chance="@this.$debug * 100" text="
-'%1 %2 Successful Jump, Values also displayed by failed ones:\nFuel: %3 of %4 Jumpdrive Name:%5, Cooldown: %6 operational: %7 Firstresult: %8\n'.[this.name,this.container.name,this.ship.cargo.{ware.fuelcells}.count,this.ship.jumpcostto.{$destination},$jumpdrive.name,$jumpdrive.cooldowntimeleft,$jumpdrive.isoperational,@$firstresult]+
+'%1 %2 Successful Jump, Values also displayed by failed ones:\nFuel: %3 of %4 Jumpdrive Name:%5, Cooldown: %6 operational: %7 Firstresult: %8\n'.[this.name,this.container.name,this.ship.cargo.{ware.energycells}.count,this.ship.jumpcostto.{$destination},$jumpdrive.name,$jumpdrive.cooldowntimeleft,$jumpdrive.isoperational,@$firstresult]+
 'Additional Info: Current Zone: %1, Target Zone: %2, Beacon: %3, result: %4\ncooldowntimes: 1: %5, 2: %6, 3: %7 4: %8   Player Zone: %9\n'.[this.zone.name,$beacon.zone.name,$beacon.name,@$result,$debug_cooldowntime1,$debug_cooldowntime2,$debug_cooldowntime3,$debug_cooldowntime4,player.zone.name]+
 'Jump events: %1   %2'.[@$debug_jumpevent1,@$debug_jumpevent2]"/>
         </do_if>
         <do_else>
           <debug_text filter="error" text="
-'%1 %2 Jump failed!!!! Possible Reasons:\nFuel: %3 of %4 Jumpdrive Name:%5, Cooldown: %6 operational: %7 Firstresult: %8\n'.[this.name,this.container.name,this.ship.cargo.{ware.fuelcells}.count,this.ship.jumpcostto.{$destination},$jumpdrive.name,$jumpdrive.cooldowntimeleft,$jumpdrive.isoperational,@$firstresult]+
+'%1 %2 Jump failed!!!! Possible Reasons:\nFuel: %3 of %4 Jumpdrive Name:%5, Cooldown: %6 operational: %7 Firstresult: %8\n'.[this.name,this.container.name,this.ship.cargo.{ware.energycells}.count,this.ship.jumpcostto.{$destination},$jumpdrive.name,$jumpdrive.cooldowntimeleft,$jumpdrive.isoperational,@$firstresult]+
 'Additional Info: Current Zone: %1, Target Zone: %2, Beacon: %3, result: %4\ncooldowntimes: 1: %5, 2: %6, 3: %7 4: %8   Player Zone: %9\n'.[this.zone.name,$beacon.zone.name,$beacon.name,@$result,$debug_cooldowntime1,$debug_cooldowntime2,$debug_cooldowntime3,$debug_cooldowntime4,player.zone.name]+
 'Jump events: %1   %2\nPerforming Fallback Warp'.[@$debug_jumpevent1,@$debug_jumpevent2]"/>
           <stop_moving object="this.ship" immediate="true"/>
