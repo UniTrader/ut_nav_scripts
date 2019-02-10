@@ -328,18 +328,64 @@
         <set_value name="$waypoints.{$waypoints.count}" exact="$targetspace"/>
         
         <!-- For Testing: print the full Path to Debuglog -->
-        <do_if value="@this.$debug">
+        <do_if value="true or @this.$debug">
           <set_value name="$LogMessage" exact="'%1 %2 Jump Path:'.[this.name,this.container.name]"/>
           <do_all exact="$waypoints.count" counter="$i">
             <set_value name="$LogMessage" exact="'%1\n%2 - %3 // %4 // %5'.[$LogMessage,$i,$waypoints.{$i}.class,$waypoints.{$i}.knownname,@$waypoints.{$i}.cluster.knownname]"/>
           </do_all>
           <debug_text filter="general" text="$LogMessage"/>
+                <debug_text filter="general" text="'End unfiltered Path'"/>
         </do_if>
         
         <!-- filter the Jump Path for the relevant Path Waypoints (Filter out Sectors where next Waypoint is a Gate in the same Sector, filter out Exit Gate in case we already have an Entry Gate, filter out Exit Gate Sector)-->
         <!--  remove the first item which is always the Start that we dont need in any case -->
-        <remove_value name="$waypoints.{1}"/>
+        <!--remove_value name="$waypoints.{1}"/-->
         <set_value name="$id" exact="1"/>
+        <do_while value="$id lt $waypoints.count">
+          <do_if value="$waypoints.{$id}.isclass.sector and $waypoints.{$id+1}.isclass.sector">
+            <find_object_component name="$search1" object="$waypoints.{$id}.cluster" class="class.highwayentrygate" destination="$waypoints.{$id+1}"/>
+            <find_object_component name="$search2" object="$waypoints.{$id}" class="class.highwayentrygate" destination="$waypoints.{$id+1}"/>
+            <!-- Modified Ego code - intended to be replaced by the line above -->
+            <find_object_component name="$highways" object="$waypoints.{$id}.cluster" class="class.highway" destination="$waypoints.{$id+1}" multiple="true"/>
+            <do_all exact="$highways.count" counter="$i">
+              <do_if value="$highways.{$i}.issuperhighway and $highways.{$i}.origin.sector == $waypoints.{$id}">
+                <set_value name="$gate" exact="$highways.{$i}.entry"/>
+                <debug_text filter="general" text="'Replaced Sector with Entrygate:'"/>
+                <debug_text filter="general" text="'Gate Search: Original: %1 // %2 ; Search1: %3 // %4 // %5 ; Search2: %6 // %7 // %8'.[$gate.class,$gate.knownname,$search1.class,$search1.knownnanme,$search1 == $gate,$search2.class,$search2.knownnanme,$search2 == $gate]"/>
+                <set_value name="$waypoints.{$id}" exact="$gate"/>
+                <break/>
+              </do_if>
+            </do_all>
+          </do_if>
+          <do_elseif value="$waypoints.{$id}.isclass.sector and $waypoints.{$id+1}.isclass.gate">
+            <do_if value="$waypoints.{$id} == $waypoints.{$id+1}.sector">
+                <debug_text filter="general" text="'Removing Sector because next Entry is a Gate in there'"/>
+                <debug_text filter="general" text="'Sector: %1 // %2 ; Gate: %3 // %4 // %5'.[$waypoints.{$id}.class,$waypoints.{$id}.knownname,$waypoints.{$id+1}.class,$waypoints.{$id+1}.knownnanme]"/>
+                <remove_value name="$waypoints.{$id}"/>
+                <set_value name="$id" operation="subtract" comment="just removed an entry - dont advance"/>
+            </do_if>
+            <do_else>
+                <debug_text filter="error" text="'Next Gate not Contained in Sector - will still remove the Sector, but will send the ship through half the galaxy in Slowmo!!!'"/>
+                <debug_text filter="error" text="'Sector: %1 // %2 ; Gate: %3 // %4 // %5'.[$waypoints.{$id}.class,$waypoints.{$id}.knownname,$waypoints.{$id+1}.class,$waypoints.{$id+1}.knownnanme]"/>
+                <remove_value name="$waypoints.{$id}"/>
+                <set_value name="$id" operation="subtract" comment="just removed an entry - dont advance"/>
+            </do_else>
+          </do_elseif>
+          <do_elseif value="$waypoints.{$id}.isclass.gate and $waypoints.{$id+1}.isclass.gate">
+            <do_if value="$waypoints.{$id}.gate == $waypoints.{$id+1}">
+                <debug_text filter="general" text="'Two connected Gates - removing Exit'"/>
+                <debug_text filter="general" text="'Start: %1 // %2 ; Destination: %3 // %4 // %5'.[$waypoints.{$id}.class,$waypoints.{$id}.knownname,$waypoints.{$id+1}.class,$waypoints.{$id+1}.knownnanme]"/>
+                <remove_value name="$waypoints.{$id+1}"/>
+            </do_if>
+            <do_else>
+                <debug_text filter="error" text="'Two unconnected Gates - doing nothing!!'"/>
+                <debug_text filter="error" text="'Gate1: %1 // %2 ; Gate2: %3 // %4 // %5'.[$waypoints.{$id}.class,$waypoints.{$id}.knownname,$waypoints.{$id+1}.class,$waypoints.{$id+1}.knownnanme]"/>
+            </do_else>
+          </do_elseif>
+          <set_value name="$id" operation="add"/>
+        </do_while>
+        
+        <do_if value="false" comment="XR Filter Code - for reference">
         <do_while value="$id lt $waypoints.count">
           <do_if value="$waypoints.{$id}.isclass.gate">
             <do_if value="$waypoints.{$id}.destination == $waypoints.{$id+1}.zone">
@@ -364,9 +410,10 @@
           </do_if>
           <set_value name="$id" operation="add"/>
         </do_while>
+          </do_if>
         
         <!-- For Testing: print the full Path to Debuglog -->
-        <do_if value="@this.$debug">
+        <do_if value="true or @this.$debug">
           <set_value name="$LogMessage" exact="'%1 %2 Jump Path cleared:'.[this.name,this.container.name]"/>
           <do_all exact="$waypoints.count" counter="$i">
             <set_value name="$LogMessage" exact="'%1\n%2 - %3 // %4 // %5'.[$LogMessage,$i,$waypoints.{$i}.class,$waypoints.{$i}.knownname,@$waypoints.{$i}.cluster.knownname]"/>
@@ -398,16 +445,20 @@
             <do_if value="not this.ship.hascontext.{this.$waypoint}" comment="didnt attemt to IC-Boost or IC-Boost failed">
               <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Jumping to %3'.[this.name,this.container.name,this.$waypoint.knownname]"/>
               <!-- JUMP!! -->
+              <debug_text filter="error" text="'%1 %2 Warping to %3 as fallback - should not happen yet!!!'.[this.name,this.container.name,this.$waypoint.knownname]"/>
+              <warp object="this.ship" sector="this.waypoint"><safepos/></warp>
+              <do_if value="false">
               <run_script name="'ut.cac.move.jump'" result="$result">
                 <param name="destination" value="this.$waypoint"/>
               </run_script>
+              </do_if>
               <do_if value="not this.ship.hascontext.{this.$waypoint}">
                 <debug_text filter="error" text="'Jump Failed! Destination: %1 / %2 Current Sector/Zone: %3 / %4 - restarting'.[@this.$waypoint.sector.name,this.$waypoint.name,this.sector.name,this.zone.name]"/>
                 <resume label="start"/>
               </do_if>
             </do_if>
           </do_if>
-          <do_elseif value="this.$waypoint.isclass.gate">
+          <do_elseif value="this.$waypoint.isclass.gate or this.$waypoint.isclass.highwayentrygate">
             
             <!-- Jump to Gate sector -->
             <find_object name="$beacon" space="this.$waypoint.zone" class="class.jumpbeacon" knownto="this.owner" checkoperational="true" chance="@this.$ut_cac.$insectorjump * 100" comment="if beacon is in Target Zone consider IS-Jump"/>
