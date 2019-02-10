@@ -372,7 +372,7 @@
             </do_else>
           </do_elseif>
           <do_elseif value="$waypoints.{$id}.isclass.gate and $waypoints.{$id+1}.isclass.gate">
-            <do_if value="$waypoints.{$id}.gate == $waypoints.{$id+1}">
+            <do_if value="$waypoints.{$id} == $waypoints.{$id+1}">
                 <debug_text filter="general" text="'Two connected Gates - removing Exit'"/>
                 <debug_text filter="general" text="'Start: %1 // %2 ; Destination: %3 // %4 // %5'.[$waypoints.{$id}.class,$waypoints.{$id}.knownname,$waypoints.{$id+1}.class,$waypoints.{$id+1}.knownname,$waypoints.{$id+1}.sector.knownname]"/>
                 <remove_value name="$waypoints.{$id+1}"/>
