@@ -107,7 +107,7 @@
       
       <!-- check if we *CAN* Boost -->
       <do_if value="this.ship.boost.available">
-        <debug_text filter="error" text="'%1 %2 Ship has no engine booster. Flight from %3(%4) to %5(%6) will take a looong time!'.[this.name,this.container.name , this.zone.knownname, this.sector.knownname, $destination.zone.knownname, $destination.sector.knownname]" />
+        <debug_text filter="error" text="'%1 %2 Ship has no engine booster. Flight from %3(%4) to %5(%6) will take a looong time!'.[this.name,this.container.name , this.zone.knownname, this.sector.knownname, @$destination.zone.knownname, $destination.sector.knownname]" />
       </do_if>
       
       <!-- set Value to interrupt continonous movement on certain ocassions -->
@@ -223,11 +223,11 @@
           <set_value name="$startpos" exact="this.ship.position" />
         </do_elseif>
         <!-- HACK for FoO - AL Gate (Exit) - just boost immediately -->
-        <do_elseif value="this.zone.macro.ismacro.{'Cluster_T_Sector01_Zone001_macro'} and this.ship.distanceto.{$startpos} gt 10km">
+        <!--do_elseif value="this.zone.macro.ismacro.{'Cluster_T_Sector01_Zone001_macro'} and this.ship.distanceto.{$startpos} gt 10km">
           <remove_value name="$startpos"/>
           <remove_value name="$startrot"/>
           <set_value name="$abortpath" exact="true"/>
-        </do_elseif>
+        </do_elseif-->
         
         <!-- figure out an arrival position in the target zone -->
           <!-- HACK for FoO - AL Gate - ignore the Big Rock there (coordinate checks are for Escorts/Followers which are only given Zone Coordinates as Target)-->
@@ -308,7 +308,7 @@
       <label name="move"/>
       
       <!-- if we are already boosting just change the Destination -->
-      <do_if value="this.ship.isboostactive">
+      <do_if value="this.ship.boost.active">
         <set_value name="$abortpath" exact="true"/>
         <resume label="boost"/>
       </do_if>

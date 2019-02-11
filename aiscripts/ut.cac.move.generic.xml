@@ -462,7 +462,7 @@
             
             <!-- Jump to Gate sector -->
             <do_if value="false" comment="disabled for X4">
-            <find_object name="$beacon" space="this.$waypoint.zone" class="class.jumpbeacon" knownto="this.owner" checkoperational="true" chance="@this.$ut_cac.$insectorjump * 100" comment="if beacon is in Target Zone consider IS-Jump"/>
+            <!--find_object name="$beacon" space="this.$waypoint.zone" class="class.jumpbeacon" knownto="this.owner" checkoperational="true" chance="@this.$ut_cac.$insectorjump * 100" comment="if beacon is in Target Zone consider IS-Jump"/-->
             <do_if value="this.sector != this.$waypoint.sector or @$beacon.exists">
               <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Jumping to nearest Jumpbeacon to %3 for gate passage'.[this.name,this.container.name,this.$waypoint.knownname]"/>
               <run_script name="'ut.cac.move.jump'" result="$result">
