@@ -32,7 +32,7 @@
       <label name="start"/>
       
       <!-- then check if the Input and Situation is Valid  -->
-      <do_if value="not $gate.exists or not $gate.isclass.gate">
+      <do_if value="not $gate.exists or not ( $gate.isclass.gate or $gate.isclass.highwayentrygate )">
         <debug_text filter="error" text="'%1 %2 Gate not existent or not a gate - aborting!'.[this.name,this.container.name]"/>
         <return/>
       </do_if>
