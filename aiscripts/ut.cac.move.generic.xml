@@ -143,8 +143,7 @@
       </conditions>
       <actions>
         <debug_text filter="error" text="'%1 %2 Target Invalid: Current Zone: %3 , Invalid Target: %4 $destination: %5 - restarting'.[this.name,this.container.name,this.zone.knownname,event.param.knownname,@$destination.knownname]"/>
-        <abort_called_scripts/>
-        <resume label="start"/>
+        <abort_called_scripts resume="start"/>
       </actions>
     </handler>
     <handler>
