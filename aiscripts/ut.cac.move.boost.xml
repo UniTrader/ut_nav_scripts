@@ -107,7 +107,7 @@
       
       <!-- check if we *CAN* Boost -->
       <do_if value="this.ship.boost.available">
-        <debug_text filter="error" text="'%1 %2 Ship has no engine booster. Flight from %3(%4) to %5(%6) will take a looong time!'.[this.name,this.container.knownname , this.zone.knownname, this.sector.knownname, @$destination.zone.knownname, $destination.sector.knownname]" />
+        <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Ship engine booster not available currently. Flight from %3(%4) to %5(%6) might take longer than planned'.[this.name,this.container.knownname , this.zone.knownname, this.sector.knownname, @$destination.zone.knownname, $destination.sector.knownname]" />
       </do_if>
       
       <!-- set Value to interrupt continonous movement on certain ocassions -->
@@ -279,11 +279,11 @@
           </create_orientation>
           
           <!-- HACK for FoO - AL Gate (Exit) - just boost immediately -->
-          <do_if value="this.zone.macro.ismacro.{'Cluster_T_Sector01_Zone001_macro'} and this.ship.distanceto.{$startpos} gt 10km">
+          <!--do_if value="this.zone.macro.ismacro.{'Cluster_T_Sector01_Zone001_macro'} and this.ship.distanceto.{$startpos} gt 10km">
             <remove_value name="$startpos"/>
             <remove_value name="$startrot"/>
             <set_value name="$abortpath" exact="true"/>
-          </do_if>
+          </do_if-->
         </do_if>
         
         <do_if value="$startpos? and ( this.ship.distanceto.{$startpos} gt this.ship.distanceto.{$position} )">

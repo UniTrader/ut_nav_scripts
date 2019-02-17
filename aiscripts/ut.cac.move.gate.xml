@@ -36,7 +36,7 @@
         <debug_text filter="error" text="'%1 %2 Gate not existent or not a gate - aborting!'.[this.name,this.container.name]"/>
         <return/>
       </do_if>
-      <do_if value="not $gate.isactive">
+      <do_if value="not ( $gate.isclass.highwayentrygate or $gate.isactive )">
         <debug_text filter="error" text="'%1 %2 Trying to pass inactive Gate - aborting!'.[this.name,this.container.name]"/>
         <return/>
       </do_if>

@@ -67,7 +67,7 @@ with a given Rotation or Orientation
       </do_if>
       <do_elseif value="not $destination.isclass.zone">
         <do_if value="$destination.zone != this.zone">
-          <do_if value="this.ship.isboostactive">
+          <do_if value="this.ship.boost.active">
             <debug_text filter="general" text="'%1 %2 Destination Object not in this Zone but still Boosting (towards it?) - Continuing'.[this.name,this.container.name]" />
           </do_if>
           <do_else>
