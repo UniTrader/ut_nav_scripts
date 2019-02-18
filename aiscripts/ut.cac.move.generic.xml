@@ -169,11 +169,11 @@
       <actions>
         <do_if value="$destination.zone == this.zone">
           <!-- Somehow check if there is a movement Step currently in progress before exit-ing? -->
-          <debug_text filter="general" text="'%1 %2 Catchup Sucessful on Zone Change in %3 - exiting'.[this.name,this.container.name,this.zone.name]"/>
+          <debug_text filter="general" text="'%1 %2 Catchup Sucessful on Zone Change in %3 - exiting'.[this.name,this.container.name,this.zone.knownname]"/>
           <return/>
         </do_if>
         <do_if value="event.object == $destination">
-          <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Object changed Zone - trying to catch up: $targetspace: %3 $destination.pilot.$waypoint: %4 $destination.zone: %5'.[this.name,this.container.name,$targetspace.name,@$destination.pilot.$waypoint.name,$destination.zone.name]"/>
+          <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Object changed Zone - trying to catch up: $targetspace: %3 $destination.pilot.$waypoint: %4 $destination.zone: %5'.[this.name,this.container.name,$targetspace.name,@$destination.pilot.$waypoint.name,$destination.zone.knownname]"/>
           <abort_called_scripts resume="start"/>
         </do_if>
       </actions>
@@ -262,7 +262,7 @@
           <set_value name="this.$namereplacement" exact="table[]"/>
         </do_if>
         <do_if value="$destination.isclass.{[class.ship,class.station]}">
-          <set_value name="this.$namereplacement.$destination" exact="$destination.zone.name"/>
+          <set_value name="this.$namereplacement.$destination" exact="$destination.zone.knownname"/>
         </do_if>
         <do_else>
           <set_value name="this.$namereplacement.$destination" exact="$targetspace.name"/>
@@ -438,7 +438,7 @@
                 <param name="destination" value="this.$waypoint"/>
               </run_script>
               <do_if value="not this.ship.hascontext.{this.$waypoint}">
-                <debug_text filter="error" text="'IC Boost failed! (why did it even happen?) Destination: %1 / %2 Current Sector/Zone: %3 / %4'.[@this.$waypoint.sector.name,this.$waypoint.name,this.sector.name,this.zone.name]"/>
+                <debug_text filter="error" text="'IC Boost failed! (why did it even happen?) Destination: %1 / %2 Current Sector/Zone: %3 / %4'.[@this.$waypoint.sector.knownname,this.$waypoint.name,this.sector.knownname,this.zone.knownname]"/>
               </do_if>
             </do_if>
             <do_if value="not this.ship.hascontext.{this.$waypoint}" comment="didnt attemt to IC-Boost or IC-Boost failed">
@@ -452,7 +452,7 @@
               </run_script>
               </do_if>
               <do_if value="not this.ship.hascontext.{this.$waypoint}">
-                <debug_text filter="error" text="'Jump Failed! Destination: %1 / %2 Current Sector/Zone: %3 / %4 - restarting'.[@this.$waypoint.sector.name,this.$waypoint.name,this.sector.name,this.zone.name]"/>
+                <debug_text filter="error" text="'Jump Failed! Destination: %1 / %2 Current Sector/Zone: %3 / %4 - restarting'.[@this.$waypoint.sector.knownname,this.$waypoint.name,this.sector.knownname,this.zone.knownname]"/>
                 <resume label="start"/>
               </do_if>
             </do_if>
@@ -468,7 +468,7 @@
                 <param name="destination" value="this.$waypoint.zone"/>
               </run_script>
               <do_if value="not this.ship.hascontext.{this.$waypoint.sector}">
-                <debug_text filter="error" text="'Move Gate - Jump Failed! Destination: %1 / %2 Current Sector/Zone: %3 / %4 - restarting'.[@this.$waypoint.sector.name,this.$waypoint.name,this.sector.name,this.zone.name]"/>
+                <debug_text filter="error" text="'Move Gate - Jump Failed! Destination: %1 / %2 Current Sector/Zone: %3 / %4 - restarting'.[@this.$waypoint.sector.knownname,this.$waypoint.name,this.sector.knownname,this.zone.knownname]"/>
                 <resume label="start"/>
               </do_if>
             </do_if>
@@ -482,7 +482,7 @@
                 <param name="position" value="position.[0m,0m,0-(this.ship.size + this.$waypoint.size)]" comment="relative to destination! (including its rotation)"/>
               </run_script>
               <do_if value="not this.ship.hascontext.{this.$waypoint.zone}">
-                <debug_text filter="error" text="'Move Gate - Boost Failed! Destination: %1 / %2 Current Sector/Zone: %3 / %4 - restarting'.[@this.$waypoint.sector.name,this.$waypoint.name,this.sector.name,this.zone.name]"/>
+                <debug_text filter="error" text="'Move Gate - Boost Failed! Destination: %1 / %2 Current Sector/Zone: %3 / %4 - restarting'.[@this.$waypoint.sector.knownname,this.$waypoint.name,this.sector.knownname,this.zone.knownname]"/>
                 <resume label="start"/>
               </do_if>
             </do_if>
@@ -494,7 +494,7 @@
               <param name="gate" value="this.$waypoint"/>
             </run_script>
             <do_if value="not this.ship.hascontext.{this.$waypoint.destination}">
-              <debug_text filter="error" text="'Move Gate itself Failed! Destination: %1 / %2 Current Sector/Zone: %3 / %4 - restarting'.[@this.$waypoint.sector.name,this.$waypoint.name,this.sector.name,this.zone.name]"/>
+              <debug_text filter="error" text="'Move Gate itself Failed! Destination: %1 / %2 Current Sector/Zone: %3 / %4 - restarting'.[@this.$waypoint.sector.knownname,this.$waypoint.name,this.sector.knownname,this.zone.knownname]"/>
               <resume label="start"/>
             </do_if>
           </do_elseif>
@@ -508,7 +508,7 @@
                 <param name="destination" value="this.$waypoint"/>
               </run_script>
               <do_if value="not this.ship.hascontext.{this.$waypoint.sector}">
-                <debug_text filter="error" text="'Move Zone - Jump Failed! Destination: %1 / %2 Current Sector/Zone: %3 / %4 - restarting'.[@this.$waypoint.sector.name,this.$waypoint.name,this.sector.name,this.zone.name]"/>
+                <debug_text filter="error" text="'Move Zone - Jump Failed! Destination: %1 / %2 Current Sector/Zone: %3 / %4 - restarting'.[@this.$waypoint.sector.knownname,this.$waypoint.name,this.sector.knownname,this.zone.knownname]"/>
                 <resume label="start"/>
               </do_if>
             </do_if>
@@ -555,7 +555,7 @@
           <param name="position" value="$safepos" comment="position is treated as position relative to the destination (includes its rotation). Default: safe position on [0,0,0] of destination (Note: boost only moves nearby, not exact)"/>
         </run_script>
         <do_if value="not this.ship.hascontext.{$targetspace}">
-          <debug_text filter="error" text="'Final boost Failed! Destination: %1 / %2 Current Sector/Zone: %3 / %4'.[@this.$waypoint.sector.name,this.$waypoint.name,this.sector.name,this.zone.name]"/>
+          <debug_text filter="error" text="'Final boost Failed! Destination: %1 / %2 Current Sector/Zone: %3 / %4'.[@this.$waypoint.sector.knownname,this.$waypoint.name,this.sector.knownname,this.zone.knownname]"/>
         </do_if>
       </do_if>
       <set_value name="this.$waypoint" exact="this.zone"/>
