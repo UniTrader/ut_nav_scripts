@@ -535,7 +535,9 @@
             <resume label="start"/>
           </do_if>
         </do_while>
-        <debug_text filter="error" text="'%1 %2 This Part should NEVER be reached!!! last waypoint: %3, destination: %4 - Restarting'.[this.name,this.container.knownname,this.$waypoint.knownname,$destination.knownname]"/>
+        <debug_text filter="error" text="'%1 %2 This Part should NEVER be reached!!! last waypoint: %3, destination: %4 - Waiting and Restarting'.[this.name,this.container.knownname,this.$waypoint.knownname,$destination.knownname]"/>
+        <play_sound object="player.entity" sound="'cockpit_alert'"/>
+        <wait exact="10min"/>
         <resume label="start"/>
       </do_if>
       <do_else>
