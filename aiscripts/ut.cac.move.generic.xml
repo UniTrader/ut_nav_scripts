@@ -507,7 +507,9 @@
               </run_script>
               <do_if value="not this.ship.hascontext.{this.$waypoint.zone}">
                 <debug_text filter="error" text="'Move Gate - Boost Failed! Destination: %1 / %2 Current Sector/Zone: %3 / %4 // distance to destination: %5 - restarting'.[@this.$waypoint.sector.knownname,this.$waypoint.name,this.sector.knownname,this.zone.knownname,this.ship.distanceto.{this.waypoint}]"/>
-                <resume label="start"/>
+                <do_if value="this.ship.distanceto.{this.waypoint} gt 10km">
+                  <resume label="start"/>
+                </do_if>
               </do_if>
             </do_if>
             <remove_value name="$waypointposition"/>
