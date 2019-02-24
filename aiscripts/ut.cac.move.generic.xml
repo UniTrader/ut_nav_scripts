@@ -169,7 +169,7 @@
       <actions>
         <do_if value="$destination.zone == this.zone">
           <!-- Somehow check if there is a movement Step currently in progress before exit-ing? -->
-          <debug_text filter="general" text="'%1 %2 Catchup Sucessful on Zone Change in %3 - exiting'.[this.name,this.container.knownname,this.zone.knownname]"/>
+          <debug_text filter="general" text="'%1 %2 Catchup Sucessful on Zone Change in %3, met %4 - exiting'.[this.name,this.container.knownname,this.zone.knownname,$destination.knownname]"/>
           <return/>
         </do_if>
         <do_if value="event.object == $destination">
