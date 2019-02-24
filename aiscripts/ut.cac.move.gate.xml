@@ -184,7 +184,7 @@
       
       <label name="pass gate"/>
       <!-- check the Vanilla Gate Blocking Mechanism and (aggresively!) wait till its free -->
-      <request_gate ship="this.ship" gate="$gate" result="$success" />
+      <request_gate ship="this.ship" gate="if true then $gate else 'request 1'" result="$success" />
       <set_value name="$RequestingTimeout" min="player.age + 2min" max="player.age + 5min"/>
       <do_while value="global.$gate_queue.{$gate}.indexof.{this.ship} gt 1 and not $success">
         <wait min="3s" max="8s" comment="aggresive gate polling, but only one Ship at the same time.">
@@ -196,7 +196,7 @@
         </wait>
         <!-- try again locking the Gate if timeout not reached yet -->
         <do_if value="player.age lt $RequestingTimeout">
-          <request_gate ship="this.ship" gate="$gate" result="$success" />
+          <request_gate ship="this.ship" gate="if true then $gate else 'request 2'" result="$success" />
         </do_if>
         <do_else>
           <set_value name="$success" exact="true"/>
@@ -213,7 +213,7 @@
       <set_value name="$moveintogate" exact="true" />
       <signal_objects object="$gate" param="'travel gate update'" delay="100ms" comment="speed up process by telling everyone to advance to the next wait pos"/>
       <signal_objects object="this.ship" param="'travel gate start'" comment="Signalling we are now passing the Gate (used by DO for Drone Recall)"/>
-      <move_gate object="this.ship" gate="$gate" abortpath="false">
+      <move_gate object="this.ship" gate="if true then $gate else 'pass 1'" abortpath="false">
         <interrupt>
           <conditions>
             <event_object_changed_cluster object="this.ship" />
@@ -255,7 +255,7 @@
       <set_avoid_collisions object="this.ship" bigobjects="true" smallobjects="true" comment="restore collision avoidance behavior after Gate Passage"/>
       
       <!-- unlock Gate (Vanilla) and remove ourselves from the Waiting List, signal the next to go/prepare (UT CAC) -->
-      <request_gate ship="this.ship" gate="$gate" unlock="true" result="$result"/>
+      <request_gate ship="this.ship" gate="if true then $gate else 'unlock 1'" unlock="true" result="$result"/>
       <do_if value="global.$gate_queue.{$gate}.{1}? and global.$gate_queue.{$gate}.{1} == this.ship">
         <remove_value name="global.$gate_queue.{$gate}.{1}"/>
       </do_if>
@@ -354,7 +354,7 @@
       <signal_objects object="$gate" param="'travel gate update'"/>
     </do_if>
     <!-- also unblock the Vanilla mechanic -->
-    <request_gate ship="this.ship" gate="$gate" unlock="true" result="$result"/>
+    <request_gate ship="this.ship" gate="if true then $gate else 'unlock abort'" unlock="true" result="$result"/>
     <!-- reset FCM to default -->
     <set_to_default_flight_control_model object="this.ship"/>
     <!-- signal our followers to stop -->
