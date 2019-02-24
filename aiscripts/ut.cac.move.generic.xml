@@ -322,7 +322,7 @@
           <set_value name="$pathend" exact="$targetspace.sector"/>
         </do_else>
         <get_jump_path component="$waypoints" multiple="true" start="this.sector" end="$pathend"/>
-        <remove_value name="$pathend"/>
+        <!--remove_value name="$pathend"/-->
         <!-- set last Entry with the Target Sector to the exact Target Space so we can determine the closest Beacon -->
         <set_value name="$waypoints.{$waypoints.count}" exact="$targetspace"/>
         
@@ -332,11 +332,12 @@
         <do_if value="@this.$debug">
           <set_value name="$LogMessage" exact="'%1 %2 Jump Path to %3:'.[this.name,this.container.name,$pathend.knownname]"/>
           <do_all exact="$waypoints.count" counter="$i">
-            <set_value name="$LogMessage" exact="'%1\n%2 - %3 // %4 // %5 // %6'.[$LogMessage,$i,$waypoints.{$i}.class,$waypoints.{$i}.knownname,@$waypoints.{$i}.cluster.knownname,@$waypoints.{$i}.sector.knownname]"/>
+            <set_value name="$LogMessage" exact="'%1\n%2 - %3 // %4 // %5 // %6'.[$LogMessage,$i,$waypoints.{$i}.class,$waypoints.{$i}.knownname,@$waypoints.{$i}.sector.knownname,@$waypoints.{$i}.cluster.knownname]"/>
           </do_all>
           <debug_text filter="general" text="$LogMessage"/>
                 <debug_text filter="general" text="'End unfiltered Path'"/>
         </do_if>
+        <remove_value name="$pathend"/>
         
         <!-- filter the Jump Path for the relevant Path Waypoints (Filter out Sectors where next Waypoint is a Gate in the same Sector, filter out Exit Gate in case we already have an Entry Gate, filter out Exit Gate Sector)-->
         <!--  remove the first item which is always the Start that we dont need in any case -->
@@ -417,7 +418,7 @@
         <do_if value="@this.$debug">
           <set_value name="$LogMessage" exact="'%1 %2 Jump Path cleared:'.[this.name,this.container.name]"/>
           <do_all exact="$waypoints.count" counter="$i">
-            <set_value name="$LogMessage" exact="'%1\n%2 - %3 // %4 // %5 // %6'.[$LogMessage,$i,$waypoints.{$i}.class,$waypoints.{$i}.knownname,@$waypoints.{$i}.cluster.knownname,@$waypoints.{$i}.sector.knownname]"/>
+            <set_value name="$LogMessage" exact="'%1\n%2 - %3 // %4 // %5 // %6'.[$LogMessage,$i,$waypoints.{$i}.class,$waypoints.{$i}.knownname,@$waypoints.{$i}.sector.knownname,@$waypoints.{$i}.cluster.knownname]"/>
           </do_all>
           <debug_text filter="general" text="$LogMessage"/>
         </do_if>
