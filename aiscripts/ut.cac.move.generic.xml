@@ -344,7 +344,32 @@
         <!--remove_value name="$waypoints.{1}"/-->
         <set_value name="$id" exact="1"/>
         <do_while value="$id lt $waypoints.count">
-          <do_if value="$waypoints.{$id}.isclass.sector and $waypoints.{$id+1}.isclass.sector">
+          <do_if value="$waypoints.{$id}.isclass.sector and $waypoints.{$id+1}.isclass.gate">
+            <do_if value="$waypoints.{$id} == $waypoints.{$id+1}.sector">
+                <debug_text filter="general" chance="@this.$debug * 100" text="'Removing Sector because next Entry is a Gate in there'"/>
+                <debug_text filter="general" chance="@this.$debug * 100" text="'Sector: %1 // %2 ; Gate: %3 // %4 // %5'.[$waypoints.{$id}.class,$waypoints.{$id}.knownname,$waypoints.{$id+1}.class,$waypoints.{$id+1}.knownname,$waypoints.{$id+1}.sector.knownname]"/>
+                <remove_value name="$waypoints.{$id}"/>
+                <set_value name="$id" operation="subtract" comment="just removed an entry - dont advance"/>
+            </do_if>
+            <do_else>
+                <debug_text filter="error" text="'Next Gate not Contained in Sector - will still remove the Sector, but will send the ship through half the galaxy in Slowmo!!!'"/>
+                <debug_text filter="error" text="'Sector: %1 // %2 ; Gate: %3 // %4 // %5'.[$waypoints.{$id}.class,$waypoints.{$id}.knownname,$waypoints.{$id+1}.class,$waypoints.{$id+1}.knownname,$waypoints.{$id+1}.sector.knownname]"/>
+                <remove_value name="$waypoints.{$id}"/>
+                <set_value name="$id" operation="subtract" comment="just removed an entry - dont advance"/>
+            </do_else>
+          </do_if>
+          <do_elseif value="$waypoints.{$id}.isclass.gate and $waypoints.{$id+1}.isclass.gate">
+            <do_if value="$waypoints.{$id} == $waypoints.{$id+1}.exit">
+                <debug_text filter="general" chance="@this.$debug * 100" text="'Two connected Gates - removing Exit'"/>
+                <debug_text filter="general" chance="@this.$debug * 100" text="'Start: %1 // %2 //%3 ; Destination: %4 // %5 // %6'.[$waypoints.{$id}.class,$waypoints.{$id}.knownname,$waypoints.{$id}.sector.knownname,$waypoints.{$id+1}.class,$waypoints.{$id+1}.knownname,$waypoints.{$id+1}.sector.knownname]"/>
+                <remove_value name="$waypoints.{$id+1}"/>
+            </do_if>
+            <do_else>
+                <debug_text filter="error" text="'Two unconnected Gates - doing nothing!!'"/>
+                <debug_text filter="error" text="'Gate1: %1 // %2 //%3 ; Gate2: %4 // %5 // %6'.[$waypoints.{$id}.class,$waypoints.{$id}.knownname,$waypoints.{$id}.sector.knownname,$waypoints.{$id+1}.class,$waypoints.{$id+1}.knownname,$waypoints.{$id+1}.sector.knownname]"/>
+            </do_else>
+          </do_elseif>
+          <do_elseif value="$waypoints.{$id}.isclass.sector and $waypoints.{$id+1}.isclass.sector">
             <find_object_component name="$search1" object="$waypoints.{$id}.cluster" class="class.highwayentrygate" destination="$waypoints.{$id+1}"/>
             <find_object_component name="$search2" object="$waypoints.{$id}" class="class.highwayentrygate" destination="$waypoints.{$id+1}"/>
             <!-- Modified Ego code - intended to be replaced by the line above -->
@@ -358,31 +383,21 @@
                 <break/>
               </do_if>
             </do_all>
-          </do_if>
-          <do_elseif value="$waypoints.{$id}.isclass.sector and $waypoints.{$id+1}.isclass.gate">
-            <do_if value="$waypoints.{$id} == $waypoints.{$id+1}.sector">
-                <debug_text filter="general" chance="@this.$debug * 100" text="'Removing Sector because next Entry is a Gate in there'"/>
-                <debug_text filter="general" chance="@this.$debug * 100" text="'Sector: %1 // %2 ; Gate: %3 // %4 // %5'.[$waypoints.{$id}.class,$waypoints.{$id}.knownname,$waypoints.{$id+1}.class,$waypoints.{$id+1}.knownname,$waypoints.{$id+1}.sector.knownname]"/>
-                <remove_value name="$waypoints.{$id}"/>
-                <set_value name="$id" operation="subtract" comment="just removed an entry - dont advance"/>
-            </do_if>
-            <do_else>
-                <debug_text filter="error" text="'Next Gate not Contained in Sector - will still remove the Sector, but will send the ship through half the galaxy in Slowmo!!!'"/>
-                <debug_text filter="error" text="'Sector: %1 // %2 ; Gate: %3 // %4 // %5'.[$waypoints.{$id}.class,$waypoints.{$id}.knownname,$waypoints.{$id+1}.class,$waypoints.{$id+1}.knownname,$waypoints.{$id+1}.sector.knownname]"/>
-                <remove_value name="$waypoints.{$id}"/>
-                <set_value name="$id" operation="subtract" comment="just removed an entry - dont advance"/>
-            </do_else>
           </do_elseif>
-          <do_elseif value="$waypoints.{$id}.isclass.gate and $waypoints.{$id+1}.isclass.gate">
-            <do_if value="$waypoints.{$id} == $waypoints.{$id+1}.exit">
-                <debug_text filter="general" chance="@this.$debug * 100" text="'Two connected Gates - removing Exit'"/>
-                <debug_text filter="general" chance="@this.$debug * 100" text="'Start: %1 // %2 //%3 ; Destination: %4 // %5 // %6'.[$waypoints.{$id}.class,$waypoints.{$id}.knownname,$waypoints.{$id}.sector.knownname,$waypoints.{$id+1}.class,$waypoints.{$id+1}.knownname,$waypoints.{$id+1}.sector.knownname]"/>
-                <remove_value name="$waypoints.{$id+1}"/>
-            </do_if>
-            <do_else>
-                <debug_text filter="error" text="'Two unconnected Gates - doing nothing!!'"/>
-                <debug_text filter="error" text="'Gate1: %1 // %2 //%3 ; Gate2: %4 // %5 // %6'.[$waypoints.{$id}.class,$waypoints.{$id}.knownname,$waypoints.{$id}.sector.knownname,$waypoints.{$id+1}.class,$waypoints.{$id+1}.knownname,$waypoints.{$id+1}.sector.knownname]"/>
-            </do_else>
+          <do_elseif value="$waypoints.{$id}.isclass.sector and $waypoints.{$id+1}.exists">
+            <find_object_component name="$search1" object="$waypoints.{$id}.cluster" class="class.highwayentrygate" destination="$waypoints.{$id+1}"/>
+            <find_object_component name="$search2" object="$waypoints.{$id}.sector" class="class.highwayentrygate" destination="$waypoints.{$id+1}"/>
+            <!-- Modified Ego code - intended to be replaced by the line above -->
+            <find_object_component name="$highways" object="$waypoints.{$id}.cluster" class="class.highway" destination="$waypoints.{$id+1}.sector" multiple="true"/>
+            <do_all exact="$highways.count" counter="$i">
+              <do_if value="$highways.{$i}.issuperhighway and $highways.{$i}.origin.sector == $waypoints.{$id}">
+                <set_value name="$gate" exact="$highways.{$i}.entry"/>
+                <debug_text filter="general" chance="@this.$debug * 100" text="'Replaced Sector with Entrygate:'"/>
+                <debug_text filter="general" chance="@this.$debug * 100" text="'Gate Search: Original: %1 // %2 ; Search1: %3 // %4 // %5 ; Search2: %6 // %7 // %8'.[$gate.class,$gate.knownname,@$search1.class,@$search1.knownname,@$search1 == $gate,@$search2.class,@$search2.knownname,@$search2 == $gate]"/>
+                <set_value name="$waypoints.{$id}" exact="$gate"/>
+                <break/>
+              </do_if>
+            </do_all>
           </do_elseif>
           <set_value name="$id" operation="add"/>
         </do_while>
