@@ -330,7 +330,7 @@
         <set_value name="$temp_debug" exact="@this.$debug"/>
         <set_value name="this.$debug" exact="true"/>
         <do_if value="@this.$debug">
-          <set_value name="$LogMessage" exact="'%1 %2 Jump Path:'.[this.name,this.container.name]"/>
+          <set_value name="$LogMessage" exact="'%1 %2 Jump Path to %3:'.[this.name,this.container.name,$pathend.knownname]"/>
           <do_all exact="$waypoints.count" counter="$i">
             <set_value name="$LogMessage" exact="'%1\n%2 - %3 // %4 // %5 // %6'.[$LogMessage,$i,$waypoints.{$i}.class,$waypoints.{$i}.knownname,@$waypoints.{$i}.cluster.knownname,@$waypoints.{$i}.sector.knownname]"/>
           </do_all>
