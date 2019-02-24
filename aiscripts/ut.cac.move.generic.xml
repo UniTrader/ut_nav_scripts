@@ -164,6 +164,7 @@
           <event_object_signalled object="$destination" param="'travel next waypoint'"/>
           <event_object_changed_zone object="this.ship"/>
         </check_any>
+        <check_value value="not $destination.isclass.{[class.cluster,class.sector,class.zone]}"/>
         <check_value value="$targetspace != ( if $destination.pilot.$waypoint? then $destination.pilot.$waypoint else $destination.zone )"/>
       </conditions>
       <actions>
