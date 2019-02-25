@@ -153,6 +153,9 @@
       </conditions>
       <actions>
         <debug_text filter="error" text="'%1 %2 Destination destroyed: %3'.[this.name,this.container.knownname,event.param.knownname,@$destination.knownname]"/>
+        <debug_to_file name="sucesslog.txt" directory="navscripts" text="
+'%1 %2 %3 destination destroyed from %4 // %5 to %6 // %7 // %8 '.[player.age, this.knownname, this.ship.knownname, $logvalues.{2}.sector.knownname, $logvalues.{2}.cluster.knownname, @$logvalues.{3}.knownname, @$logvalues.{3}.sector.knownname, @$logvalues.{3}.cluster.knownname ] + 
+'(actual location: %1 // %2 ) in %3'.[this.sector.knownname, this.cluster.knownname, ( player.age - $logvalues.{1} )min]"/>
         <abort_called_scripts/>
         <return value="1"/>
       </actions>
@@ -171,6 +174,9 @@
         <do_if value="$destination.zone == this.zone">
           <!-- Somehow check if there is a movement Step currently in progress before exit-ing? -->
           <debug_text filter="general" text="'%1 %2 Catchup Sucessful on Zone Change in %3, met %4 - exiting'.[this.name,this.container.knownname,this.zone.knownname,$destination.knownname]"/>
+          <debug_to_file name="sucesslog.txt" directory="navscripts" text="
+'%1 %2 %3 catched up from %4 // %5 to %6 // %7 // %8 '.[player.age, this.knownname, this.ship.knownname, $logvalues.{2}.sector.knownname, $logvalues.{2}.cluster.knownname, @$logvalues.{3}.knownname, @$logvalues.{3}.sector.knownname, @$logvalues.{3}.cluster.knownname ] + 
+'(actual location: %1 // %2 ) in %3'.[this.sector.knownname, this.cluster.knownname, ( player.age - $logvalues.{1} )min]"/>
           <return/>
         </do_if>
         <do_if value="event.object == $destination">
@@ -212,6 +218,7 @@
       
       <set_value name="$bigship" exact="this.ship.isclass.ship_xl or this.ship.isclass.ship_l"/>
       
+      <set_value name="$logvalues" exact="[player.age, this.ship.zone, $destination]"/>
       
       <!-- first Validate Input -
       A) was a correct/existent Destination passed
@@ -220,6 +227,9 @@
       
       <do_if value="not $destination.exists">
         <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Destination does not exist - aborting'.[this.name,this.container.name]"/>
+        <debug_to_file name="sucesslog.txt" directory="navscripts" text="
+'%1 %2 %3 destination nonexistent from %4 // %5 to %6 // %7 // %8 '.[player.age, this.knownname, this.ship.knownname, $logvalues.{2}.sector.knownname, $logvalues.{2}.cluster.knownname, @$logvalues.{3}.knownname, @$logvalues.{3}.sector.knownname, @$logvalues.{3}.cluster.knownname ] + 
+'(actual location: %1 // %2 ) in %3'.[this.sector.knownname, this.cluster.knownname, ( player.age - $logvalues.{1} )min]"/>
         <return value="2"/>
       </do_if>
       
@@ -279,6 +289,9 @@
       <do_if value="this.ship.hascontext.{$targetspace}">
         <do_if value="$destination == $targetspace and $endintargetspace">
           <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Already has right Context - Exit without movement'.[this.name,this.container.name]"/>
+          <debug_to_file name="sucesslog.txt" directory="navscripts" text="
+'%1 %2 %3 already at destinationspace from %4 // %5 to %6 // %7 // %8 '.[player.age, this.knownname, this.ship.knownname, $logvalues.{2}.sector.knownname, $logvalues.{2}.cluster.knownname, @$logvalues.{3}.knownname, @$logvalues.{3}.sector.knownname, @$logvalues.{3}.cluster.knownname ] + 
+'(actual location: %1 // %2 ) in %3'.[this.sector.knownname, this.cluster.knownname, ( player.age - $logvalues.{1} )min]"/>
           <return/>
         </do_if>
         <do_elseif value="$endintargetspace">
@@ -294,6 +307,9 @@
           </do_if>
           <do_else>
             <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Is already in the right Zone - Exit without movement'.[this.name,this.container.name]"/>
+            <debug_to_file name="sucesslog.txt" directory="navscripts" text="
+'%1 %2 %3 destination arrived here from %4 // %5 to %6 // %7 // %8 '.[player.age, this.knownname, this.ship.knownname, $logvalues.{2}.sector.knownname, $logvalues.{2}.cluster.knownname, @$logvalues.{3}.knownname, @$logvalues.{3}.sector.knownname, @$logvalues.{3}.cluster.knownname ] + 
+'(actual location: %1 // %2 ) in %3'.[this.sector.knownname, this.cluster.knownname, ( player.age - $logvalues.{1} )min]"/>
           </do_else>
           <return/>
         </do_elseif>
@@ -545,6 +561,9 @@
           <do_if value="this.ship.hascontext.{$targetspace}">
             <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 We have Destination Context in %3'.[this.name,this.container.knownname,this.$waypoint.knownname]"/>
             <!-- we have reached the Target Space (which is a Sector or Cluster) - Exit -->
+            <debug_to_file name="sucesslog.txt" directory="navscripts" text="
+'%1 %2 %3 arrived in targetspace from %4 // %5 to %6 // %7 // %8 '.[player.age, this.knownname, this.ship.knownname, $logvalues.{2}.sector.knownname, $logvalues.{2}.cluster.knownname, @$logvalues.{3}.knownname, @$logvalues.{3}.sector.knownname, @$logvalues.{3}.cluster.knownname ] + 
+'(actual location: %1 // %2 ) in %3'.[this.sector.knownname, this.cluster.knownname, ( player.age - $logvalues.{1} )min]"/>
             <return/>
           </do_if>
           <remove_value name="$waypoints.{1}"/>
@@ -627,6 +646,10 @@
           <set_skill entity="this" type="skilltype.navigation" exact="1"/>
         </do_elseif>
       </do_if>-->
+      
+      <debug_to_file name="sucesslog.txt" directory="navscripts" text="
+'%1 %2 %3 completed journey from %4 // %5 to %6 // %7 // %8 '.[player.age, this.knownname, this.ship.knownname, $logvalues.{2}.sector.knownname, $logvalues.{2}.cluster.knownname, @$logvalues.{3}.knownname, @$logvalues.{3}.sector.knownname, @$logvalues.{3}.cluster.knownname ] + 
+'(actual location: %1 // %2 ) in %3'.[this.sector.knownname, this.cluster.knownname, ( player.age - $logvalues.{1} )min]"/>
       
       <set_value name="this.$waypoint" exact="this.zone"/>
       <remove_value name="this.$destination"/>
