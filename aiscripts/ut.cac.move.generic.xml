@@ -485,7 +485,7 @@
               <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Jumping to %3'.[this.name,this.container.knownname,this.$waypoint.knownname]"/>
               <!-- JUMP!! -->
               <debug_text filter="error" text="'%1 %2 Warping to %3 as fallback - should not happen yet!!!'.[this.name,this.container.knownname,this.$waypoint.knownname]"/>
-              <warp object="this.ship" sector="this.waypoint"><safepos/></warp>
+              <warp object="this.ship" sector="this.$waypoint"><safepos/></warp>
               <do_if value="false" comment="disabled for X4">
               <run_script name="'ut.cac.move.jump'" result="$result">
                 <param name="destination" value="this.$waypoint"/>
@@ -522,8 +522,8 @@
                 <param name="position" value="position.[0m,0m,0-(this.ship.size + this.$waypoint.size)]" comment="relative to destination! (including its rotation)"/>
               </run_script>
               <do_if value="not this.ship.hascontext.{this.$waypoint.zone}">
-                <debug_text filter="error" text="'Move Gate - Boost Failed! Destination: %1 / %2 Current Sector/Zone: %3 / %4 // distance to destination: %5 - restarting'.[@this.$waypoint.sector.knownname,this.$waypoint.name,this.sector.knownname,this.zone.knownname,this.ship.distanceto.{this.waypoint}]"/>
-                <do_if value="this.ship.distanceto.{this.waypoint} gt 10km">
+                <debug_text filter="error" text="'Move Gate - Boost Failed! Destination: %1 / %2 Current Sector/Zone: %3 / %4 // distance to destination: %5 - restarting'.[@this.$waypoint.sector.knownname,this.$waypoint.name,this.sector.knownname,this.zone.knownname,this.ship.distanceto.{this.$waypoint}]"/>
+                <do_if value="this.ship.distanceto.{this.$waypoint} gt 10km">
                   <resume label="start"/>
                 </do_if>
               </do_if>
