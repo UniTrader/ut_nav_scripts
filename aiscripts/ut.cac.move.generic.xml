@@ -247,6 +247,7 @@
       <do_if value="$destination.isclass.galaxy or $destination.isclass.cluster or $destination.isclass.sector or $destination.isclass.zone">
         <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Destination is a Space - Move until we have the right Context'.[this.name,this.container.name]"/>
         <set_value name="$targetspace" exact="$destination"/>
+        <set_value name="$endintargetspace" exact="true"/>
       </do_if>
       <do_elseif value="$destination.isclass.ship">
         <do_if value="$destination.pilot.$waypoint?">
