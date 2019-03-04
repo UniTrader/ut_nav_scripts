@@ -345,15 +345,15 @@
         <set_value name="$waypoints.{$waypoints.count}" exact="$targetspace"/>
         
         <!-- For Testing: print the full Path to Debuglog -->
-        <set_value name="$temp_debug" exact="@this.$debug"/>
-        <set_value name="this.$debug" exact="true"/>
+        <!--set_value name="$temp_debug" exact="@this.$debug"/>
+        <set_value name="this.$debug" exact="true"/-->
         <do_if value="@this.$debug">
           <set_value name="$LogMessage" exact="'%1 %2 Jump Path to %3:'.[this.name,this.container.name,$pathend.knownname]"/>
           <do_all exact="$waypoints.count" counter="$i">
             <set_value name="$LogMessage" exact="'%1\n%2 - %3 // %4 // %5 // %6'.[$LogMessage,$i,$waypoints.{$i}.class,$waypoints.{$i}.knownname,@$waypoints.{$i}.sector.knownname,@$waypoints.{$i}.cluster.knownname]"/>
           </do_all>
           <debug_text filter="general" text="$LogMessage"/>
-                <debug_text filter="general" text="'End unfiltered Path'"/>
+          <debug_text filter="general" text="'End unfiltered Path'"/>
         </do_if>
         <remove_value name="$pathend"/>
         
@@ -457,9 +457,9 @@
         </do_if>
         
         
-        <set_value name="this.$debug" exact="$temp_debug"/>
+        <!--set_value name="this.$debug" exact="$temp_debug"/>
         <remove_value name="$temp_debug"/>
-        <remove_value  name="this.$debug" chance="(this.$debug == false) * 100"/>
+        <remove_value  name="this.$debug" chance="(this.$debug == false) * 100"/-->
         
         <!-- Track Experience Progress: Save time when Navigation started and ended 
         <do_if value="this.$ut_cac.$experience.{skilltype.navigation}?">
