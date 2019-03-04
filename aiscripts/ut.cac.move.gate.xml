@@ -370,10 +370,6 @@
         </do_while>
       </do_else>
       
-      <!-- Temp debug output to confirm sucessfull passages in the Log -->
-      <do_if value="not $gate.isclass.gate">
-        <debug_text filter="error" text="'%1 %2 Just passed an Highwayentrygate sucessful'.[this.name,this.container.name,global.$gate_queue.{$gate}.indexof.{this.ship}]"/>
-      </do_if>
     </actions>
   </attention>
   <on_abort>
