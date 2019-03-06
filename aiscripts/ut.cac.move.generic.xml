@@ -489,6 +489,7 @@
               </do_if>
               <do_if value="not this.ship.hascontext.{this.$waypoint}">
                 <debug_text filter="error" text="'Jump Failed! Destination: %1 / %2 Current Sector/Zone: %3 / %4 - restarting'.[@this.$waypoint.sector.knownname,this.$waypoint.name,this.sector.knownname,this.zone.knownname]"/>
+                <wait exact="1min"/>
                 <resume label="start"/>
               </do_if>
             </do_if>
@@ -505,6 +506,7 @@
               </run_script>
               <do_if value="not this.ship.hascontext.{this.$waypoint.sector}">
                 <debug_text filter="error" text="'Move Gate - Jump Failed! Destination: %1 / %2 Current Sector/Zone: %3 / %4 - restarting'.[@this.$waypoint.sector.knownname,this.$waypoint.name,this.sector.knownname,this.zone.knownname]"/>
+                <wait exact="1min"/>
                 <resume label="start"/>
               </do_if>
             </do_if>
@@ -520,6 +522,7 @@
               <do_if value="not this.ship.hascontext.{this.$waypoint.zone}">
                 <debug_text filter="error" text="'Move Gate - Boost Failed! Destination: %1 / %2 / %3 Current Sector/Zone: %4 / %5 // distance to destination: %6 - restarting'.[@this.$waypoint.sector.knownname,@this.$waypoint.zone.knownname,this.$waypoint.name,this.sector.knownname,this.zone.knownname,this.ship.distanceto.{this.$waypoint}]"/>
                 <do_if value="this.ship.distanceto.{this.$waypoint} gt 10km">
+                  <wait exact="1min"/>
                   <resume label="start"/>
                 </do_if>
               </do_if>
@@ -533,6 +536,7 @@
             </run_script>
             <do_if value="not this.ship.hascontext.{this.$waypoint.destination}">
               <debug_text filter="error" text="'Move Gate itself Failed! Destination: %1 / %2 Current Sector/Zone: %3 / %4 - restarting'.[@this.$waypoint.sector.knownname,this.$waypoint.name,this.sector.knownname,this.zone.knownname]"/>
+              <wait exact="1min"/>
               <resume label="start"/>
             </do_if>
           </do_elseif>
@@ -547,6 +551,7 @@
               </run_script>
               <do_if value="not this.ship.hascontext.{this.$waypoint.sector}">
                 <debug_text filter="error" text="'Move Zone - Jump Failed! Destination: %1 / %2 Current Sector/Zone: %3 / %4 - restarting'.[@this.$waypoint.sector.knownname,this.$waypoint.name,this.sector.knownname,this.zone.knownname]"/>
+                <wait exact="1min"/>
                 <resume label="start"/>
               </do_if>
             </do_if>
@@ -570,7 +575,7 @@
         </do_while>
         <debug_text filter="error" text="'%1 %2 This Part should NEVER be reached!!! last waypoint: %3, destination: %4 - Waiting and Restarting'.[this.name,this.container.knownname,this.$waypoint.knownname,$destination.knownname]"/>
         <play_sound object="player.entity" sound="'cockpit_alert'"/>
-        <wait exact="10min"/>
+        <wait exact="1min"/>
         <resume label="start"/>
       </do_if>
       <do_else>
