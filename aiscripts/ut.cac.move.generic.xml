@@ -251,13 +251,30 @@
           <set_value name="$targetspace" exact="$destination.pilot.$waypoint"/>
           <do_if value="$targetspace.isclass.gate">
             <set_value name="$targetspace" exact="$targetspace.destination"/>
+            <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Destination is a Ship which has announced its next movement Step - follow it to Jumpgate Destination %3 to meet up'.[this.name,this.container.knownname,$targetspace.knownname]"/>
           </do_if>
-          <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Destination is a Ship which has announced its next movement Step - follow it to %3 to meet up'.[this.name,this.container.knownname,$targetspace.knownname]"/>
+          <do_elseif value="$targetspace.isclass.gate">
+            <set_value name="$targetspace" exact="$targetspace.destination"/>
+            <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Destination is a Ship which has announced its next movement Step - follow it to Highway Destination%3 to meet up'.[this.name,this.container.knownname,$targetspace.knownname]"/>
+          </do_elseif>
+          <do_else>
+            <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Destination is a Ship which has announced its next movement Step - follow it to %3 to meet up'.[this.name,this.container.knownname,$targetspace.knownname]"/>
+          </do_else>
         </do_if>
         <do_else>
           <set_value name="$targetspace" exact="$destination.zone"/>
           <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Destination is a Ship ( %4  // %5 ) which didnt announce its movement intention - Fly to its Zone %3'.[this.name,this.container.knownname,$targetspace.knownname,$destination.knownname,$destination.pilot.knownname]"/>
         </do_else>
+      </do_elseif>
+      <do_elseif value="$destination.isclass.gate">
+        <set_value name="$destination" exact="$destination"/>
+        <set_value name="$targetspace" exact="$destination.destination"/>
+        <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Destination is a Jumpgate - pass through'.[this.name,this.container.name]"/>
+      </do_elseif>
+      <do_elseif value="$destination.isclass.gate">
+        <set_value name="$destination" exact="$destination"/>
+        <set_value name="$targetspace" exact="$destination.destination"/>
+        <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Destination is a Highwayentrygate - pass through'.[this.name,this.container.name]"/>
       </do_elseif>
       <do_else>
         <set_value name="$targetspace" exact="$destination.zone"/>
