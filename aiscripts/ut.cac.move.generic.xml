@@ -17,6 +17,7 @@
     <param name="position" default="null" comment="position is treated as an offset to destination. Default: safe position on [0,0,0] of destination"/>
     <param name="rotation" default="null" comment="rotation the ship should have - overridden by lookat"/>
     <param name="lookat" default="null" comment="position the ship should point to - overrides rotation"/>
+    <param name="gotogate" default="null" comment="Dont go through the Jump/Highway gate to its datination, but just near the Gate itself"/>
     <param name="endintargetspace" default="false" comment="complete this script if we have the correct Space context, no matter where (may be Cluster, Sector or Zone, will resolve to Zone if an Object is the destination)"/>
     <param name="exitonneworder" default="false" comment="Exit immediately when receiving a new Order. If set to a Number of 2 or greater this is the Number of Orders the this.{$orderlist} has to contain before aborting (since 1 is always this Script)"/>
   </params>
@@ -266,15 +267,16 @@
           <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Destination is a Ship ( %4  // %5 ) which didnt announce its movement intention - Fly to its Zone %3'.[this.name,this.container.knownname,$targetspace.knownname,$destination.knownname,$destination.pilot.knownname]"/>
         </do_else>
       </do_elseif>
-      <do_elseif value="$destination.isclass.gate">
-        <set_value name="$destination" exact="$destination"/>
-        <set_value name="$targetspace" exact="$destination.destination"/>
-        <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Destination is a Jumpgate - pass through'.[this.name,this.container.name]"/>
-      </do_elseif>
-      <do_elseif value="$destination.isclass.gate">
-        <set_value name="$destination" exact="$destination"/>
-        <set_value name="$targetspace" exact="$destination.destination"/>
-        <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Destination is a Highwayentrygate - pass through'.[this.name,this.container.name]"/>
+      <do_elseif value="$destination.isclass.{[class.gate,class.highwayentrygate]}">
+        <do_if value="$gotogate">
+        <set_value name="$targetspace" exact="$destination.highway.origin"/>
+        <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Destination is a Jump/Highwaygate, but we have been tolt to not go through, so just getting close'.[this.name,this.container.name]"/>
+        </do_if>
+        <do_else>
+          <set_value name="$destination" exact="$destination"/>
+          <set_value name="$targetspace" exact="$destination.destination"/>
+          <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Destination is a Jump/Highwaygate - pass through'.[this.name,this.container.name]"/>
+        </do_else>
       </do_elseif>
       <do_else>
         <set_value name="$targetspace" exact="$destination.zone"/>
