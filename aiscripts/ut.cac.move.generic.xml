@@ -176,7 +176,7 @@
           <!-- Somehow check if there is a movement Step currently in progress before exit-ing? -->
           <debug_text filter="general" text="'%1 %2 Catchup Sucessful on Zone Change in %3, met %4 - exiting'.[this.name,this.container.knownname,this.zone.knownname,$destination.knownname]"/>
           <debug_to_file name="'sucesslog.txt'" directory="'navscripts'" text="
-'%s %s %s %s catched up from %s // %s to %s // %s // %s (actual location: %s // %s )'.[player.age, this.knownname, this.ship.knownname, $logvalues.{2}.sector.knownname, $logvalues.{2}.cluster.knownname, @$logvalues.{3}.knownname, @$logvalues.{3}.sector.knownname, @$logvalues.{3}.cluster.knownname, this.sector.knownname, this.cluster.knownname,player.age - $logvalues.{1}]"/>
+'%s %s %s %s catched up from %s // %s to %s // %s // %s (actual location: %s // %s )'.[player.age, player.age - $logvalues.{1}, this.knownname, global.$navscripts_active, this.ship.knownname, $logvalues.{2}.sector.knownname, $logvalues.{2}.cluster.knownname, @$logvalues.{3}.knownname, @$logvalues.{3}.sector.knownname, @$logvalues.{3}.cluster.knownname, this.sector.knownname, this.cluster.knownname]"/>
           <set_value name="global.$navscripts_active" operation="subtract"/>
           <return/>
         </do_if>
