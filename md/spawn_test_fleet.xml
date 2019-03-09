@@ -6,7 +6,7 @@
         <cue_is_complete cue="md.Setup.Start"/>
       </conditions>
       <actions>
-        <do_all exact="10">
+        <do_all exact="10" counter="$i">
           <create_ship name="$Testship" zone="player.zone">
             <select size="[class.ship_xl,class.ship_l].random"/>
             <pilot macro="character_boron_generic_01_macro">
@@ -24,6 +24,7 @@
             <safepos object="player.ship" radius="5km"/>
           </create_ship>
         </do_all>
+        <set_value name="$Testship.idcode" exact="'TST-00' + ( $i - 1 )"/>
       </actions>
     </cue>
   </cues>
