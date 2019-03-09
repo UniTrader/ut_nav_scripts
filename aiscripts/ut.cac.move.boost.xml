@@ -23,7 +23,7 @@
     <handler comment="Exploding Rocks">
       <conditions>
         <event_object_collided object="this.ship"/>
-        <check_value value="this.ship.boost.active"/>
+        <check_value value="this.ship.travel.active"/>
         <check_value value="event.param.isclass.asteroid"/>
       </conditions>
       <actions>
@@ -77,7 +77,7 @@
         <return/>
       </do_elseif>
       <do_if value="$destination == this.zone and ( ( not $position ) or this.ship.distanceto.{$position} lt 5km )">
-        <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Already in the right Zone and close to Target Position - so why boosting?'.[this.name,this.container.knownname]"/>
+        <debug_text filter="general" text="'%1 %2 Already in the right Zone and close to Target Position - so why boosting?'.[this.name,this.container.knownname]"/><!-- chance="@this.$debug * 100"-->
         <return/>
       </do_if>
       <do_if value="not $leader and $leader_preparegroup">
@@ -106,8 +106,8 @@
       <!-- also consider adding a Sector-to-Sector-Boost here (with Context Switch) -->
       
       <!-- check if we *CAN* Boost -->
-      <do_if value="this.ship.boost.available">
-        <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Ship engine booster not available currently. Flight from %3(%4) to %5(%6) might take longer than planned'.[this.name,this.container.knownname , this.zone.knownname, this.sector.knownname, @$destination.zone.knownname, $destination.sector.knownname]" />
+      <do_if value="this.ship.travel.available">
+        <debug_text filter="general" text="'%1 %2 Ship travel engine not available currently. Flight from %3(%4) to %5(%6) might take longer than planned'.[this.name,this.container.knownname , this.zone.knownname, this.sector.knownname, @$destination.zone.knownname, $destination.sector.knownname]" /><!-- chance="@this.$debug * 100"-->
       </do_if>
       
       <!-- set Value to interrupt continonous movement on certain ocassions -->
@@ -287,15 +287,15 @@
         </do_if>
         
         <do_if value="$startpos? and ( this.ship.distanceto.{$startpos} gt this.ship.distanceto.{$position} )">
-          <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Distance to Start Pos greater than Distance to Target - aborting'.[this.name,this.container.knownname]"/>
+          <debug_text filter="general" text="'%1 %2 Distance to Start Pos greater than Distance to Target - aborting'.[this.name,this.container.knownname]"/><!-- chance="@this.$debug * 100"-->
           <return/>
         </do_if>
         <do_if value="$targetpos? and ( this.ship.distanceto.{$targetpos} gt this.ship.distanceto.{$position} )">
-          <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Distance to Target Pos greater than Distance to Target - aborting'.[this.name,this.container.knownname]"/>
+          <debug_text filter="general" text="'%1 %2 Distance to Target Pos greater than Distance to Target - aborting'.[this.name,this.container.knownname]"/><!-- chance="@this.$debug * 100"-->
           <return/>
         </do_if>
         <do_if value="$startpos? and $targetpos? and ( this.ship.distanceto.{$startpos} gt this.ship.distanceto.{$position} ) + ( this.ship.distanceto.{$targetpos} gt this.ship.distanceto.{$position} )">
-          <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Distance flown in Slow Mode greater than Distance to Target - aborting'.[this.name,this.container.knownname]"/>
+          <debug_text filter="general" text="'%1 %2 Distance flown in Slow Mode greater than Distance to Target - aborting'.[this.name,this.container.knownname]"/><!-- chance="@this.$debug * 100"-->
           <return/>
         </do_if>
         
@@ -308,7 +308,7 @@
       <label name="move"/>
       
       <!-- if we are already boosting just change the Destination -->
-      <do_if value="this.ship.boost.active">
+      <do_if value="this.ship.travel.active">
         <set_value name="$abortpath" exact="true"/>
         <resume label="boost"/>
       </do_if>
@@ -533,7 +533,7 @@
     </actions>
   </attention>
   <on_abort>
-    <do_if value="this.ship.boost.active">
+    <do_if value="this.ship.travel.active">
       <stop_boost object="this.ship"/>
     </do_if>
     <stop_moving object="this.ship"/>
