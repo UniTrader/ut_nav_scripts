@@ -155,9 +155,9 @@
       <actions>
         <debug_text filter="error" text="'%1 %2 Destination destroyed: %3 // %4'.[this.name,this.container.knownname,@event.param.knownname,@$destination.knownname]"/>
         <debug_to_file name="'sucesslog.txt'" directory="'navscripts'" text="
-'%s %s %s %s ERROR - destination destroyed from %s // %s to %s // %s // %s (actual location: %s // %s )'.[player.age,player.age - $logvalues.{1}, global.$navscripts_active, this.knownname, this.ship.knownname, $logvalues.{2}.sector.knownname, $logvalues.{2}.cluster.knownname, @$logvalues.{3}.knownname, @$logvalues.{3}.sector.knownname, @$logvalues.{3}.cluster.knownname, this.sector.knownname, this.cluster.knownname]"/>
+'%s %s %s %s ERROR - destination destroyed from %s // %s to %s // %s // %s (actual location: %s // %s )'.[player.age,player.age - $logvalues.{1}, global.$navscripts_active.count, this.knownname, this.ship.knownname, $logvalues.{2}.sector.knownname, $logvalues.{2}.cluster.knownname, @$logvalues.{3}.knownname, @$logvalues.{3}.sector.knownname, @$logvalues.{3}.cluster.knownname, this.sector.knownname, this.cluster.knownname]"/>
         <abort_called_scripts/>
-        <set_value name="global.$navscripts_active" operation="subtract"/>
+        <remove_from_group groupname="global.$navscripts_active" object="this.ship"/>
         <return value="1"/>
       </actions>
     </handler>
@@ -176,8 +176,8 @@
           <!-- Somehow check if there is a movement Step currently in progress before exit-ing? -->
           <debug_text filter="general" text="'%1 %2 Catchup Sucessful on Zone Change in %3, met %4 - exiting'.[this.name,this.container.knownname,this.zone.knownname,$destination.knownname]"/>
           <debug_to_file name="'sucesslog.txt'" directory="'navscripts'" text="
-'%s %s %s %s catched up from %s // %s to %s // %s // %s (actual location: %s // %s )'.[player.age, player.age - $logvalues.{1}, this.knownname, global.$navscripts_active, this.ship.knownname, $logvalues.{2}.sector.knownname, $logvalues.{2}.cluster.knownname, @$logvalues.{3}.knownname, @$logvalues.{3}.sector.knownname, @$logvalues.{3}.cluster.knownname, this.sector.knownname, this.cluster.knownname]"/>
-          <set_value name="global.$navscripts_active" operation="subtract"/>
+'%s %s %s %s catched up from %s // %s to %s // %s // %s (actual location: %s // %s )'.[player.age, player.age - $logvalues.{1}, this.knownname, global.$navscripts_active.count, this.ship.knownname, $logvalues.{2}.sector.knownname, $logvalues.{2}.cluster.knownname, @$logvalues.{3}.knownname, @$logvalues.{3}.sector.knownname, @$logvalues.{3}.cluster.knownname, this.sector.knownname, this.cluster.knownname]"/>
+          <remove_from_group groupname="global.$navscripts_active" object="this.ship"/>
           <return/>
         </do_if>
         <do_if value="event.object == $destination">
@@ -220,7 +220,7 @@
       <set_value name="$bigship" exact="this.ship.isclass.ship_xl or this.ship.isclass.ship_l"/>
       
       <set_value name="$logvalues" exact="[player.age, this.ship.zone, $destination]"/>
-      <set_value name="global.$navscripts_active" operation="add"/>
+      <add_to_group groupname="global.$navscripts_active" object="this.ship"/>
       
       <!-- first Validate Input -
       A) was a correct/existent Destination passed
@@ -230,9 +230,8 @@
       <do_if value="not $destination.exists">
         <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Destination does not exist - aborting'.[this.name,this.container.name]"/>
         <debug_to_file name="'sucesslog.txt'" directory="'navscripts'" text="
-'%s %s %s %s ERROR - destination nonexistent from %s // %s to %s // %s // %s (actual location: %s // %s )'.[player.age,player.age - $logvalues.{1}, global.$navscripts_active, this.knownname, this.ship.knownname, $logvalues.{2}.sector.knownname, $logvalues.{2}.cluster.knownname, @$logvalues.{3}.knownname, @$logvalues.{3}.sector.knownname, @$logvalues.{3}.cluster.knownname, this.sector.knownname, this.cluster.knownname]"/>
-        <set_value name="global.$navscripts_active" operation="subtract"/>
-        <return value="2"/>
+'%s %s %s %s ERROR - destination nonexistent from %s // %s to %s // %s // %s (actual location: %s // %s )'.[player.age,player.age - $logvalues.{1}, global.$navscripts_active.count, this.knownname, this.ship.knownname, $logvalues.{2}.sector.knownname, $logvalues.{2}.cluster.knownname, @$logvalues.{3}.knownname, @$logvalues.{3}.sector.knownname, @$logvalues.{3}.cluster.knownname, this.sector.knownname, this.cluster.knownname]"/>
+        <remove_from_group groupname="global.$navscripts_active" object="this.ship"/>
       </do_if>
       
       <run_script name="'ut.cac.move.free'">
@@ -311,8 +310,8 @@
         <do_if value="$destination == $targetspace and $endintargetspace">
           <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Already has right Context - Exit without movement'.[this.name,this.container.name]"/>
           <debug_to_file name="'sucesslog.txt'" directory="'navscripts'" text="
-'%s %s %s %s already at destinationspace from %s // %s to %s // %s // %s (actual location: %s // %s )'.[player.age,player.age - $logvalues.{1}, global.$navscripts_active, this.knownname, this.ship.knownname, $logvalues.{2}.sector.knownname, $logvalues.{2}.cluster.knownname, @$logvalues.{3}.knownname, @$logvalues.{3}.sector.knownname, @$logvalues.{3}.cluster.knownname, this.sector.knownname, this.cluster.knownname]"/>
-          <set_value name="global.$navscripts_active" operation="subtract"/>
+'%s %s %s %s already at destinationspace from %s // %s to %s // %s // %s (actual location: %s // %s )'.[player.age,player.age - $logvalues.{1}, global.$navscripts_active.count, this.knownname, this.ship.knownname, $logvalues.{2}.sector.knownname, $logvalues.{2}.cluster.knownname, @$logvalues.{3}.knownname, @$logvalues.{3}.sector.knownname, @$logvalues.{3}.cluster.knownname, this.sector.knownname, this.cluster.knownname]"/>
+          <remove_from_group groupname="global.$navscripts_active" object="this.ship"/>
           <return/>
         </do_if>
         <do_elseif value="$endintargetspace">
@@ -329,9 +328,9 @@
           <do_else>
             <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Is already in the right Zone - Exit without movement'.[this.name,this.container.name]"/>
             <debug_to_file name="'sucesslog.txt'" directory="'navscripts'" text="
-'%s %s %s %s destination arrived here from %s // %s to %s // %s // %s (actual location: %s // %s )'.[player.age,player.age - $logvalues.{1}, global.$navscripts_active, this.knownname, this.ship.knownname, $logvalues.{2}.sector.knownname, $logvalues.{2}.cluster.knownname, @$logvalues.{3}.knownname, @$logvalues.{3}.sector.knownname, @$logvalues.{3}.cluster.knownname, this.sector.knownname, this.cluster.knownname]"/>
+'%s %s %s %s destination arrived here from %s // %s to %s // %s // %s (actual location: %s // %s )'.[player.age,player.age - $logvalues.{1}, global.$navscripts_active.count, this.knownname, this.ship.knownname, $logvalues.{2}.sector.knownname, $logvalues.{2}.cluster.knownname, @$logvalues.{3}.knownname, @$logvalues.{3}.sector.knownname, @$logvalues.{3}.cluster.knownname, this.sector.knownname, this.cluster.knownname]"/>
           </do_else>
-          <set_value name="global.$navscripts_active" operation="subtract"/>
+          <remove_from_group groupname="global.$navscripts_active" object="this.ship"/>
           <return/>
         </do_elseif>
         <do_else>
@@ -582,15 +581,15 @@
             </do_if>
             </do_if>
             <resume label="fine movement"/>
-            <set_value name="global.$navscripts_active" operation="subtract"/>
+            <remove_from_group groupname="global.$navscripts_active" object="this.ship"/>
             <return/>
           </do_elseif>
           <do_if value="this.ship.hascontext.{$targetspace}">
             <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 We have Destination Context in %3'.[this.name,this.container.knownname,this.$waypoint.knownname]"/>
             <!-- we have reached the Target Space (which is a Sector or Cluster) - Exit -->
             <debug_to_file name="'sucesslog.txt'" directory="'navscripts'" text="
-'%s %s %s %s arrived in targetspace from %s // %s to %s // %s // %s (actual location: %s // %s )'.[player.age,player.age - $logvalues.{1}, global.$navscripts_active, this.knownname, this.ship.knownname, $logvalues.{2}.sector.knownname, $logvalues.{2}.cluster.knownname, @$logvalues.{3}.knownname, @$logvalues.{3}.sector.knownname, @$logvalues.{3}.cluster.knownname, this.sector.knownname, this.cluster.knownname]"/>
-            <set_value name="global.$navscripts_active" operation="subtract"/>
+'%s %s %s %s arrived in targetspace from %s // %s to %s // %s // %s (actual location: %s // %s )'.[player.age,player.age - $logvalues.{1}, global.$navscripts_active.count, this.knownname, this.ship.knownname, $logvalues.{2}.sector.knownname, $logvalues.{2}.cluster.knownname, @$logvalues.{3}.knownname, @$logvalues.{3}.sector.knownname, @$logvalues.{3}.cluster.knownname, this.sector.knownname, this.cluster.knownname]"/>
+            <remove_from_group groupname="global.$navscripts_active" object="this.ship"/>
             <return/>
           </do_if>
           <remove_value name="$waypoints.{1}"/>
@@ -614,7 +613,7 @@
           <param name="lookat" value="$lookat" comment="position the ship should point to - overridden by rotation"/>
           <param name="endintargetzone" value="$endintargetspace" comment="complete this script if we have the correct Zone context, no matter where"/>
         </run_script>
-        <set_value name="global.$navscripts_active" operation="subtract"/>
+        <remove_from_group groupname="global.$navscripts_active" object="this.ship"/>
         <return/>
       </do_else>
       
@@ -676,11 +675,11 @@
       </do_if>-->
       
       <debug_to_file name="'sucesslog.txt'" directory="'navscripts'" text="
-'%s %s  %s %s %scompleted journey from %s // %s to %s // %s // %s (actual location: %s // %s )'.[player.age,player.age - $logvalues.{1}, global.$navscripts_active, this.knownname, this.ship.knownname, $logvalues.{2}.sector.knownname, $logvalues.{2}.cluster.knownname, @$logvalues.{3}.knownname, @$logvalues.{3}.sector.knownname, @$logvalues.{3}.cluster.knownname, this.sector.knownname, this.cluster.knownname]"/>
+'%s %s  %s %s %scompleted journey from %s // %s to %s // %s // %s (actual location: %s // %s )'.[player.age,player.age - $logvalues.{1}, global.$navscripts_active.count, this.knownname, this.ship.knownname, $logvalues.{2}.sector.knownname, $logvalues.{2}.cluster.knownname, @$logvalues.{3}.knownname, @$logvalues.{3}.sector.knownname, @$logvalues.{3}.cluster.knownname, this.sector.knownname, this.cluster.knownname]"/>
       
       <set_value name="this.$waypoint" exact="this.zone"/>
       <remove_value name="this.$destination"/>
-      <set_value name="global.$navscripts_active" operation="subtract"/>
+      <remove_from_group groupname="global.$navscripts_active" object="this.ship"/>
     </actions>
   </attention>
   <on_abort>
