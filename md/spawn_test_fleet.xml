@@ -23,8 +23,8 @@
             </loadout>
             <safepos object="player.ship" radius="5km"/>
           </create_ship>
+          <set_value name="$Testship.idcode" exact="'TST-00' + ( $i - 1 )"/>
         </do_all>
-        <set_value name="$Testship.idcode" exact="'TST-00' + ( $i - 1 )"/>
       </actions>
     </cue>
   </cues>
