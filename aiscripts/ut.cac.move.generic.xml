@@ -559,7 +559,7 @@
               <param name="gate" value="this.$waypoint"/>
             </run_script>
             <do_if value="not this.ship.hascontext.{this.$waypoint.destination}">
-              <debug_text filter="error" text="'Move Gate itself Failed! Destination: %1 / %2 Current Sector/Zone: %3 / %4 - restarting'.[@this.$waypoint.sector.knownname,this.$waypoint.name,this.sector.knownname,this.zone.knownname]"/>
+              <debug_text filter="error" text="'Move Gate itself Failed! Destination: %s / %s / %s Current Sector/Zone: %s / %s - restarting'.[@this.$waypoint.sector.knownname,@this.$waypoint.zone.knownname,this.$waypoint.knownname,this.sector.knownname,this.zone.knownname]"/>
               <wait exact="1min"/>
               <resume label="start"/>
             </do_if>
