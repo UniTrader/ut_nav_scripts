@@ -9,6 +9,7 @@
         <do_all exact="10" counter="$i">
           <create_ship name="$Testship" zone="player.zone">
             <select size="[class.ship_xl,class.ship_l].random"/>
+            <owner exact="faction.player"/>
             <pilot macro="character_boron_generic_01_macro">
               <owner exact=" faction.player"/>
               <skills>
@@ -23,7 +24,6 @@
             </loadout>
             <safepos object="player.ship" radius="5km"/>
           </create_ship>
-          <set_value name="$Testship.idcode" exact="'TST-00' + ( $i - 1 )"/>
         </do_all>
       </actions>
     </cue>
