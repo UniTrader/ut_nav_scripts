@@ -287,15 +287,15 @@
         </do_if>
         
         <do_if value="$startpos? and ( this.ship.distanceto.{$startpos} gt this.ship.distanceto.{$position} )">
-          <debug_text filter="general" text="'%1 %2 Distance to Start Pos greater than Distance to Target - aborting'.[this.name,this.container.knownname]"/><!-- chance="@this.$debug * 100"-->
+          <debug_text filter="general" text="'%1 %2 Distance to Start Pos ( %3 ) greater than Distance to Target ( %4 ) - aborting'.[this.name,this.container.knownname,this.ship.distanceto.{$startpos},this.ship.distanceto.{$position} ]"/><!-- chance="@this.$debug * 100"-->
           <return/>
         </do_if>
         <do_if value="$targetpos? and ( this.ship.distanceto.{$targetpos} gt this.ship.distanceto.{$position} )">
-          <debug_text filter="general" text="'%1 %2 Distance to Target Pos greater than Distance to Target - aborting'.[this.name,this.container.knownname]"/><!-- chance="@this.$debug * 100"-->
+          <debug_text filter="general" text="'%1 %2 Distance to Target Pos  (%3 ) greater than Distance to Target ( %4 ) - aborting'.[this.name,this.container.knownname,this.ship.distanceto.{$targetpos},this.ship.distanceto.{$position}]"/><!-- chance="@this.$debug * 100"-->
           <return/>
         </do_if>
-        <do_if value="$startpos? and $targetpos? and ( this.ship.distanceto.{$startpos} gt this.ship.distanceto.{$position} ) + ( this.ship.distanceto.{$targetpos} gt this.ship.distanceto.{$position} )">
-          <debug_text filter="general" text="'%1 %2 Distance flown in Slow Mode greater than Distance to Target - aborting'.[this.name,this.container.knownname]"/><!-- chance="@this.$debug * 100"-->
+        <do_if value="$startpos? and $targetpos? and ( this.ship.distanceto.{$startpos} + $targetpos.distanceto.{$position} ) gt $startpos.distanceto.{$targetpos}">
+          <debug_text filter="general" text="'%1 %2 Distance flown in Slow Mode (%3 ) greater than Distance to Target ( %4 ) - aborting'.[this.name,this.container.knownname,this.ship.distanceto.{$startpos} + $targetpos.distanceto.{$position},$startpos.distanceto.{$targetpos}]"/><!-- chance="@this.$debug * 100"-->
           <return/>
         </do_if>
         
