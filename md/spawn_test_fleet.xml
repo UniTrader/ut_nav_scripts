@@ -25,6 +25,7 @@
             <safepos object="player.ship" radius="5km"/>
           </create_ship>
         </do_all>
+        <create_object macro="macro.Highway01_Cluster_04_Sector001_macro" sector="player.sector"/>
       </actions>
     </cue>
   </cues>
