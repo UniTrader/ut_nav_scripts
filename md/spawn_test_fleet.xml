@@ -25,7 +25,7 @@
             <safepos object="player.ship" radius="5km"/>
           </create_ship>
         </do_all>
-        <create_object name="$highway" macro="macro.Highway01_Cluster_04_Sector001_macro" sector="player.sector"/>
+        <create_object name="$highway" macro="macro.Highway01_Cluster_04_Sector001_macro" sector="player.sector" zone="player.zone"/>
         <set_known object="$highway" known="true"/>
         <debug_text filter="general" text="'HIGHWAY %S CREATED'.[$highway]"/>
       </actions>
