@@ -290,7 +290,7 @@
           <debug_text filter="general" text="'%1 %2 Distance to Start Pos ( %3 ) greater than Distance to Target ( %4 ) - aborting'.[this.name,this.container.knownname,this.ship.distanceto.{$startpos},this.ship.distanceto.{$position} ]"/><!-- chance="@this.$debug * 100"-->
           <return/>
         </do_if>
-        <do_if value="$targetpos? and ( this.ship.distanceto.{$targetpos} gt this.ship.distanceto.{$position} )">
+        <do_if value="$targetpos? and ( this.ship.distanceto.{$targetpos} gt this.ship.distanceto.{$position} * 1.2 )">
           <debug_text filter="general" text="'%1 %2 Distance to Target Pos  (%3 ) greater than Distance to Target ( %4 ) - aborting'.[this.name,this.container.knownname,this.ship.distanceto.{$targetpos},this.ship.distanceto.{$position}]"/><!-- chance="@this.$debug * 100"-->
           <return/>
         </do_if>
