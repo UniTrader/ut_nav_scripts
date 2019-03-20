@@ -1,19 +1,113 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <diff>
   <add sel="/aiscript/attention/actions" pos="prepend">
-    <do_if value="this.ship.iscapitalship">
-      <run_script name="'ut.cac.move.generic'">
-        <param name="destination" value="$destination" comment="can be a space or an object in a zone. Providing Sector and Cluster will attempt to find the nearest zone"/>
-        <param name="position" value="$position" comment="position is treated as an offset to destination. Default: safe position on [0,0,0] of destination"/>
-        <param name="rotation" value="$rotation" comment="rotation the ship should have - overridden by lookat"/>
-        <param name="lookat" value="$lookat" comment="position the ship should point to - overrides rotation"/>
-        <param name="endintargetspace" value="$endintargetzone" comment="complete this script if we have the correct Space context, no matter where (may be Cluster, Sector or Zone, will resolve to Zone if an Object is the destination)"/>
-        <!--
-      <param name="noboost" default="false" type="internal" text="{1041, 10077}" comment="No boosting. set true to prevent ships boosting"/>
-      <param name="disablecollisionavoidance" type="internal" default="false" text="{1041, 10028}" comment="Disable collision avoidance. HACK - disable collision-avoidance for this ship"/>
-      <param name="abortpath" default="true" type="internal" text="{1041, 10000}" comment="Abort path. disable aborting existing path"/>
-      <param name="forcesteering" default="false" type="internal" text="{1041, 10154}" comment="Force steering. force steering flight control model"/>-->
-      </run_script>
+    <do_if value="this.ship.iscapitalship and not this.$timelogging?">
+      <set_value name="$logging_start" exact="this.zone"/>
+      <set_value name="$logging_destination" exact="$destination"/>
+      <do_if value="not global.$navtimetable?">
+        <set_value name="global.$navtimetable" exact="table[]"/>
+      </do_if>
+      <do_if value="not global.$navtimetable.{$logging_start}?">
+        <set_value name="global.$navtimetable.{$logging_start}" exact="table[]"/>
+      </do_if>
+      <do_if value="not global.$navtimetable.{$logging_start}.{$logging_destination}?">
+        <set_value name="global.$navtimetable.{$logging_start}.{$logging_destination}" exact="[[],[]]"/>
+      </do_if>
+      
+      <set_value name="$logtimetable" exact="global.$navtimetable.{$logging_start}.{$logging_destination}"/>
+      <do_if value="global.$navtimetable.{$logging_start}.{$logging_destination}.{1}.count gt global.$navtimetable.{$logging_start}.{$logging_destination}.{2}.count">
+        <remove_value name="$logging_destination"/>
+        <set_value name="this.$timelogging" exact="player.age"/>
+      </do_if>
+      <do_else>
+        <run_script name="'ut.cac.move.generic'">
+          <remove_value name="$logging_destination"/>
+          <set_value name="this.$timelogging" exact="player.age"/>
+          <param name="destination" value="$destination" comment="can be a space or an object in a zone. Providing Sector and Cluster will attempt to find the nearest zone"/>
+          <param name="position" value="$position" comment="position is treated as an offset to destination. Default: safe position on [0,0,0] of destination"/>
+          <param name="rotation" value="$rotation" comment="rotation the ship should have - overridden by lookat"/>
+          <param name="lookat" value="$lookat" comment="position the ship should point to - overrides rotation"/>
+          <param name="endintargetspace" value="$endintargetzone" comment="complete this script if we have the correct Space context, no matter where (may be Cluster, Sector or Zone, will resolve to Zone if an Object is the destination)"/>
+          <!--
+        <param name="noboost" default="false" type="internal" text="{1041, 10077}" comment="No boosting. set true to prevent ships boosting"/>
+        <param name="disablecollisionavoidance" type="internal" default="false" text="{1041, 10028}" comment="Disable collision avoidance. HACK - disable collision-avoidance for this ship"/>
+        <param name="abortpath" default="true" type="internal" text="{1041, 10000}" comment="Abort path. disable aborting existing path"/>
+        <param name="forcesteering" default="false" type="internal" text="{1041, 10154}" comment="Force steering. force steering flight control model"/>-->
+        </run_script>
+        <append_to_list name="$logtimetable.{1}" exact="player.age - this.$timelogging"/>
+        <remove_value name="$logtimetable"/>
+        <remove_value name="this.$timelogging"/>
+      </do_else>
+    </do_if>
+  </add>
+  <add sel="/aiscript/attention/actions">
+    <do_if value="$logtimetable?">
+      <append_to_list name="$logtimetable.{2}" exact="player.age - this.$timelogging"/>
+      <do_if value="$logtimetable.{2}.count == 10">
+        <debug_to_file name="'time.txt'" directory="'navscripts'" text="
+      'Times for Way from %s %s %s %s to %s %s %s %s so far:'.[$logging_start.cluster.knownname,$logging_start.sector.knownname,$logging_start.knownname,$logging_start,$logging_destination.cluster.knownname,$logging_destination.sector.knownname,$logging_destination.knownname,$logging_destination]"/>
+        <debug_to_file name="'time.txt'" directory="'navscripts'" text="$logtimetable.{1}"/>
+        <debug_to_file name="'time.txt'" directory="'navscripts'" text="$logtimetable.{2}"/>
+        <debug_to_file name="'time.txt'" directory="'navscripts'" text="'============================================================================================================='"/>
+        <set_value name="$logtimetable.{1}" exact="[]"/>
+        <set_value name="$logtimetable.{2}" exact="[]"/>
+      </do_if>
+      <remove_value name="this.$timelogging"/>
+    </do_if>
+  </add>
+  <add sel="//on_abort">
+    <do_if value="$logtimetable?">
+      <remove_value name="this.$timelogging"/>
+    </do_if>
+  </add>
+  <add sel="//return[1]" pos="before">
+    <do_if value="$logtimetable?">
+      <remove_value name="this.$timelogging"/>
+    </do_if>
+  </add>
+  <add sel="//return[2]" pos="before">
+    <do_if value="$logtimetable?">
+      <remove_value name="this.$timelogging"/>
+    </do_if>
+  </add>
+  <add sel="//return[3]">
+    <do_if value="$logtimetable?">
+      <append_to_list name="$logtimetable.{2}" exact="player.age - this.$timelogging"/>
+      <do_if value="$logtimetable.{2}.count == 10">
+        <debug_to_file name="'time.txt'" directory="'navscripts'" text="
+      'Times for Way from %s %s %s %s to %s %s %s %s so far:'.[$logging_start.cluster.knownname,$logging_start.sector.knownname,$logging_start.knownname,$logging_start,$logging_destination.cluster.knownname,$logging_destination.sector.knownname,$logging_destination.knownname,$logging_destination]"/>
+        <debug_to_file name="'time.txt'" directory="'navscripts'" text="$logtimetable.{1}"/>
+        <debug_to_file name="'time.txt'" directory="'navscripts'" text="$logtimetable.{2}"/>
+        <debug_to_file name="'time.txt'" directory="'navscripts'" text="'============================================================================================================='"/>
+        <set_value name="$logtimetable.{1}" exact="[]"/>
+        <set_value name="$logtimetable.{2}" exact="[]"/>
+      </do_if>
+      <remove_value name="this.$timelogging"/>
+    </do_if>
+  </add>
+  <add sel="//return[4]" pos="before">
+    <do_if value="$logtimetable?">
+      <remove_value name="this.$timelogging"/>
+    </do_if>
+  </add>
+  <add sel="//return[5]" pos="before">
+    <do_if value="$logtimetable?">
+      <remove_value name="this.$timelogging"/>
+    </do_if>
+  </add>
+  <add sel="//return[6]" pos="before">
+    <do_if value="$logtimetable?">
+      <remove_value name="this.$timelogging"/>
+    </do_if>
+  </add>
+  <add sel="//return[7]" pos="before">
+    <do_if value="$logtimetable?">
+      <remove_value name="this.$timelogging"/>
+    </do_if>
+  </add>
+  <add sel="//return[8]" pos="before">
+    <do_if value="$logtimetable?">
+      <remove_value name="this.$timelogging"/>
     </do_if>
   </add>
 </diff>
