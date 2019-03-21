@@ -35,7 +35,6 @@
         <param name="forcesteering" default="false" type="internal" text="{1041, 10154}" comment="Force steering. force steering flight control model"/>-->
         </run_script>
         <append_to_list name="$logtimetable.{1}" exact="player.age - this.$timelogging"/>
-        <remove_value name="$logtimetable"/>
         <remove_value name="this.$timelogging"/>
       </do_else>
     </do_if>
@@ -45,7 +44,7 @@
       <append_to_list name="$logtimetable.{2}" exact="player.age - this.$timelogging"/>
       <do_if value="$logtimetable.{2}.count == 10">
         <debug_to_file name="'time.txt'" directory="'navscripts'" text="
-      'Times for Way from %s %s %s %s to %s %s %s %s so far:'.[$logging_start.cluster.knownname,$logging_start.sector.knownname,$logging_start.knownname,$logging_start,$logging_destination.cluster.knownname,$logging_destination.sector.knownname,$logging_destination.knownname,$logging_destination]"/>
+      'Times for Way from %s %s %s %s to %s %s %s %s (class %s ) so far:'.[$logging_start.cluster.knownname,$logging_start.sector.knownname,$logging_start.knownname,$logging_start,$logging_destination.cluster.knownname,$logging_destination.sector.knownname,$logging_destination.knownname,$logging_destination,$logging_destination.class]"/>
         <debug_to_file name="'time.txt'" directory="'navscripts'" text="$logtimetable.{1}"/>
         <debug_to_file name="'time.txt'" directory="'navscripts'" text="$logtimetable.{2}"/>
         <debug_to_file name="'time.txt'" directory="'navscripts'" text="'============================================================================================================='"/>
@@ -60,52 +59,54 @@
       <remove_value name="this.$timelogging"/>
     </do_if>
   </add>
-  <add sel="//return[1]" pos="before">
+  <add sel="(//return)[1]" pos="before">
     <do_if value="$logtimetable?">
       <remove_value name="this.$timelogging"/>
     </do_if>
   </add>
-  <add sel="//return[2]" pos="before">
+  <add sel="(//return)[2]" pos="before">
     <do_if value="$logtimetable?">
       <remove_value name="this.$timelogging"/>
     </do_if>
   </add>
-  <add sel="//return[3]">
+  <add sel="(//return)[3]" pos="before">
     <do_if value="$logtimetable?">
-      <append_to_list name="$logtimetable.{2}" exact="player.age - this.$timelogging"/>
-      <do_if value="$logtimetable.{2}.count == 10">
-        <debug_to_file name="'time.txt'" directory="'navscripts'" text="
-      'Times for Way from %s %s %s %s to %s %s %s %s so far:'.[$logging_start.cluster.knownname,$logging_start.sector.knownname,$logging_start.knownname,$logging_start,$logging_destination.cluster.knownname,$logging_destination.sector.knownname,$logging_destination.knownname,$logging_destination]"/>
-        <debug_to_file name="'time.txt'" directory="'navscripts'" text="$logtimetable.{1}"/>
-        <debug_to_file name="'time.txt'" directory="'navscripts'" text="$logtimetable.{2}"/>
-        <debug_to_file name="'time.txt'" directory="'navscripts'" text="'============================================================================================================='"/>
-        <set_value name="$logtimetable.{1}" exact="[]"/>
-        <set_value name="$logtimetable.{2}" exact="[]"/>
-      </do_if>
-      <remove_value name="this.$timelogging"/>
+      <do_if value="this.$timelogging">
+        <append_to_list name="$logtimetable.{2}" exact="player.age - this.$timelogging"/>
+        <do_if value="$logtimetable.{2}.count == 10">
+          <debug_to_file name="'time.txt'" directory="'navscripts'" text="
+          'Times for Way from %s %s %s %s to %s %s %s %s (class %s ) so far:'.[$logging_start.cluster.knownname,$logging_start.sector.knownname,$logging_start.knownname,$logging_start,$logging_destination.cluster.knownname,$logging_destination.sector.knownname,$logging_destination.knownname,$logging_destination,$logging_destination.class]"/>
+          <debug_to_file name="'time.txt'" directory="'navscripts'" text="$logtimetable.{1}"/>
+          <debug_to_file name="'time.txt'" directory="'navscripts'" text="$logtimetable.{2}"/>
+          <debug_to_file name="'time.txt'" directory="'navscripts'" text="'============================================================================================================='"/>
+          <set_value name="$logtimetable.{1}" exact="[]"/>
+          <set_value name="$logtimetable.{2}" exact="[]"/>
+        </do_if>
+        <remove_value name="this.$timelogging"/>
+        </do_if>
     </do_if>
   </add>
-  <add sel="//return[4]" pos="before">
-    <do_if value="$logtimetable?">
-      <remove_value name="this.$timelogging"/>
-    </do_if>
-  </add>
-  <add sel="//return[5]" pos="before">
+  <add sel="(//return)[4]" pos="before">
     <do_if value="$logtimetable?">
       <remove_value name="this.$timelogging"/>
     </do_if>
   </add>
-  <add sel="//return[6]" pos="before">
+  <add sel="(//return)[5]" pos="before">
     <do_if value="$logtimetable?">
       <remove_value name="this.$timelogging"/>
     </do_if>
   </add>
-  <add sel="//return[7]" pos="before">
+  <add sel="(//return)[6]" pos="before">
     <do_if value="$logtimetable?">
       <remove_value name="this.$timelogging"/>
     </do_if>
   </add>
-  <add sel="//return[8]" pos="before">
+  <add sel="(//return)[7]" pos="before">
+    <do_if value="$logtimetable?">
+      <remove_value name="this.$timelogging"/>
+    </do_if>
+  </add>
+  <add sel="(//return)[8]" pos="before">
     <do_if value="$logtimetable?">
       <remove_value name="this.$timelogging"/>
     </do_if>
