@@ -22,12 +22,12 @@
             <loadout>
               <level exact="1"/>
             </loadout>
-            <safepos object="player.ship" radius="5km"/>
+            <safepos object="player.container" radius="5km"/>
           </create_ship>
         </do_all>
         <create_object name="$highway" macro="macro.Highway01_Cluster_04_Sector001_macro" sector="player.sector" zone="player.zone"/>
         <set_known object="$highway" known="true"/>
-        <debug_text filter="general" text="'HIGHWAY %S CREATED'.[$highway]"/>
+        <debug_text filter="general" text="'HIGHWAY %s CREATED'.[$highway]"/>
       </actions>
     </cue>
   </cues>
