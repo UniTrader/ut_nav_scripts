@@ -6,6 +6,7 @@
       <set_value name="$logging_destination" exact="$destination"/>
       <do_if value="not global.$navtimetable?">
         <set_value name="global.$navtimetable" exact="table[]"/>
+        <debug_to_file append="false" name="'time.txt'" directory="'navscripts'" text="'File started at %s'.[player.systemtime.{'%Y-%m-%d %H:%M:%S'}]"/>
       </do_if>
       <do_if value="not global.$navtimetable.{$logging_start}?">
         <set_value name="global.$navtimetable.{$logging_start}" exact="table[]"/>
