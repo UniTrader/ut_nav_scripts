@@ -13,8 +13,8 @@
       </do_if>
       <do_if value="not global.$navtimetable.{$logging_start}.{$logging_destination}?">
         <set_value name="global.$navtimetable.{$logging_start}.{$logging_destination}" exact="table[]"/>
-        <append_to_list name="global.$navtimetable.{$logging_start}.{$logging_destination}.$ut_cac" exact="[]"/>
-        <append_to_list name="global.$navtimetable.{$logging_start}.{$logging_destination}.$vanilla" exact="[]"/>
+        <set_value name="global.$navtimetable.{$logging_start}.{$logging_destination}.$ut_cac" exact="[]"/>
+        <set_value name="global.$navtimetable.{$logging_start}.{$logging_destination}.$vanilla" exact="[]"/>
       </do_if>
       
       <set_value name="$logtimetable" exact="global.$navtimetable.{$logging_start}.{$logging_destination}"/>
