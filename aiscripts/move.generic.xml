@@ -12,13 +12,13 @@
         <set_value name="global.$navtimetable.{$logging_start}" exact="table[]"/>
       </do_if>
       <do_if value="not global.$navtimetable.{$logging_start}.{$logging_destination}?">
-        <set_value name="global.$navtimetable.{$logging_start}.{$logging_destination}" exact="[]"/>
-        <append_to_list name="global.$navtimetable.{$logging_start}.{$logging_destination}" exact="[]"/>
-        <append_to_list name="global.$navtimetable.{$logging_start}.{$logging_destination}" exact="[]"/>
+        <set_value name="global.$navtimetable.{$logging_start}.{$logging_destination}" exact="table[]"/>
+        <append_to_list name="global.$navtimetable.{$logging_start}.{$logging_destination}.$ut_cac" exact="[]"/>
+        <append_to_list name="global.$navtimetable.{$logging_start}.{$logging_destination}.$vanilla" exact="[]"/>
       </do_if>
       
       <set_value name="$logtimetable" exact="global.$navtimetable.{$logging_start}.{$logging_destination}"/>
-      <do_if value="$logtimetable.{1}.count gt $logtimetable.{2}.count">
+      <do_if value="$logtimetable.$ut_cac.count gt $logtimetable.$vanilla.count">
         <set_value name="this.$timelogging" exact="player.age"/>
       </do_if>
       <do_else>
@@ -36,80 +36,81 @@
         <param name="abortpath" default="true" type="internal" text="{1041, 10000}" comment="Abort path. disable aborting existing path"/>
         <param name="forcesteering" default="false" type="internal" text="{1041, 10154}" comment="Force steering. force steering flight control model"/>-->
         </run_script>
-        <append_to_list name="$logtimetable.{1}" exact="player.age - this.$timelogging"/>
+        <append_to_list name="$logtimetable.$ut_cac" exact="player.age - this.$timelogging"/>
         <remove_value name="this.$timelogging"/>
+        <remove_value name="$logtimetable"/>
       </do_else>
     </do_if>
   </add>
   <add sel="/aiscript/attention/actions">
-    <do_if value="$logtimetable?">
-      <append_to_list name="$logtimetable.{2}" exact="player.age - this.$timelogging"/>
-      <do_if value="$logtimetable.{2}.count == 10">
+    <do_if value="$logtimetable? and this.$timelogging?">
+      <append_to_list name="$logtimetable.$vanilla" exact="player.age - this.$timelogging"/>
+      <do_if value="$logtimetable.$vanilla.count == 10">
         <debug_to_file name="'time.txt'" directory="'navscripts'" text="
       'Times for Way from %s %s %s %s to %s %s %s %s (class %s ) so far:'.[$logging_start.cluster.knownname,$logging_start.sector.knownname,$logging_start.knownname,$logging_start,$logging_destination.cluster.knownname,$logging_destination.sector.knownname,$logging_destination.knownname,$logging_destination,$logging_destination.class]"/>
-        <debug_to_file name="'time.txt'" directory="'navscripts'" text="$logtimetable.{1}"/>
-        <debug_to_file name="'time.txt'" directory="'navscripts'" text="$logtimetable.{2}"/>
+        <debug_to_file name="'time.txt'" directory="'navscripts'" text="$logtimetable.$ut_cac"/>
+        <debug_to_file name="'time.txt'" directory="'navscripts'" text="$logtimetable.$vanilla"/>
         <debug_to_file name="'time.txt'" directory="'navscripts'" text="'============================================================================================================='"/>
-        <set_value name="$logtimetable.{1}" exact="[]"/>
-        <set_value name="$logtimetable.{2}" exact="[]"/>
+        <set_value name="$logtimetable.$ut_cac" exact="[]"/>
+        <set_value name="$logtimetable.$vanilla" exact="[]"/>
       </do_if>
       <remove_value name="this.$timelogging"/>
     </do_if>
   </add>
   <add sel="//on_abort">
-    <do_if value="$logtimetable?">
+    <do_if value="$logtimetable? and this.$timelogging?">
       <remove_value name="this.$timelogging"/>
     </do_if>
   </add>
   <add sel="(//return)[1]" pos="before">
-    <do_if value="$logtimetable?">
+    <do_if value="$logtimetable? and this.$timelogging?">
       <remove_value name="this.$timelogging"/>
     </do_if>
   </add>
   <add sel="(//return)[2]" pos="before">
-    <do_if value="$logtimetable?">
+    <do_if value="$logtimetable? and this.$timelogging?">
       <remove_value name="this.$timelogging"/>
     </do_if>
   </add>
   <add sel="(//return)[3]" pos="before">
-    <do_if value="$logtimetable?">
+    <do_if value="$logtimetable? and this.$timelogging?">
       <do_if value="this.$timelogging">
-        <append_to_list name="$logtimetable.{2}" exact="player.age - this.$timelogging"/>
-        <do_if value="$logtimetable.{2}.count == 10">
+        <append_to_list name="$logtimetable.$vanilla" exact="player.age - this.$timelogging"/>
+        <do_if value="$logtimetable.$vanilla.count == 10">
           <debug_to_file name="'time.txt'" directory="'navscripts'" text="
           'Times for Way from %s %s %s %s to %s %s %s %s (class %s ) so far:'.[$logging_start.cluster.knownname,$logging_start.sector.knownname,$logging_start.knownname,$logging_start,$logging_destination.cluster.knownname,$logging_destination.sector.knownname,$logging_destination.knownname,$logging_destination,$logging_destination.class]"/>
-          <debug_to_file name="'time.txt'" directory="'navscripts'" text="$logtimetable.{1}"/>
-          <debug_to_file name="'time.txt'" directory="'navscripts'" text="$logtimetable.{2}"/>
+          <debug_to_file name="'time.txt'" directory="'navscripts'" text="$logtimetable.$ut_cac"/>
+          <debug_to_file name="'time.txt'" directory="'navscripts'" text="$logtimetable.$vanilla"/>
           <debug_to_file name="'time.txt'" directory="'navscripts'" text="'============================================================================================================='"/>
-          <set_value name="$logtimetable.{1}" exact="[]"/>
-          <set_value name="$logtimetable.{2}" exact="[]"/>
+          <set_value name="$logtimetable.$ut_cac" exact="[]"/>
+          <set_value name="$logtimetable.$vanilla" exact="[]"/>
         </do_if>
         <remove_value name="this.$timelogging"/>
         </do_if>
     </do_if>
   </add>
   <add sel="(//return)[4]" pos="before">
-    <do_if value="$logtimetable?">
+    <do_if value="$logtimetable? and this.$timelogging?">
       <remove_value name="this.$timelogging"/>
     </do_if>
   </add>
   <add sel="(//return)[5]" pos="before">
-    <do_if value="$logtimetable?">
+    <do_if value="$logtimetable? and this.$timelogging?">
       <remove_value name="this.$timelogging"/>
     </do_if>
   </add>
   <add sel="(//return)[6]" pos="before">
-    <do_if value="$logtimetable?">
+    <do_if value="$logtimetable? and this.$timelogging?">
       <remove_value name="this.$timelogging"/>
     </do_if>
   </add>
   <add sel="(//return)[7]" pos="before">
-    <do_if value="$logtimetable?">
+    <do_if value="$logtimetable? and this.$timelogging?">
       <remove_value name="this.$timelogging"/>
     </do_if>
   </add>
   <add sel="(//return)[8]" pos="before">
-    <do_if value="$logtimetable?">
+    <do_if value="$logtimetable? and this.$timelogging?">
       <remove_value name="this.$timelogging"/>
     </do_if>
   </add>
