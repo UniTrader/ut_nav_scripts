@@ -11,12 +11,13 @@
         <set_value name="global.$navtimetable.{$logging_start}" exact="table[]"/>
       </do_if>
       <do_if value="not global.$navtimetable.{$logging_start}.{$logging_destination}?">
-        <set_value name="global.$navtimetable.{$logging_start}.{$logging_destination}" exact="[[],[]]"/>
+        <set_value name="global.$navtimetable.{$logging_start}.{$logging_destination}" exact="[]"/>
+        <append_to_list name="global.$navtimetable.{$logging_start}.{$logging_destination}" exact="[]"/>
+        <append_to_list name="global.$navtimetable.{$logging_start}.{$logging_destination}" exact="[]"/>
       </do_if>
       
       <set_value name="$logtimetable" exact="global.$navtimetable.{$logging_start}.{$logging_destination}"/>
-      <do_if value="global.$navtimetable.{$logging_start}.{$logging_destination}.{1}.count gt global.$navtimetable.{$logging_start}.{$logging_destination}.{2}.count">
-        <remove_value name="$logging_destination"/>
+      <do_if value="$logtimetable.{1}.count gt $logtimetable.{2}.count">
         <set_value name="this.$timelogging" exact="player.age"/>
       </do_if>
       <do_else>
