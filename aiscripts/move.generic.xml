@@ -44,15 +44,19 @@
   <add sel="/aiscript/attention/actions">
     <do_if value="$logtimetable? and this.$timelogging?">
       <append_to_list name="$logtimetable.$vanilla" exact="player.age - this.$timelogging"/>
-      <do_if value="$logtimetable.$vanilla.count == 10">
+      <do_if value="$logtimetable.$vanilla.count ge 10">
         <debug_to_file name="'time.txt'" directory="'navscripts'" text="
       'Times for Way from %s %s %s %s to %s %s %s %s (class %s ) so far:'.[$logging_start.cluster.knownname,$logging_start.sector.knownname,$logging_start.knownname,$logging_start,$logging_destination.cluster.knownname,$logging_destination.sector.knownname,$logging_destination.knownname,$logging_destination,$logging_destination.class]"/>
         <debug_to_file name="'time.txt'" directory="'navscripts'" text="$logtimetable.$ut_cac"/>
         <debug_to_file name="'time.txt'" directory="'navscripts'" text="$logtimetable.$vanilla"/>
         <debug_to_file name="'time.txt'" directory="'navscripts'" text="'============================================================================================================='"/>
-        <set_value name="$logtimetable.$ut_cac" exact="[]"/>
-        <set_value name="$logtimetable.$vanilla" exact="[]"/>
-      </do_if>
+        <do_all exact="$logtimetable.$ut_cac.count">
+          <remove_value name="$logtimetable.$ut_cac.{1}"/>
+        </do_all>
+        <do_all exact="$logtimetable.$vanilla.count">
+          <remove_value name="$logtimetable.$vanilla.{1}"/>
+        </do_all>
+        </do_if>
       <remove_value name="this.$timelogging"/>
     </do_if>
   </add>
@@ -75,14 +79,18 @@
     <do_if value="$logtimetable? and this.$timelogging?">
       <do_if value="this.$timelogging">
         <append_to_list name="$logtimetable.$vanilla" exact="player.age - this.$timelogging"/>
-        <do_if value="$logtimetable.$vanilla.count == 10">
+        <do_if value="$logtimetable.$vanilla.count ge 10">
           <debug_to_file name="'time.txt'" directory="'navscripts'" text="
           'Times for Way from %s %s %s %s to %s %s %s %s (class %s ) so far:'.[$logging_start.cluster.knownname,$logging_start.sector.knownname,$logging_start.knownname,$logging_start,$logging_destination.cluster.knownname,$logging_destination.sector.knownname,$logging_destination.knownname,$logging_destination,$logging_destination.class]"/>
           <debug_to_file name="'time.txt'" directory="'navscripts'" text="$logtimetable.$ut_cac"/>
           <debug_to_file name="'time.txt'" directory="'navscripts'" text="$logtimetable.$vanilla"/>
           <debug_to_file name="'time.txt'" directory="'navscripts'" text="'============================================================================================================='"/>
-          <set_value name="$logtimetable.$ut_cac" exact="[]"/>
-          <set_value name="$logtimetable.$vanilla" exact="[]"/>
+          <do_all exact="$logtimetable.$ut_cac.count">
+            <remove_value name="$logtimetable.$ut_cac.{1}"/>
+          </do_all>
+          <do_all exact="$logtimetable.$vanilla.count">
+            <remove_value name="$logtimetable.$vanilla.{1}"/>
+          </do_all>
         </do_if>
         <remove_value name="this.$timelogging"/>
         </do_if>
