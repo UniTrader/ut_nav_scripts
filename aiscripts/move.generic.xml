@@ -22,9 +22,8 @@
         <set_value name="this.$timelogging" exact="player.age"/>
       </do_if>
       <do_else>
+        <set_value name="this.$timelogging" exact="player.age"/>
         <run_script name="'ut.cac.move.generic'">
-          <remove_value name="$logging_destination"/>
-          <set_value name="this.$timelogging" exact="player.age"/>
           <param name="destination" value="$destination" comment="can be a space or an object in a zone. Providing Sector and Cluster will attempt to find the nearest zone"/>
           <param name="position" value="$position" comment="position is treated as an offset to destination. Default: safe position on [0,0,0] of destination"/>
           <param name="rotation" value="$rotation" comment="rotation the ship should have - overridden by lookat"/>
