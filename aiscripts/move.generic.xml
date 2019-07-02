@@ -2,10 +2,10 @@
 <diff xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://utnas/~unitrader/XRebirthxsds/aiscripts-diff.xsd">
   <add sel="/aiscript/attention/actions" pos="prepend">
     <do_if value="this.ship.iscapitalship and not this.$timelogging?">
-      <set_value name="$logging_start" exact="this.zone"/>
-      <set_value name="$logging_destination" exact="$destination"/>
       <do_if value="not this.$timelogging?">
         <set_value name="this.$timelogging" exact="player.age"/>
+        <set_value name="$logging_start" exact="this.zone"/>
+        <set_value name="$logging_destination" exact="$destination"/>
       </do_if>
       <do_if value="this.owner != faction.player and this.seed % 2 == 1">
         <set_value name="this.$timelogging" exact="player.age"/>
@@ -21,62 +21,23 @@
         <param name="abortpath" default="true" type="internal" text="{1041, 10000}" comment="Abort path. disable aborting existing path"/>
         <param name="forcesteering" default="false" type="internal" text="{1041, 10154}" comment="Force steering. force steering flight control model"/>-->
         </run_script>
-        <debug_to_file name="'%1-%2-UT.txt'.[$logging_start,$logging_destination]" directory="'navscripts'" text="this.$timelogging.formatted.default"/>
+        <debug_to_file name="'%1-%2-UT.txt'.[$logging_start,$logging_destination]" directory="'navscripts'" text="(player.age - this.$timelogging).formatted.default"/>
         
         <remove_value name="this.$timelogging"/>
         <remove_value name="$logtimetable"/>
       </do_if>
     </do_if>
   </add>
-  <add sel="/aiscript/attention/actions">
-    <do_if value="this.$timelogging?">
-        <debug_to_file name="'%1-%2-EGO.txt'.[$logging_start,$logging_destination]" directory="'navscripts'" text="this.$timelogging.formatted.default"/>
-      <remove_value name="this.$timelogging"/>
-    </do_if>
-  </add>
   <add sel="//on_abort">
-    <do_if value="this.$timelogging?">
+    <do_if value="this.$timelogging? and $logging_start? and $logging_destination?">
       <remove_value name="this.$timelogging"/>
     </do_if>
   </add>
-  <add sel="(//return)[1]" pos="before">
-    <do_if value="this.$timelogging?">
-      <remove_value name="this.$timelogging"/>
-    </do_if>
-  </add>
-  <add sel="(//return)[2]" pos="before">
-    <do_if value="this.$timelogging?">
-      <remove_value name="this.$timelogging"/>
-    </do_if>
-  </add>
-  <add sel="(//return)[3]" pos="before">
-    <do_if value="this.$timelogging?">
-      <debug_to_file name="'%1-%2-EGO.txt'.[$logging_start,$logging_destination]" directory="'navscripts'" text="this.$timelogging.formatted.default"/>
-      <remove_value name="this.$timelogging"/>
-    </do_if>
-  </add>
-  <add sel="(//return)[4]" pos="before">
-    <do_if value="this.$timelogging?">
-      <remove_value name="this.$timelogging"/>
-    </do_if>
-  </add>
-  <add sel="(//return)[5]" pos="before">
-    <do_if value="this.$timelogging?">
-      <remove_value name="this.$timelogging"/>
-    </do_if>
-  </add>
-  <add sel="(//return)[6]" pos="before">
-    <do_if value="this.$timelogging?">
-      <remove_value name="this.$timelogging"/>
-    </do_if>
-  </add>
-  <add sel="(//return)[7]" pos="before">
-    <do_if value="this.$timelogging?">
-      <remove_value name="this.$timelogging"/>
-    </do_if>
-  </add>
-  <add sel="(//return)[8]" pos="before">
-    <do_if value="this.$timelogging?">
+  <add sel="//return" pos="before">
+    <do_if value="this.$timelogging? and $logging_start? and $logging_destination?">
+      <do_if value="$returnvalue">
+        <debug_to_file name="'%1-%2-EGO.txt'.[$logging_start,$logging_destination]" directory="'navscripts'" text="(player.age - this.$timelogging).formatted.default"/>
+      </do_if>
       <remove_value name="this.$timelogging"/>
     </do_if>
   </add>
