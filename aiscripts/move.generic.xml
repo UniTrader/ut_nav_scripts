@@ -2,10 +2,15 @@
 <diff xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://utnas/~unitrader/XRebirthxsds/aiscripts-diff.xsd">
   <add sel="/aiscript/attention/actions" pos="prepend">
     <do_if value="this.ship.iscapitalship and not this.$timelogging?">
-      <do_if value="not this.$timelogging?">
+      <do_if value="not this.$timelogging? and ($destination.isclass.cluster or $destination.isclass.sector or $destination.isclass.zone or $destination.isclass.station)">
         <set_value name="this.$timelogging" exact="player.age"/>
         <set_value name="$logging_start" exact="this.zone"/>
-        <set_value name="$logging_destination" exact="$destination"/>
+        <do_if value="$destination.isclass.station">
+        <set_value name="$logging_destination" exact="$destination.zone"/>
+        </do_if>
+        <do_else>
+          <set_value name="$logging_destination" exact="$destination"/>
+         </do_else>
       </do_if>
       <do_if value="this.owner != faction.player and this.seed % 2 == 1">
         <set_value name="this.$timelogging" exact="player.age"/>
