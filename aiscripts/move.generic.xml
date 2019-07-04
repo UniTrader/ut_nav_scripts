@@ -12,6 +12,7 @@
           <set_value name="$logging_destination" exact="$destination"/>
          </do_else>
       </do_if>
+      <set_value name="$logging_distance" exact="this.ship.distanceto.{$destination}"/>
       <do_if value="this.owner != faction.player and this.seed % 2 == 1">
         <set_value name="this.$timelogging" exact="player.age"/>
         <run_script name="'ut.cac.move.generic'">
@@ -26,7 +27,7 @@
         <param name="abortpath" default="true" type="internal" text="{1041, 10000}" comment="Abort path. disable aborting existing path"/>
         <param name="forcesteering" default="false" type="internal" text="{1041, 10154}" comment="Force steering. force steering flight control model"/>-->
         </run_script>
-        <debug_to_file name="'%1 %2 -%3 %4 -UT.txt'.[$logging_start,$logging_start.sector.knownname,$logging_destination,if $logging_destination.isclass.zone then $logging_destination.sector.knownname else $logging_destination.knownname]" directory="'navscripts'" text="(player.age - this.$timelogging).formatted.default"/>
+        <debug_to_file name="'%1 %2 -%3 %4 -UT.txt'.[$logging_start,$logging_start.sector.knownname,$logging_destination,if $logging_destination.isclass.zone then $logging_destination.sector.knownname else $logging_destination.knownname]" directory="'navscripts'" text="(player.age - this.$timelogging).formatted.default + ' ' + $logging_distance"/>
         
         <remove_value name="this.$timelogging"/>
         <remove_value name="$logtimetable"/>
@@ -41,7 +42,7 @@
   <add sel="//return" pos="before">
     <do_if value="this.$timelogging? and $logging_start? and $logging_destination?">
       <do_if value="$returnvalue">
-        <debug_to_file name="'%1 %2 -%3 %4 -EGO.txt'.[$logging_start,$logging_start.sector.knownname,$logging_destination,if $logging_destination.isclass.zone then $logging_destination.sector.knownname else $logging_destination.knownname]" directory="'navscripts'" text="(player.age - this.$timelogging).formatted.default"/>
+        <debug_to_file name="'%1 %2 -%3 %4 -EGO.txt'.[$logging_start,$logging_start.sector.knownname,$logging_destination,if $logging_destination.isclass.zone then $logging_destination.sector.knownname else $logging_destination.knownname]" directory="'navscripts'" text="(player.age - this.$timelogging).formatted.default + ' ' + $logging_distance"/>
       </do_if>
       <remove_value name="this.$timelogging"/>
     </do_if>
