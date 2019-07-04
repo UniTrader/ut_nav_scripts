@@ -130,10 +130,10 @@
         <position x="0m" y="0m" z="$queue_distance"/>
       </transform_position>
       <transform_position name="$position" refposition="$gate.position" refrotation="rotation.[0deg, $gate.rotation.pitch, 0deg]" >
-        <position value="$positon"/>
+        <position value="$position"/>
       </transform_position>
       <transform_position name="$position" refposition="$gate.position" refrotation="rotation.[0deg, 0deg, $gate.rotation.roll]" >
-        <position value="$positon"/>
+        <position value="$position"/>
       </transform_position>
       <create_orientation name="$rotation" orientation="look_at"  refobject="$gate">
           <position value="$position"/>
