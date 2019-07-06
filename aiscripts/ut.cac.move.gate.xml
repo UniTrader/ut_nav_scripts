@@ -181,6 +181,7 @@
         <disable_collision_response object="$DEBUGSHIP"/>
         <disable_collisions_between object="$DEBUGSHIP" target="this.ship"/>
         <disable_collisions_between object="this.ship" target="$DEBUGSHIP"/>
+        <add_effect object="$DEBUGSHIP" effect="'hq_warpin'"/>
       </do_if>
       
       <set_value name="$continuepath" exact="2" comment="re-enable soft-advancing queue and also set it persistent"/>
@@ -304,6 +305,7 @@
         <disable_collision_response object="$DEBUGSHIP"/>
         <disable_collisions_between object="$DEBUGSHIP" target="this.ship"/>
         <disable_collisions_between object="this.ship" target="$DEBUGSHIP"/>
+        <add_effect object="$DEBUGSHIP" effect="'hq_warpin'"/>
       </do_if>
       <do_if value="$moveintogate">
         <wait>
@@ -413,11 +415,15 @@
         </do_while>
       </do_else>
       
+      <do_if value="this.ship.owner == faction.player">
       <destroy_object object="$DEBUGSHIP"/>
+      </do_if>
     </actions>
   </attention>
   <on_abort>
+      <do_if value="this.ship.owner == faction.player">
     <destroy_object object="$DEBUGSHIP"/>
+    </do_if>
     
      <!-- remove ourselves from the waiting List if we are in it and signal everyone the Queue has been changed-->
     <do_if value="global.$gate_queue.{$gate}.indexof.{this.ship}">
