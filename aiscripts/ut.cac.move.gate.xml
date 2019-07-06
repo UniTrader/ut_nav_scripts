@@ -103,6 +103,9 @@
         <set_value name="global.$gate_queue.{$gate}.{$queue_position}" exact="this.ship" operation="insert"/>
         <!-- ToDo: Signal Everyone who was just moved up (or do a general Update) - not necesary currently since its only used for Group Coordination. Might be necesary when Special Ability to Sneak in Queue becomes available -->
       </do_else>
+      <do_if value="this.ship.owner == faction.player">
+        <set_object_name object="this.ship" name="'' + $queue_position + $queue_position + $queue_position + $queue_position + $queue_position"/>
+      </do_if>
       <do_if value="not $passage_group">
         <create_group groupname="$passage_group"/>
       </do_if>
@@ -113,6 +116,9 @@
       <!-- Calculate Position so we can sort into the Queue behind the Gate, and Move there (restarts with every Passage or Abort of others for fluid movement) -->
       <label name="fly to prep pos"/>
       <set_value name="$queue_position" exact="global.$gate_queue.{$gate}.indexof.{this.ship}"/>
+      <do_if value="this.ship.owner == faction.player">
+        <set_object_name object="this.ship" name="'' + $queue_position + $queue_position + $queue_position + $queue_position + $queue_position"/>
+      </do_if>
       
       <do_if value="not $queue_position">
         <debug_text filter="error" text="'%1 %2 Not in Gate Queue - Restarting!'.[this.name,this.container.name]"/>
@@ -129,6 +135,9 @@
           <remove_value name="global.$gate_queue.{$gate}.{$i}"/>
           <!-- also re-adjust queue Position -->
           <set_value name="$queue_position" operation="subtract"/>
+      <do_if value="this.ship.owner == faction.player">
+        <set_object_name object="this.ship" name="'' + $queue_position + $queue_position + $queue_position + $queue_position + $queue_position"/>
+      </do_if>
         </do_else>
       </do_all>
       <do_if value="global.$gate_queue.{$gate}.{1}.pilot.commandaction.param == $gate" comment="if the leading Ship is currently flying into the Gate it doesnt need is full length reserved because one half will be behind the Gate at the target pos">
