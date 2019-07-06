@@ -426,12 +426,14 @@
       
       <do_if value="this.ship.owner == faction.player">
       <destroy_object object="$DEBUGSHIP"/>
+        <set_object_name object="this.ship" name="this.ship.macro.name"/>
       </do_if>
     </actions>
   </attention>
   <on_abort>
       <do_if value="this.ship.owner == faction.player">
     <destroy_object object="$DEBUGSHIP"/>
+        <set_object_name object="this.ship" name="this.ship.macro.name"/>
     </do_if>
     
      <!-- remove ourselves from the waiting List if we are in it and signal everyone the Queue has been changed-->
