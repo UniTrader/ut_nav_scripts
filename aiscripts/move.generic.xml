@@ -13,7 +13,7 @@
          </do_else>
       </do_if>
       <set_value name="$logging_distance" exact="this.ship.distanceto.{$destination}"/>
-      <do_if value="this.owner != faction.player and this.seed % 2 == 1">
+      <do_if value="this.owner == faction.player or this.seed % 2 == 1">
         <set_value name="this.$timelogging" exact="player.age"/>
         <run_script name="'ut.cac.move.generic'">
           <param name="destination" value="$destination" comment="can be a space or an object in a zone. Providing Sector and Cluster will attempt to find the nearest zone"/>
