@@ -29,32 +29,20 @@
     <actions>
       <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Script started with Params:\n$gate: %3 ; $cleargate: %4 $formationlist: %5'.[this.name,this.container.name,$gate,$cleargate,@$formationlist]"/>
       
-      <do_if value="this.ship.owner == faction.player">
-        <create_ship name="$DEBUGSHIP" macro="this.ship.macro" zone="this.ship.zone">
-          <owner exact="faction.player"/>
-        </create_ship>
-        <disable_collision_response object="$DEBUGSHIP"/>
-        <disable_collisions_between object="$DEBUGSHIP" target="this.ship"/>
-        <disable_collisions_between object="this.ship" target="$DEBUGSHIP"/>
-      </do_if>
-      
       <label name="start"/>
       
       <!-- then check if the Input and Situation is Valid  -->
       <do_if value="not $gate.exists or not ( $gate.isclass.gate or $gate.isclass.highwayentrygate )">
         <debug_text filter="error" text="'%1 %2 Gate not existent or not a gate - aborting!'.[this.name,this.container.name]"/>
-        <destroy_object object="$DEBUGSHIP"/>
         <return/>
       </do_if>
       <do_if value="not ( $gate.isclass.highwayentrygate or $gate.isactive )">
         <debug_text filter="error" text="'%1 %2 Trying to pass inactive Gate - aborting!'.[this.name,this.container.name]"/>
-        <destroy_object object="$DEBUGSHIP"/>
         <return/>
       </do_if>
       <do_if value="if $gate.isclass.gate then this.zone != $gate.zone else this.zone != $gate.highway.origin">
         <do_if value="this.ship.distanceto.{$gate} gt 25km">
           <debug_text filter="error" text="'%1 %2 Not in Gate Zone and farther than 25km - aborting! (distance: %3)'.[this.name,this.container.name,this.ship.distanceto.{$gate}]"/>
-          <destroy_object object="$DEBUGSHIP"/>
           <return/>
         </do_if>
         <do_else>
@@ -147,8 +135,14 @@
       <do_if value="$gate.isclass.gate" comment="approach Jump Gates from behind, therefore negative value (and Highway Entry Gates from the front)">
         <set_value name="$queue_distance" exact="$queue_distance * -1"/>
       </do_if>
-      <transform_position name="$position" refposition="$gate.position" refrotation="$gate.rotation" >
+      <transform_position name="$position" refposition="$gate.position" refrotation="rotation.[$gate.rotation.yaw, 0deg, 0deg]" >
         <position x="0m" y="0m" z="$queue_distance"/>
+      </transform_position>
+      <transform_position name="$position" refposition="$gate.position" refrotation="rotation.[0deg, $gate.rotation.pitch, 0deg]" >
+        <position value="$position"/>
+      </transform_position>
+      <transform_position name="$position" refposition="$gate.position" refrotation="rotation.[0deg, 0deg, $gate.rotation.roll]" >
+        <position value="$position"/>
       </transform_position>
       <create_orientation name="$rotation" orientation="look_at"  refobject="$gate">
           <position value="$position"/>
@@ -178,15 +172,6 @@
           </actions>
         </interrupt>
       </move_to>
-      
-      <do_if value="this.ship.owner == faction.player">
-        <warp object="$DEBUGSHIP" zone="$gate.zone"><position value="$position"/><rotation value="$rotation"/></warp>
-        <disable_collision_response object="$DEBUGSHIP"/>
-        <disable_collisions_between object="$DEBUGSHIP" target="this.ship"/>
-        <disable_collisions_between object="this.ship" target="$DEBUGSHIP"/>
-        <add_effect object="$DEBUGSHIP" effect="'hq_warpin'"/>
-      </do_if>
-      
       <set_value name="$continuepath" exact="2" comment="re-enable soft-advancing queue and also set it persistent"/>
       <set_avoid_collisions object="this.ship" bigobjects="false" smallobjects="false" comment="disable collision avoidance while in queue to avoid other ships pushing us out and delaying everything"/>
       <do_if value="$queue_position == 1">
@@ -303,13 +288,6 @@
           </on_attentionchange>
         </move_to>
       </do_else>
-      <do_if value="this.ship.owner == faction.player">
-        <warp object="$DEBUGSHIP" zone="$gate.zone"><position value="$gate.position"/><rotation value="$gate.rotation"/></warp>
-        <disable_collision_response object="$DEBUGSHIP"/>
-        <disable_collisions_between object="$DEBUGSHIP" target="this.ship"/>
-        <disable_collisions_between object="this.ship" target="$DEBUGSHIP"/>
-        <add_effect object="$DEBUGSHIP" effect="'hq_warpin'"/>
-      </do_if>
       <do_if value="$moveintogate">
         <wait>
           <interrupt>
@@ -359,9 +337,15 @@
       <!--  move forward a bit to clear gate exit for the next ship (rate can be one ship every 30s with this Script)  -->
       <do_if value="$cleargate" comment=" and this.ship.pilot.skill.navigation ge 2">
         <!--wait exact="100ms" comment="otherwise the player.ship skips movement for some reason"/-->
-        <transform_position name="$position" refposition="this.ship.position" refrotation="this.ship.rotation" >
+        <transform_position name="$position" refposition="this.ship.position" refrotation="rotation.[this.ship.rotation.yaw, 0deg, 0deg]" >
           <position x="0m" y="0m" z="(this.ship.size *6)"/>
         </transform_position>
+      <transform_position name="$position" refposition="this.ship.position" refrotation="rotation.[0deg, this.ship.rotation.pitch, 0deg]" >
+        <position value="$positon"/>
+      </transform_position>
+      <transform_position name="$position" refposition="this.ship.position" refrotation="rotation.[0deg, 0deg, this.ship.rotation.roll]" >
+        <position value="$positon"/>
+      </transform_position>
         <!-- figure out an arrival position in the target zone -->
         <!-- HACK for FoO - AL Gate - ignore the big rock instead of the current ship for safepos AND dont avoid collissions to avoid needless tours -->
         <!--do_if value="this.zone.macro.ismacro.{'Cluster_T_Sector01_Zone001_macro'}">
@@ -413,14 +397,12 @@
       </do_else>
       
       <do_if value="this.ship.owner == faction.player">
-      <destroy_object object="$DEBUGSHIP"/>
         <set_object_name object="this.ship" name="this.ship.macro.name"/>
       </do_if>
     </actions>
   </attention>
   <on_abort>
       <do_if value="this.ship.owner == faction.player">
-    <destroy_object object="$DEBUGSHIP"/>
         <set_object_name object="this.ship" name="this.ship.macro.name"/>
     </do_if>
     
