@@ -30,7 +30,7 @@
       <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Script started with Params:\n$gate: %3 ; $cleargate: %4 $formationlist: %5'.[this.name,this.container.name,$gate,$cleargate,@$formationlist]"/>
       
       <do_if value="this.ship.owner == faction.player">
-        <create_ship name="$DEBUGSHIP" macro="this.ship.macro">
+        <create_ship name="$DEBUGSHIP" macro="this.ship.macro" zone="this.ship.zone">
           <owner exact="faction.player"/>
         </create_ship>
         <disable_collision_response object="$DEBUGSHIP"/>
