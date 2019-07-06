@@ -147,14 +147,8 @@
       <do_if value="$gate.isclass.gate" comment="approach Jump Gates from behind, therefore negative value (and Highway Entry Gates from the front)">
         <set_value name="$queue_distance" exact="$queue_distance * -1"/>
       </do_if>
-      <transform_position name="$position" refposition="$gate.position" refrotation="rotation.[$gate.rotation.yaw, 0deg, 0deg]" >
+      <transform_position name="$position" refposition="$gate.position" refrotation="$gate.rotation" >
         <position x="0m" y="0m" z="$queue_distance"/>
-      </transform_position>
-      <transform_position name="$position" refposition="$gate.position" refrotation="rotation.[0deg, $gate.rotation.pitch, 0deg]" >
-        <position value="$position"/>
-      </transform_position>
-      <transform_position name="$position" refposition="$gate.position" refrotation="rotation.[0deg, 0deg, $gate.rotation.roll]" >
-        <position value="$position"/>
       </transform_position>
       <create_orientation name="$rotation" orientation="look_at"  refobject="$gate">
           <position value="$position"/>
@@ -365,15 +359,9 @@
       <!--  move forward a bit to clear gate exit for the next ship (rate can be one ship every 30s with this Script)  -->
       <do_if value="$cleargate" comment=" and this.ship.pilot.skill.navigation ge 2">
         <!--wait exact="100ms" comment="otherwise the player.ship skips movement for some reason"/-->
-        <transform_position name="$position" refposition="this.ship.position" refrotation="rotation.[this.ship.rotation.yaw, 0deg, 0deg]" >
+        <transform_position name="$position" refposition="this.ship.position" refrotation="this.ship.rotation" >
           <position x="0m" y="0m" z="(this.ship.size *6)"/>
         </transform_position>
-      <transform_position name="$position" refposition="this.ship.position" refrotation="rotation.[0deg, this.ship.rotation.pitch, 0deg]" >
-        <position value="$positon"/>
-      </transform_position>
-      <transform_position name="$position" refposition="this.ship.position" refrotation="rotation.[0deg, 0deg, this.ship.rotation.roll]" >
-        <position value="$positon"/>
-      </transform_position>
         <!-- figure out an arrival position in the target zone -->
         <!-- HACK for FoO - AL Gate - ignore the big rock instead of the current ship for safepos AND dont avoid collissions to avoid needless tours -->
         <!--do_if value="this.zone.macro.ismacro.{'Cluster_T_Sector01_Zone001_macro'}">
