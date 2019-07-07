@@ -115,7 +115,7 @@
       <!-- calculate Target Distance to the Gate -->
       <set_value name="$queue_distance" exact="0m"/>
       <do_all exact="$queue_position" counter="$i" reverse="true">
-        <do_if value="global.$gate_queue.{$gate}.{$i}.exists and ( global.$gate_queue.{$gate}.{$i}.zone == $gate.zone or global.$gate_queue.{$gate}.{$i}.distanceto.{$gate} lt 30km )">
+        <do_if value="global.$gate_queue.{$gate}.{$i}.exists and global.$gate_queue.{$gate}.{$i}.sector == $gate.sector">
           <set_value name="$queue_distance" operation="add" exact="global.$gate_queue.{$gate}.{$i}.size * 2"/>
         </do_if>
         <do_else>
