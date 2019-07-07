@@ -92,7 +92,7 @@
         <!-- ToDo: Signal Everyone who was just moved up (or do a general Update) - not necesary currently since its only used for Group Coordination. Might be necesary when Special Ability to Sneak in Queue becomes available -->
       </do_else>
       <do_if value="this.ship.owner == faction.player">
-        <set_object_name object="this.ship" name="if $queue_position lt 10 then '00' else if $queue_position lt 100 then '0' else '' + $queue_position"/>
+        <set_object_name object="this.ship" name="(if $queue_position lt 10 then '00' else if $queue_position lt 100 then '0' else '' ) + $queue_position"/>
       </do_if>
       <do_if value="not $passage_group">
         <create_group groupname="$passage_group"/>
@@ -105,7 +105,7 @@
       <label name="fly to prep pos"/>
       <set_value name="$queue_position" exact="global.$gate_queue.{$gate}.indexof.{this.ship}"/>
       <do_if value="this.ship.owner == faction.player">
-        <set_object_name object="this.ship" name="if $queue_position lt 10 then '00' else if $queue_position lt 100 then '0' else '' + $queue_position"/>
+        <set_object_name object="this.ship" name="(if $queue_position lt 10 then '00' else if $queue_position lt 100 then '0' else '' ) + $queue_position"/>
       </do_if>
       
       <do_if value="not $queue_position">
@@ -124,7 +124,7 @@
           <!-- also re-adjust queue Position -->
           <set_value name="$queue_position" operation="subtract"/>
       <do_if value="this.ship.owner == faction.player">
-        <set_object_name object="this.ship" name="if $queue_position lt 10 then '00' else if $queue_position lt 100 then '0' else '' + $queue_position"/>
+        <set_object_name object="this.ship" name="(if $queue_position lt 10 then '00' else if $queue_position lt 100 then '0' else '') + $queue_position"/>
       </do_if>
         </do_else>
       </do_all>
