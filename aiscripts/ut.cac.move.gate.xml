@@ -242,7 +242,8 @@
           <position x="0m" y="0m" z="this.ship.length * 0.45"/>
         </transform_position>
         <set_value name="$rotation" exact="$gate.rotation.inverse"/>
-        <move_to object="this.ship" destination="$gate.zone" forceposition="true" forcerotation="true" finishonapproach="false" abortpath="not $continuepath">
+        <set_command_action commandaction="flyingto" param="$gate"/>
+        <move_to object="this.ship" destination="$gate.zone" forceposition="true" forcerotation="true" finishonapproach="false" abortpath="not $continuepath" commandaction="false">
           <position value="$position" />
           <rotation value="$rotation"/>
           <interrupt>
