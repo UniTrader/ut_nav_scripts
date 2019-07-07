@@ -244,25 +244,33 @@
       <set_value name="$moveintogate" exact="true" />
       <signal_objects object="$gate" param="'travel gate update'" delay="100ms" comment="speed up process by telling everyone to advance to the next wait pos"/>
       <signal_objects object="this.ship" param="'travel gate start'" comment="Signalling we are now passing the Gate (used by DO for Drone Recall)"/>
+      <label name="pass gate GO"/>
       <do_if value="$gate.isclass.gate" comment="Enter Jumpgate">
-        <transform_position name="$position" refposition="$gate.position" refrotation="$gate.rotation" >
-          <position x="0m" y="0m" z="this.ship.length * 0.45"/>
-        </transform_position>
-        <set_value name="$rotation" exact="$gate.rotation.inverse"/>
-        <set_command_action commandaction="commandaction.flyingto" param="$gate"/>
-        <move_to object="this.ship" destination="$gate.zone" forceposition="true" forcerotation="true" finishonapproach="false" abortpath="not $continuepath" commandaction="false">
-          <position value="$position" />
-          <rotation value="$rotation"/>
-          <interrupt>
-            <conditions>
-              <event_object_changed_sector object="this.ship" />
-            </conditions>
-            <actions>
-              <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 just changed from cluster %3 to cluster %4 (moved through gate; move_to case)'.[this.name,this.container.name,$gate.zone.knownname,event.param2.knownname, event.param.knownname]"/>
-              <set_value name="$moveintogate" exact="false" />
-            </actions>
-          </interrupt>
-        </move_to>
+        <do_if value="this.ship.attention gt attention.visible">
+          <transform_position name="$position" refposition="$gate.position" refrotation="$gate.rotation" >
+            <position x="0m" y="0m" z="this.ship.length * 0.45"/>
+          </transform_position>
+          <set_value name="$rotation" exact="$gate.rotation.inverse"/>
+          <set_command_action commandaction="commandaction.flyingto" param="$gate"/>
+          <move_to object="this.ship" destination="$gate.zone" forceposition="true" forcerotation="true" finishonapproach="false" abortpath="not $continuepath" commandaction="false">
+            <position value="$position" />
+            <rotation value="$rotation"/>
+            <interrupt>
+              <conditions>
+                <event_object_changed_sector object="this.ship" />
+              </conditions>
+              <actions>
+                <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 just changed from cluster %3 to cluster %4 (moved through gate; move_to case)'.[this.name,this.container.name,$gate.zone.knownname,event.param2.knownname, event.param.knownname]"/>
+                <set_value name="$moveintogate" exact="false" />
+              </actions>
+            </interrupt>
+            <on_attentionchange>
+              <do_if value="this.ship.attention gt attention.visible">
+                <resume label="pass gate GO"/>
+              </do_if>
+            </on_attentionchange>
+          </move_to>
+        </do_if>
         <do_if value="$moveintogate">
           <move_gate object="this.ship" gate="if true then $gate else 'pass 1'" abortpath="false">
             <interrupt>
@@ -275,7 +283,7 @@
               </actions>
             </interrupt>
             <on_attentionchange>
-              <do_if value="this.ship.attention == attention.visible">
+              <do_if value="this.ship.attention gt attention.visible">
                 <create_orientation name="$rotation" orientation="look_at"  refobject="$gate">
                    <position value="this.ship.position"/>
                 </create_orientation>
