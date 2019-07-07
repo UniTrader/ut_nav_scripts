@@ -134,13 +134,17 @@
       <set_value name="$queue_distance" operation="subtract" exact="this.ship.size * 0.6" comment="current Ship only needs to be acounted for in half"/>
       <do_if value="$gate.isclass.gate" comment="approach Jump Gates from behind, therefore negative value (and Highway Entry Gates from the front)">
         <set_value name="$queue_distance" exact="$queue_distance * -1"/>
+        <set_value name="$rotation" exact="$gate.rotation.inverse"/>
       </do_if>
+      <do_else>
+        <set_value name="$rotation" exact="$gate.rotation"/>
+      </do_else>
       <transform_position name="$position" refposition="$gate.position" refrotation="$gate.rotation" >
         <position x="if $gate.isclass.gate then 1000m else -1000m" y="0m" z="$queue_distance"/>
       </transform_position>
-      <create_orientation name="$rotation" orientation="look_at"  refobject="$gate">
+      <!--create_orientation name="$rotation" orientation="look_at"  refobject="$gate">
           <position value="$position"/>
-        </create_orientation>
+        </create_orientation-->
       <!--get_safe_pos result="$safeposition" allowyaxis="true" zone="$gate.zone" value="$position" radius="this.ship.size" ignored="$ignoredobject"/-->
       <!-- move to position in queue/prep pos -->
       
