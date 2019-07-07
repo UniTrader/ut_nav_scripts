@@ -135,7 +135,7 @@
       <do_if value="$gate.isclass.gate" comment="approach Jump Gates from behind, therefore negative value (and Highway Entry Gates from the front)">
         <set_value name="$queue_distance" exact="$queue_distance * -1"/>
       </do_if>
-      <transform_position name="$position" refposition="position.[0m,0m,0m]" refrotation="$gate.rotation" >
+      <transform_position name="$position" refposition="$gate.position" refrotation="$gate.rotation" >
         <position x="0m" y="0m" z="$queue_distance"/>
       </transform_position>
       <create_orientation name="$rotation" orientation="look_at"  refobject="$gate">
