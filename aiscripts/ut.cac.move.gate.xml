@@ -109,7 +109,14 @@
       </do_if>
       
       <do_if value="not $queue_position">
-        <debug_text filter="error" text="'%1 %2 Not in Gate Queue - Restarting!'.[this.name,this.container.name]"/>
+        <debug_text filter="error" text="'%1 %2 Not in Gate Queue - Turning around and Restarting!'.[this.name,this.container.name]"/>
+        <transform_position name="$position" refposition="this.ship.position" refrotation="this.ship.rotation" >
+          <position x="-10km" y="0m" z="0m"/>
+        </transform_position>
+        <move_to object="this.ship" destination="this.ship.zone" forceposition="false" forcerotation="false" finishonapproach="true" abortpath="true">
+          <position value="$position" />
+          <rotation value="this.ship.rotation.inverse"/>
+        </move_to>
         <resume label="start"/>
       </do_if>
       <!-- calculate Target Distance to the Gate -->
