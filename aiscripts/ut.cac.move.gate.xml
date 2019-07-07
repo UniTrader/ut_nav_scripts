@@ -136,7 +136,7 @@
         <set_value name="$queue_distance" exact="$queue_distance * -1"/>
       </do_if>
       <transform_position name="$position" refposition="$gate.position" refrotation="$gate.rotation" >
-        <position x="if $gate.isclass.gate then -1000m else 1000m" y="0m" z="$queue_distance"/>
+        <position x="if $gate.isclass.gate then 1000m else -1000m" y="0m" z="$queue_distance"/>
       </transform_position>
       <create_orientation name="$rotation" orientation="look_at"  refobject="$gate">
           <position value="$position"/>
