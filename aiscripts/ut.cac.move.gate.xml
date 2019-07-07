@@ -210,6 +210,7 @@
       
       <label name="pass gate"/>
       <!-- check the Vanilla Gate Blocking Mechanism and (aggresively!) wait till its free -->
+      <wait exact="10min"/>
       <request_gate ship="this.ship" gate="if true then $gate else 'request 1'" result="$success" />
       <set_value name="$RequestingTimeout" min="player.age + 2min" max="player.age + 5min"/>
       <do_while value="global.$gate_queue.{$gate}.indexof.{this.ship} gt 1 and not $success">
