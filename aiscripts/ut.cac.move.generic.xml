@@ -541,7 +541,7 @@
               <debug_text filter="general" chance="@this.$debug * 100" text="'%1	%2	Boosting near to %3 for gate passage'.[this.name,this.container.knownname,this.$waypoint.knownname]"/>
               <run_script name="'ut.cac.move.boost'">
                 <param name="destination" value="this.$waypoint"/>
-                <param name="position" value="position.[0m,10km,if this.$waypoint.isclass.gate then -10km else 10km]" comment="relative to destination! (including its rotation)"/>
+                <param name="position" value="position.[0m,10km,( if this.$waypoint.isclass.gate then -2km else 2km ) * global.$gate_queue.{$gate}.count]" comment="relative to destination! (including its rotation)"/>
               </run_script>
               <do_if value="not this.ship.hascontext.{this.$waypoint.zone}">
                 <debug_text filter="error" text="'Move Gate - Boost Failed! Destination: %1 / %2 / %3 Current Sector/Zone: %4 / %5 // distance to destination: %6 - restarting'.[@this.$waypoint.sector.knownname,@this.$waypoint.zone.knownname,this.$waypoint.name,this.sector.knownname,this.zone.knownname,this.ship.distanceto.{this.$waypoint}]"/>
