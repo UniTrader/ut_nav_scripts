@@ -116,7 +116,7 @@
       <set_value name="$queue_distance" exact="0m"/>
       <do_all exact="$queue_position" counter="$i" reverse="true">
         <do_if value="global.$gate_queue.{$gate}.{$i}.exists and global.$gate_queue.{$gate}.{$i}.sector == $gate.sector">
-          <set_value name="$queue_distance" operation="add" exact="global.$gate_queue.{$gate}.{$i}.size * 2"/>
+          <set_value name="$queue_distance" operation="add" exact="global.$gate_queue.{$gate}.{$i}.size * 1.2"/>
         </do_if>
         <do_else>
           <!-- remove invalid entries from queue when encountering them.. -->
@@ -129,9 +129,9 @@
         </do_else>
       </do_all>
       <do_if value="global.$gate_queue.{$gate}.{1}.pilot.commandaction.param == $gate" comment="if the leading Ship is currently flying into the Gate it doesnt need is full length reserved because one half will be behind the Gate at the target pos">
-        <set_value name="$queue_distance" operation="subtract" exact="global.$gate_queue.{$gate}.{1}.size"/>
+        <set_value name="$queue_distance" operation="subtract" exact="global.$gate_queue.{$gate}.{1}.size * 0.6"/>
       </do_if>
-      <set_value name="$queue_distance" operation="subtract" exact="this.ship.size" comment="current Ship only needs to be acounted for in half"/>
+      <set_value name="$queue_distance" operation="subtract" exact="this.ship.size * 0.6" comment="current Ship only needs to be acounted for in half"/>
       <do_if value="$gate.isclass.gate" comment="approach Jump Gates from behind, therefore negative value (and Highway Entry Gates from the front)">
         <set_value name="$queue_distance" exact="$queue_distance * -1"/>
       </do_if>
