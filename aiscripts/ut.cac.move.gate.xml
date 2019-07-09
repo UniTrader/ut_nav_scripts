@@ -309,7 +309,7 @@
             </actions>
           </interrupt>
           <on_attentionchange>
-            <do_if value="this.ship.attention == attention.visible">
+            <do_if value="this.ship.attention gt attention.visible">
               <create_orientation name="$rotation" orientation="look_at"  refobject="$gate">
                  <position value="this.ship.position"/>
               </create_orientation>
@@ -332,7 +332,7 @@
             </actions>
           </interrupt>
           <on_attentionchange>
-            <do_if value="this.ship.attention == attention.visible">
+            <do_if value="this.ship.attention gt attention.visible">
               <warp object="this.ship" zone="this.zone">
                 <rotation value="$gate.rotation"/>
                 <position object="this.ship"/>
