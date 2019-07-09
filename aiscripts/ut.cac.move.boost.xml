@@ -107,7 +107,7 @@
       
       <!-- check if we *CAN* Boost -->
       <do_if value="this.ship.travel.available">
-        <debug_text filter="general" text="'%1 %2 Ship travel engine not available currently. Flight from %3(%4) to %5(%6) might take longer than planned'.[this.name,this.container.knownname , this.zone.knownname, this.sector.knownname, @$destination.zone.knownname, $destination.sector.knownname]" /><!-- chance="@this.$debug * 100"-->
+        <debug_text filter="general" text="'%1 %2 Ship travel engine not available currently. Flight from %3(%4) to %5(%6) might take longer than planned'.[this.name,this.container.knownname , this.zone.knownname, this.sector.knownname, @$destination.zone.knownname, $destination.sector.knownname]" chance="@this.$debug * 100"/>
       </do_if>
       
       <!-- set Value to interrupt continonous movement on certain ocassions -->
