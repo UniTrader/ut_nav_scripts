@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <diff xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://utnas/~unitrader/XRebirthxsds/aiscripts-diff.xsd">
-  <add sel="/aiscript/attention/actions" pos="prepend">
+  <add sel="/aiscript/attention/actions/label[@name='start']" pos="before">
     <do_if value="this.ship.iscapitalship"><!-- and not this.$timelogging?
       <do_if value="not this.$timelogging? and ($destination.isclass.cluster or $destination.isclass.sector or $destination.isclass.zone or $destination.isclass.station)">
         <set_value name="this.$timelogging" exact="player.age"/>
