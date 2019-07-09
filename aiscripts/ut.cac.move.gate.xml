@@ -67,28 +67,32 @@
         <set_value name="this.$ut_cac.$isactive"/>
       </do_if>
       
+      <!-- Planned feature: multiple Approach Paths - Define the Lists for target offsets here -->
+      <set_value name="$OffsetList" exact="[position.[0m,0m,-1m]]"/>
+      
       <!-- check if global Var for Gate Passage exists and create if necesary -->
       <!-- Note: the Table must always have a first entry which is reserved for the Ship currently flying into the Gate - set to null if currently no Ship is passing. -->
       <do_if value="not global.$gate_queue?">
-        <set_value name="global.$gate_queue" exact="table[{$gate}=[]]"/>
+        <set_value name="global.$gate_queue" exact="table[{$gate}=[[]]]"/>
         <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Creating Global Gate Passage Table: %3 current Gate: %4'.[this.knownname,this.container.knownname,global.$gate_queue,$gate]"/>
       </do_if>
       <do_elseif value="not global.$gate_queue.{$gate}?">
-        <set_value name="global.$gate_queue.{$gate}" exact="[]"/>
+        <create_list name="global.$gate_queue.{$gate}" exact="$OffsetList.count"/>
+        <set_value name="global.$gate_queue.{$gate}.{1}" exact="[]"/>
         <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Adding Gate to Global Gate Passage Table: %3 current Gate: %4'.[this.knownname,this.container.knownname,global.$gate_queue,$gate]"/>
       </do_elseif>
       
       <!-- Register in Gate Queue, Create Passage Group to keep a Group of Ships together after Passage and tell Followers our Position so they can add themselves before us if required -->
       <do_if value="not $queue_position">
-        <do_if value="global.$gate_queue.{$gate}.indexof.{this.ship}">
-          <debug_text filter="error" text="'%1 %2 Already Registered in Gate Queue on Script Start - removing %3'.[this.name,this.container.name,global.$gate_queue.{$gate}.indexof.{this.ship}]"/>
-          <remove_value name="global.$gate_queue.{$gate}.{global.$gate_queue.{$gate}.indexof.{this.ship}}"/>
+        <do_if value="global.$gate_queue.{$gate}.{1}.indexof.{this.ship}">
+          <debug_text filter="error" text="'%1 %2 Already Registered in Gate Queue on Script Start - removing %3'.[this.name,this.container.name,global.$gate_queue.{$gate}.{1}.indexof.{this.ship}]"/>
+          <remove_value name="global.$gate_queue.{$gate}.{1}.{global.$gate_queue.{$gate}.{1}.indexof.{this.ship}}"/>
         </do_if>
-        <append_to_list name="global.$gate_queue.{$gate}" exact="this.ship"/>
-        <set_value name="$queue_position" exact="global.$gate_queue.{$gate}.count"/>
+        <append_to_list name="global.$gate_queue.{$gate}.{1}" exact="this.ship"/>
+        <set_value name="$queue_position" exact="global.$gate_queue.{$gate}.{1}.count"/>
       </do_if>
       <do_else>
-        <set_value name="global.$gate_queue.{$gate}.{$queue_position}" exact="this.ship" operation="insert"/>
+        <set_value name="global.$gate_queue.{$gate}.{1}.{$queue_position}" exact="this.ship" operation="insert"/>
         <!-- ToDo: Signal Everyone who was just moved up (or do a general Update) - not necesary currently since its only used for Group Coordination. Might be necesary when Special Ability to Sneak in Queue becomes available -->
       </do_else>
       <do_if value="this.ship.owner == faction.player">
@@ -103,7 +107,7 @@
       
       <!-- Calculate Position so we can sort into the Queue behind the Gate, and Move there (restarts with every Passage or Abort of others for fluid movement) -->
       <label name="fly to prep pos"/>
-      <set_value name="$queue_position" exact="global.$gate_queue.{$gate}.indexof.{this.ship}"/>
+      <set_value name="$queue_position" exact="global.$gate_queue.{$gate}.{1}.indexof.{this.ship}"/>
       <do_if value="this.ship.owner == faction.player">
         <set_object_name object="this.ship" name="(if $queue_position lt 10 then '00' else if $queue_position lt 100 then '0' else '' ) + $queue_position"/>
       </do_if>
@@ -122,12 +126,12 @@
       <!-- calculate Target Distance to the Gate -->
       <set_value name="$queue_distance" exact="0m"/>
       <do_all exact="$queue_position" counter="$i" reverse="true">
-        <do_if value="global.$gate_queue.{$gate}.{$i}.exists and global.$gate_queue.{$gate}.{$i}.sector == $gate.sector">
-          <set_value name="$queue_distance" operation="add" exact="global.$gate_queue.{$gate}.{$i}.size * 1.2"/>
+        <do_if value="global.$gate_queue.{$gate}.{1}.{$i}.exists and global.$gate_queue.{$gate}.{1}.{$i}.sector == $gate.sector">
+          <set_value name="$queue_distance" operation="add" exact="global.$gate_queue.{$gate}.{1}.{$i}.size * 1.2"/>
         </do_if>
         <do_else>
           <!-- remove invalid entries from queue when encountering them.. -->
-          <remove_value name="global.$gate_queue.{$gate}.{$i}"/>
+          <remove_value name="global.$gate_queue.{$gate}.{1}.{$i}"/>
           <!-- also re-adjust queue Position -->
           <set_value name="$queue_position" operation="subtract"/>
       <do_if value="this.ship.owner == faction.player">
@@ -135,8 +139,8 @@
       </do_if>
         </do_else>
       </do_all>
-      <do_if value="global.$gate_queue.{$gate}.{1}.pilot.commandaction.param == $gate" comment="if the leading Ship is currently flying into the Gate it doesnt need is full length reserved because one half will be behind the Gate at the target pos">
-        <set_value name="$queue_distance" operation="subtract" exact="global.$gate_queue.{$gate}.{1}.size * 0.6"/>
+      <do_if value="global.$gate_queue.{$gate}.{1}.{1}.pilot.commandaction.param == $gate" comment="if the leading Ship is currently flying into the Gate it doesnt need is full length reserved because one half will be behind the Gate at the target pos">
+        <set_value name="$queue_distance" operation="subtract" exact="global.$gate_queue.{$gate}.{1}.{1}.size * 0.6"/>
       </do_if>
       <set_value name="$queue_distance" operation="subtract" exact="this.ship.size * 0.6" comment="current Ship only needs to be acounted for in half"/>
       <do_if value="$gate.isclass.gate" comment="approach Jump Gates from behind, therefore negative value (and Highway Entry Gates from the front)">
@@ -183,15 +187,15 @@
         <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Reached Wait Pos in front of queue - Flying into Gate now.'.[this.knownname,this.container.knownname,global.$gate_queue,$gate]"/>
         <resume label="pass gate"/>
       </do_if>
-      <do_elseif value="this.ship.distanceto.{$gate} lt global.$gate_queue.{$gate}.{$queue_position - 1}.distanceto.{$gate}" comment="we are closer to the Gate than the Ship before us - swap positions to avoid delays">
-        <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Reached Wait Pos and Ship in front is farther away than we - swapping pos\nOther Ship: %3; Distance: %4 Our Distance: %5'.[this.knownname,this.container.knownname,global.$gate_queue.{$gate}.{$queue_position - 1}.name,global.$gate_queue.{$gate}.{$queue_position - 1}.distanceto.{$gate},this.ship.distanceto.{$gate}]"/>
-        <set_value name="global.$gate_queue.{$gate}.{$queue_position}" exact="global.$gate_queue.{$gate}.{$queue_position - 1}"/>
-        <set_value name="global.$gate_queue.{$gate}.{$queue_position - 1}" exact="this.ship"/>
-        <signal_objects object="global.$gate_queue.{$gate}.{$queue_position}" param="'travel gate update'" comment="queue changed - signal the Ship we just changed positions with specifically"/>
+      <do_elseif value="this.ship.distanceto.{$gate} lt global.$gate_queue.{$gate}.{1}.{$queue_position - 1}.distanceto.{$gate}" comment="we are closer to the Gate than the Ship before us - swap positions to avoid delays">
+        <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Reached Wait Pos and Ship in front is farther away than we - swapping pos\nOther Ship: %3; Distance: %4 Our Distance: %5'.[this.knownname,this.container.knownname,global.$gate_queue.{$gate}.{1}.{$queue_position - 1}.name,global.$gate_queue.{$gate}.{1}.{$queue_position - 1}.distanceto.{$gate},this.ship.distanceto.{$gate}]"/>
+        <set_value name="global.$gate_queue.{$gate}.{1}.{$queue_position}" exact="global.$gate_queue.{$gate}.{1}.{$queue_position - 1}"/>
+        <set_value name="global.$gate_queue.{$gate}.{1}.{$queue_position - 1}" exact="this.ship"/>
+        <signal_objects object="global.$gate_queue.{$gate}.{1}.{$queue_position}" param="'travel gate update'" comment="queue changed - signal the Ship we just changed positions with specifically"/>
         <resume label="fly to prep pos"/>
       </do_elseif>
       <do_else>
-        <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Reached Wait Pos and Ship in front is closer than we - waiting\nOther Ship: %3; Distance: %4 Our Distance: %5'.[this.knownname,this.container.knownname,global.$gate_queue.{$gate}.{$queue_position - 1}.name,global.$gate_queue.{$gate}.{$queue_position - 1}.distanceto.{$gate},this.ship.distanceto.{$gate}]"/>
+        <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Reached Wait Pos and Ship in front is closer than we - waiting\nOther Ship: %3; Distance: %4 Our Distance: %5'.[this.knownname,this.container.knownname,global.$gate_queue.{$gate}.{1}.{$queue_position - 1}.name,global.$gate_queue.{$gate}.{1}.{$queue_position - 1}.distanceto.{$gate},this.ship.distanceto.{$gate}]"/>
         <wait max="5min" comment="just in case the Signal doesnt trigger properly">
         <interrupt>
           <conditions>
@@ -217,7 +221,7 @@
       <!-- check the Vanilla Gate Blocking Mechanism and (aggresively!) wait till its free -->
       <request_gate ship="this.ship" gate="if true then $gate else 'request 1'" result="$success" />
       <set_value name="$RequestingTimeout" min="player.age + 2min" max="player.age + 5min"/>
-      <do_while value="global.$gate_queue.{$gate}.indexof.{this.ship} gt 1 and not $success">
+      <do_while value="global.$gate_queue.{$gate}.{1}.indexof.{this.ship} gt 1 and not $success">
         <wait min="3s" max="8s" comment="aggresive gate polling, but only one Ship at the same time.">
           <interrupt>
             <conditions>
@@ -345,21 +349,21 @@
       
       <!-- unlock Gate (Vanilla) and remove ourselves from the Waiting List, signal the next to go/prepare (UT CAC) -->
       <request_gate ship="this.ship" gate="if true then $gate else 'unlock 1'" unlock="true" result="$result"/>
-      <do_if value="global.$gate_queue.{$gate}.{1}? and global.$gate_queue.{$gate}.{1} == this.ship">
-        <remove_value name="global.$gate_queue.{$gate}.{1}"/>
+      <do_if value="global.$gate_queue.{$gate}.{1}.{1}? and global.$gate_queue.{$gate}.{1}.{1} == this.ship">
+        <remove_value name="global.$gate_queue.{$gate}.{1}.{1}"/>
       </do_if>
       <do_else>
-        <debug_text filter="error" text="'%1 %2 Just passed the Gate and wanted to clear queue, but our Position was not 1 but %3'.[this.name,this.container.name,global.$gate_queue.{$gate}.indexof.{this.ship}]"/>
-        <remove_value name="global.$gate_queue.{$gate}.{global.$gate_queue.{$gate}.indexof.{this.ship}}"/>
-        <do_if value="global.$gate_queue.{$gate}.indexof.{this.ship}">
-          <debug_text filter="error" text="'And also %1'.[global.$gate_queue.{$gate}.indexof.{this.ship}]"/>
-          <remove_value name="global.$gate_queue.{$gate}.{global.$gate_queue.{$gate}.indexof.{this.ship}}"/>
-          <do_if value="global.$gate_queue.{$gate}.indexof.{this.ship}">
-            <debug_text filter="error" text="'And also %1 (2nd additional check)'.[global.$gate_queue.{$gate}.indexof.{this.ship}]"/>
-            <remove_value name="global.$gate_queue.{$gate}.{global.$gate_queue.{$gate}.indexof.{this.ship}}"/>
-            <do_if value="global.$gate_queue.{$gate}.indexof.{this.ship}">
-              <debug_text filter="error" text="'And also %1 (last check)'.[global.$gate_queue.{$gate}.indexof.{this.ship}]"/>
-              <remove_value name="global.$gate_queue.{$gate}.{global.$gate_queue.{$gate}.indexof.{this.ship}}"/>
+        <debug_text filter="error" text="'%1 %2 Just passed the Gate and wanted to clear queue, but our Position was not 1 but %3'.[this.name,this.container.name,global.$gate_queue.{$gate}.{1}.indexof.{this.ship}]"/>
+        <remove_value name="global.$gate_queue.{$gate}.{1}.{global.$gate_queue.{$gate}.{1}.indexof.{this.ship}}"/>
+        <do_if value="global.$gate_queue.{$gate}.{1}.indexof.{this.ship}">
+          <debug_text filter="error" text="'And also %1'.[global.$gate_queue.{$gate}.{1}.indexof.{this.ship}]"/>
+          <remove_value name="global.$gate_queue.{$gate}.{1}.{global.$gate_queue.{$gate}.{1}.indexof.{this.ship}}"/>
+          <do_if value="global.$gate_queue.{$gate}.{1}.indexof.{this.ship}">
+            <debug_text filter="error" text="'And also %1 (2nd additional check)'.[global.$gate_queue.{$gate}.{1}.indexof.{this.ship}]"/>
+            <remove_value name="global.$gate_queue.{$gate}.{1}.{global.$gate_queue.{$gate}.{1}.indexof.{this.ship}}"/>
+            <do_if value="global.$gate_queue.{$gate}.{1}.indexof.{this.ship}">
+              <debug_text filter="error" text="'And also %1 (last check)'.[global.$gate_queue.{$gate}.{1}.indexof.{this.ship}]"/>
+              <remove_value name="global.$gate_queue.{$gate}.{1}.{global.$gate_queue.{$gate}.{1}.indexof.{this.ship}}"/>
             </do_if>
           </do_if>
         </do_if>
@@ -434,17 +438,17 @@
     </do_if>
     
      <!-- remove ourselves from the waiting List if we are in it and signal everyone the Queue has been changed-->
-    <do_if value="global.$gate_queue.{$gate}.indexof.{this.ship}">
-      <remove_value name="global.$gate_queue.{$gate}.{global.$gate_queue.{$gate}.indexof.{this.ship}}"/>
-      <do_if value="global.$gate_queue.{$gate}.indexof.{this.ship}">
-        <debug_text filter="error" text="'%1 %2 Abort Case Occupied mote than one queue Slot, additional one: %3'.[this.name,this.container.name,global.$gate_queue.{$gate}.indexof.{this.ship}]"/>
-        <remove_value name="global.$gate_queue.{$gate}.{global.$gate_queue.{$gate}.indexof.{this.ship}}"/>
-        <do_if value="global.$gate_queue.{$gate}.indexof.{this.ship}">
-          <debug_text filter="error" text="'And also %1 (2nd check)'.[global.$gate_queue.{$gate}.indexof.{this.ship}]"/>
-          <remove_value name="global.$gate_queue.{$gate}.{global.$gate_queue.{$gate}.indexof.{this.ship}}"/>
-          <do_if value="global.$gate_queue.{$gate}.indexof.{this.ship}">
-            <debug_text filter="error" text="'And also %1 (last check)'.[global.$gate_queue.{$gate}.indexof.{this.ship}]"/>
-            <remove_value name="global.$gate_queue.{$gate}.{global.$gate_queue.{$gate}.indexof.{this.ship}}"/>
+    <do_if value="global.$gate_queue.{$gate}.{1}.indexof.{this.ship}">
+      <remove_value name="global.$gate_queue.{$gate}.{1}.{global.$gate_queue.{$gate}.{1}.indexof.{this.ship}}"/>
+      <do_if value="global.$gate_queue.{$gate}.{1}.indexof.{this.ship}">
+        <debug_text filter="error" text="'%1 %2 Abort Case Occupied mote than one queue Slot, additional one: %3'.[this.name,this.container.name,global.$gate_queue.{$gate}.{1}.indexof.{this.ship}]"/>
+        <remove_value name="global.$gate_queue.{$gate}.{1}.{global.$gate_queue.{$gate}.{1}.indexof.{this.ship}}"/>
+        <do_if value="global.$gate_queue.{$gate}.{1}.indexof.{this.ship}">
+          <debug_text filter="error" text="'And also %1 (2nd check)'.[global.$gate_queue.{$gate}.{1}.indexof.{this.ship}]"/>
+          <remove_value name="global.$gate_queue.{$gate}.{1}.{global.$gate_queue.{$gate}.{1}.indexof.{this.ship}}"/>
+          <do_if value="global.$gate_queue.{$gate}.{1}.indexof.{this.ship}">
+            <debug_text filter="error" text="'And also %1 (last check)'.[global.$gate_queue.{$gate}.{1}.indexof.{this.ship}]"/>
+            <remove_value name="global.$gate_queue.{$gate}.{1}.{global.$gate_queue.{$gate}.{1}.indexof.{this.ship}}"/>
           </do_if>
         </do_if>
       </do_if>
