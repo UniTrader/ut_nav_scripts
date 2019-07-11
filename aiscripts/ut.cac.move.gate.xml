@@ -69,6 +69,10 @@
       <!-- Planned feature: multiple Approach Paths - Define the Lists for target offsets here -->
       <set_value name="$OffsetList" exact="[position.[0m,0m,-1m]]"/>
       
+      <!-- Set the offset from the queue line to make it look less robotic -->
+      <set_value name="$LineOffsetX" min="0 - this.ship.width / 2" max="this.ship.width / 2"/>
+      <set_value name="$LineOffsetX" min="0 - this.ship.height / 2" max="this.ship.height / 2"/>
+      
       <!-- check if global Var for Gate Passage exists and create if necesary -->
       <!-- Note: the Table must always have a first entry which is reserved for the Ship currently flying into the Gate - set to null if currently no Ship is passing. -->
       <do_if value="not global.$gate_queue?">
@@ -149,7 +153,7 @@
         <set_value name="$rotation" exact="$gate.rotation"/>
       </do_else-->
       <transform_position name="$position" refposition="$gate.position" refrotation="$gate.rotation" >
-        <position x="this.seed % this.ship.width" y="this.seed % this.ship.height" z="$queue_distance"/>
+        <position x="$LineOffsetX" y="$LineOffsetY" z="$queue_distance"/>
       </transform_position>
       <create_orientation name="$rotation" orientation="look_at"  refobject="$gate">
           <position value="$position"/>
