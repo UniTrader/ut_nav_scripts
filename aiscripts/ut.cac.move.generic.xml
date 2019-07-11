@@ -153,7 +153,7 @@
         <event_object_destroyed object="@$destination" comment="script will check immediately that destination is valid at start"/>
       </conditions>
       <actions>
-        <debug_text filter="error" text="'%1	%2	Destination destroyed: %3 // %4'.[this.name,this.container.knownname,@event.param.knownname,@$destination.knownname]"/>
+        <debug_text filter="error" chance="@this.$debug * 100" text="'%1	%2	Destination destroyed: %3 // %4'.[this.name,this.container.knownname,@event.param.knownname,@$destination.knownname]"/>
         <debug_to_file name="'sucesslog.txt'" directory="'navscripts'" text="
 '%s	%s	%s	%s	ERROR - destination destroyed from %s // %s to %s // %s // %s (actual location: %s // %s )'.[player.age,player.age - $logvalues.{1}, global.$navscripts_active.count, this.knownname, this.ship.knownname, $logvalues.{2}.sector.knownname, $logvalues.{2}.cluster.knownname, @$logvalues.{3}.knownname, @$logvalues.{3}.sector.knownname, @$logvalues.{3}.cluster.knownname, this.sector.knownname, this.cluster.knownname]"/>
         <abort_called_scripts/>
