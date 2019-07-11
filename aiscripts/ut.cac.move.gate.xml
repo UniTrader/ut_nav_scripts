@@ -42,11 +42,10 @@
       </do_if>
       <do_if value="if $gate.isclass.gate then this.zone != $gate.zone else this.zone != $gate.highway.origin">
         <do_if value="this.ship.distanceto.{$gate} gt 25km">
-          <debug_text filter="error" text="'%1 %2 Not in Gate Zone and farther than 25km - aborting! (distance: %3)'.[this.name,this.container.name,this.ship.distanceto.{$gate}]"/>
-          <return/>
+          <debug_text filter="error" text="'%1 %2 Not in Gate Zone and farther than 25km - Still continuing though! (distance: %3)'.[this.name,this.container.name,this.ship.distanceto.{$gate}]"/>
         </do_if>
         <do_else>
-          <debug_text filter="error" text="'%1 %2 Not in Gate Zone a but closer than 25km - continuing anyway (distance: %3)'.[this.name,this.container.name,this.ship.distanceto.{$gate}]"/>
+          <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Not in Gate Zone but closer than 25km - continuing anyway (distance: %3)'.[this.name,this.container.name,this.ship.distanceto.{$gate}]"/>
         </do_else>
       </do_if>
       
