@@ -254,7 +254,7 @@
       <do_if value="$gate.isclass.gate" comment="Enter Jumpgate">
         <do_if value="this.ship.attention gt attention.visible">
           <transform_position name="$position" refposition="$gate.position" refrotation="$gate.rotation" >
-            <position x="0m" y="0m" z="this.ship.length * 0.45"/>
+            <position x="$LineOffsetX" y="$LineOffsetY" z="this.ship.length * 0.45"/>
           </transform_position>
           <set_value name="$rotation" exact="$gate.rotation.inverse"/>
           <set_command_action commandaction="commandaction.flyingto" param="$gate"/>
