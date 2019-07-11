@@ -71,7 +71,7 @@
       
       <!-- Set the offset from the queue line to make it look less robotic -->
       <set_value name="$LineOffsetX" min="0 - this.ship.width / 2" max="this.ship.width / 2"/>
-      <set_value name="$LineOffsetX" min="0 - this.ship.height / 2" max="this.ship.height / 2"/>
+      <set_value name="$LineOffsetY" min="0 - this.ship.height / 2" max="this.ship.height / 2"/>
       
       <!-- check if global Var for Gate Passage exists and create if necesary -->
       <!-- Note: the Table must always have a first entry which is reserved for the Ship currently flying into the Gate - set to null if currently no Ship is passing. -->
