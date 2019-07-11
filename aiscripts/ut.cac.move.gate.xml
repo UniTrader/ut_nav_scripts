@@ -116,7 +116,7 @@
       <do_if value="not $queue_position">
         <debug_text filter="error" text="'%1 %2 Not in Gate Queue - Turning around and Restarting!'.[this.name,this.container.name]"/>
         <transform_position name="$position" refposition="this.ship.position" refrotation="this.ship.rotation" >
-          <position x="-10km" y="0m" z="0m"/>
+          <position x="$LineOffsetX * 10" y="$LineOffsetY * 10" z="0m"/>
         </transform_position>
         <move_to object="this.ship" destination="this.ship.zone" forceposition="false" forcerotation="false" finishonapproach="true" abortpath="true">
           <position value="$position" />
