@@ -71,7 +71,8 @@
       
       <!-- Set the offset from the queue line to make it look less robotic -->
       <set_value name="$LineOffsetX" min="0 - this.ship.width / 2" max="this.ship.width / 2"/>
-      <set_value name="$LineOffsetY" min="0 - this.ship.height / 2" max="this.ship.height / 2"/>
+      <set_value name="$LineOffsetY" min="0 - this.ship.length / 8" max="this.ship.length / 8"/>
+      <set_value name="$LineOffsetZ" min="0 - this.ship.height / 2" max="this.ship.height / 2"/>
       
       <!-- check if global Var for Gate Passage exists and create if necesary -->
       <!-- Note: the Table must always have a first entry which is reserved for the Ship currently flying into the Gate - set to null if currently no Ship is passing. -->
@@ -116,7 +117,7 @@
       <do_if value="not $queue_position">
         <debug_text filter="error" text="'%1 %2 Not in Gate Queue - Turning around and Restarting!'.[this.name,this.container.name]"/>
         <transform_position name="$position" refposition="this.ship.position" refrotation="this.ship.rotation" >
-          <position x="$LineOffsetX * 10" y="$LineOffsetY * 10" z="0m"/>
+          <position x="$LineOffsetX * 10" y="$LineOffsetY * 10" z="$LineOffsetZ * 10m"/>
         </transform_position>
         <move_to object="this.ship" destination="this.ship.zone" forceposition="false" forcerotation="false" finishonapproach="true" abortpath="true">
           <position value="$position" />
@@ -153,7 +154,7 @@
         <set_value name="$rotation" exact="$gate.rotation"/>
       </do_else>
       <transform_position name="$position" refposition="$gate.position" refrotation="$gate.rotation" >
-        <position x="$LineOffsetX" y="$LineOffsetY" z="$queue_distance"/>
+        <position x="$LineOffsetX" y="$LineOffsetY" z="$queue_distance + $LineOffsetZ"/>
       </transform_position>
       <!--create_orientation name="$rotation" orientation="look_at"  refobject="$gate">
           <position value="$position"/>
