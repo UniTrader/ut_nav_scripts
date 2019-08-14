@@ -1,21 +1,13 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <diff xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://utnas/~unitrader/XRebirthxsds/aiscripts-diff.xsd">
-  <add sel="/aiscript/attention/actions/label[@name='start']" pos="before">
-    <do_if value="this.ship.iscapitalship"><!-- and not this.$timelogging?
-      <do_if value="not this.$timelogging? and ($destination.isclass.cluster or $destination.isclass.sector or $destination.isclass.zone or $destination.isclass.station)">
-        <set_value name="this.$timelogging" exact="player.age"/>
-        <set_value name="$logging_start" exact="this.zone"/>
-        <do_if value="$destination.isclass.station">
-        <set_value name="$logging_destination" exact="$destination.zone"/>
-        </do_if>
-        <do_else>
-          <set_value name="$logging_destination" exact="$destination"/>
-         </do_else>
-      </do_if>
-      <set_value name="$logging_distance" exact="this.ship.distanceto.{$destination}"/>
-      <do_if value="this.owner == faction.player or this.seed % 2 == 1">
-        <set_value name="this.$timelogging" exact="player.age"/-->
-        <run_script name="'ut.cac.move.generic'">
+  <add sel="/aiscript/interrupts">
+    <handler>
+      <conditions>
+        <event_object_signalled object="this" param="'run alternative script'"/>
+        <check_value value="this.ship.iscapitalship"/>
+      </conditions>
+      <actions>
+        <run_interrupt_script name="event.param2" resume="start">
           <param name="destination" value="$destination" comment="can be a space or an object in a zone. Providing Sector and Cluster will attempt to find the nearest zone"/>
           <param name="position" value="$position" comment="position is treated as an offset to destination. Default: safe position on [0,0,0] of destination"/>
           <param name="rotation" value="$rotation" comment="rotation the ship should have - overridden by lookat"/>
@@ -26,25 +18,11 @@
         <param name="disablecollisionavoidance" type="internal" default="false" text="{1041, 10028}" comment="Disable collision avoidance. HACK - disable collision-avoidance for this ship"/>
         <param name="abortpath" default="true" type="internal" text="{1041, 10000}" comment="Abort path. disable aborting existing path"/>
         <param name="forcesteering" default="false" type="internal" text="{1041, 10154}" comment="Force steering. force steering flight control model"/>-->
-        </run_script>
-        <!--debug_to_file name="'%1 %2 -%3 %4 %5 -UT.txt'.[$logging_start,$logging_start.sector.knownname,$logging_destination,if $logging_destination.isclass.zone then $logging_destination.sector.knownname else $logging_destination.knownname,$logging_destination.class]" directory="'navscripts'" text="(player.age - this.$timelogging).formatted.default + ' ' + $logging_distance"/>
-        
-        <remove_value name="this.$timelogging"/>
-        <remove_value name="$logtimetable"/>
-      </do_if-->
-    </do_if>
+        </run_interrupt_script>
+      </actions>
+    </handler>
   </add>
-  <!--add sel="//on_abort">
-    <do_if value="this.$timelogging? and $logging_start? and $logging_destination?">
-      <remove_value name="this.$timelogging"/>
-    </do_if>
+  <add sel="/aiscript/attention/actions/label[@name='start']" pos="before">
+    <signal_objects object="this" param="'run alternative script'"/>
   </add>
-  <add sel="//return" pos="before">
-    <do_if value="this.$timelogging? and $logging_start? and $logging_destination?">
-      <do_if value="$returnvalue">
-        <debug_to_file name="'%1 %2 -%3 %4 %5 -EGO.txt'.[$logging_start,$logging_start.sector.knownname,$logging_destination,if $logging_destination.isclass.zone then $logging_destination.sector.knownname else $logging_destination.knownname,$logging_destination.class]" directory="'navscripts'" text="(player.age - this.$timelogging).formatted.default + ' ' + $logging_distance"/>
-      </do_if>
-      <remove_value name="this.$timelogging"/>
-    </do_if>
-  </add-->
 </diff>
