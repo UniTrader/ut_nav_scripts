@@ -244,6 +244,9 @@
         <resume label="finish"/>
       </do_if>
       
+      <!-- ToDo: Reffering here to Vanilla behavior - see if its sufficient -->
+      <include_interrupt_actions ref="GetBlacklistgroup"/>
+      
       <!-- if destination is a Space (galaxy, Cluster, Sector, Zone) use it as targetspace, otherwise get its Zone as first Destination and care about the fine movements only in the last step -->
       <do_if value="$destination.isclass.galaxy or $destination.isclass.cluster or $destination.isclass.sector or $destination.isclass.zone">
         <debug_text filter="general" chance="@this.$debug * 100" text="'%1	%2	Destination is a Space - Move until we have the right Context'.[this.name,this.container.name]"/>
@@ -358,7 +361,12 @@
           <debug_text filter="error" text="'%1	%2	Targetspace is not a Space! %3! trying to get its Sector...'.[this.name,this.container.knownname,$targetspace.knownname]"/>
           <set_value name="$pathend" exact="$targetspace.sector"/>
         </do_else>
-        <get_jump_path component="$waypoints" multiple="true" start="this.sector" end="$pathend"/>
+        <get_jump_path component="$waypoints" multiple="true" start="this.sector" end="$pathend" useblacklist="$blacklistgroup" refobject="this.assignedcontrolled"/>
+        <do_if value="$waypoints.count lt 2">
+          <!-- ToDo: Follow Path until a blacklisted Sector was passed and path again from there -->
+          <debug_text filter="error" text="'%1	%2	No Valid Path from %3 to %4 using Blacklist - Ignoring it!'.[this.name,this.container.knownname,this.sector.knownname,$targetspace.knownname]"/>
+          <get_jump_path component="$waypoints" multiple="true" start="this.sector" end="$pathend"/>
+        </do_if>
         <!--remove_value name="$pathend"/-->
         <!-- set last Entry with the Target Sector to the exact Target Space so we can determine the closest Beacon -->
         <set_value name="$waypoints.{$waypoints.count}" exact="$targetspace"/>
