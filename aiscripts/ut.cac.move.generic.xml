@@ -57,6 +57,7 @@
                 <event_object_signalled object="$object" param="'travel aborted'" check="false"/>
               </check_all>
             </check_any>
+            <check_value value="this.ship.isclass.ship_xl or this.ship.isclass.ship_l"/><!-- Only for Big Ships currently -->
           </check_all>
         </conditions>
         <actions>
