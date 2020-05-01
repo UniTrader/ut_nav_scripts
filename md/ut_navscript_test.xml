@@ -19,7 +19,7 @@
               <set_value name="player.entity.$namereplacement" exact="table[]"/>
               <debug_text filter="general" text="'Created namereplacement var '"/>
             </do_if>
-            <do_all exact="10" counter="$i">
+            <do_all exact="100" counter="$i">
               <set_value name="$level" exact="$i"/>
               <do_while value="$level gt 3">
                 <set_value name="$level" exact="3" operation="subtract"/>
@@ -37,10 +37,9 @@
                 </pilot>
                 <safepos object="player.container" radius="5km"/>
               </create_ship>
-              <set_object_name object="$Testship" name="'TEST ' + $i"/>
               <set_value name="player.entity.$namereplacement.{$Testship}" exact="table[]"/>
               <set_value name="player.entity.$namereplacement.{$Testship}.$scriptcmd" exact="'Initialized'"/>
-              <signal_objects object="player.galaxy" param="'Object Name Updated'" param2="[$Testship,$Testship]" param3="$i + ' $scriptcmd DEBUG'"/>
+              <signal_objects object="player.galaxy" param="'Object Name Updated'" param2="[$Testship,$Testship]" param3="(if $i lt 10 then '00' else if $i lt 100 then '0' else '') + $i + ' $scriptcmd'"/>
             </do_all>
           </actions>
         </cue>
