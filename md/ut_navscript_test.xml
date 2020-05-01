@@ -13,9 +13,11 @@
           <actions>
             <do_if value="not player.entity.$unformatted_names?">
               <set_value name="player.entity.$unformatted_names" exact="table[]"/>
+              <debug_text filter="general" text="'Created unformatted names var '"/>
             </do_if>
             <do_if value="not player.entity.$namereplacement?">
               <set_value name="player.entity.$namereplacement" exact="table[]"/>
+              <debug_text filter="general" text="'Created namereplacement var '"/>
             </do_if>
             <do_all exact="10" counter="$i">
               <set_value name="$level" exact="$i"/>
