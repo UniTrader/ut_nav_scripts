@@ -38,6 +38,7 @@
                 <safepos object="player.container" radius="5km"/>
               </create_ship>
               <set_object_name object="$Testship" name="'TEST ' + $i"/>
+              <set_value name="player.entity.$namereplacement.{$Testship}" exact="table[]"/>
               <set_value name="player.entity.$namereplacement.{$Testship}.$scriptcmd" exact="'Initialized'"/>
               <signal_objects object="player.galaxy" param="'Object Name Updated'" param2="[$Testship,$Testship]" param3="$i + ' $scriptcmd DEBUG'"/>
             </do_all>
