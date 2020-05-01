@@ -37,10 +37,8 @@
                 </pilot>
                 <safepos object="player.container" radius="5km"/>
               </create_ship>
-              <set_value name="player.entity.$unformatted_names.{$Testship}" exact="$i + ' $scriptcmd'"/>
-              <set_value name="player.entity.$namereplacement.{$Testship}" exact="table[]"/>
-              <debug_text filter="general" text="player.entity.$unformatted_names.{$Testship}"/>
               <set_object_name object="$Testship" name="'TEST ' + $i"/>
+              <signal_objects object="player.galaxy" param="'Object Name Updated'" param2="[$Testship,$Testship]" param3="$i + ' $scriptcmd DEBUG'"/>
             </do_all>
           </actions>
         </cue>
