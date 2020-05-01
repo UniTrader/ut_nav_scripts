@@ -325,12 +325,16 @@
       <!-- move to prep pos, BOOST, and end -->
       <do_if value="$startpos?">
         <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Moving to Start Position'.[this.name,this.container.knownname]"/>
+<set_value name="this.$namereplacement.$scriptcmd" exact="'cac.move.boost move_to 328'"/>
+<signal_objects object="this.container" param="'Object Name Updated'"/>
         <move_to object="this.ship" destination="this.zone" forceposition="false" forcerotation="true" forcesteering="this.ship.distanceto.{$startpos} lt 100m" finishonapproach="true" abortpath="this.$mayabortpath?">
           <position value="$startpos" space="this.zone" />
           <rotation value="$startrot" />
           <interrupt_after_time time="150ms"/>
         </move_to>
         <do_if value="$leader_preparegroup.count and this.ship.numwaypoints" comment="to sync Boosting in Groups, but also allow smooth transition for single boosting">
+<set_value name="this.$namereplacement.$scriptcmd" exact="'cac.move.boost wait 333'"/>
+<signal_objects object="this.container" param="'Object Name Updated'"/>
           <wait sinceversion="30" resume="true">
             <interrupt>
               <conditions>
@@ -340,6 +344,8 @@
           </wait>
         </do_if>
         <do_elseif value="this.ship.numwaypoints">
+<set_value name="this.$namereplacement.$scriptcmd" exact="'cac.move.boost wait 345'"/>
+<signal_objects object="this.container" param="'Object Name Updated'"/>
           <wait sinceversion="30" resume="true">
             <interrupt>
               <conditions>
@@ -363,6 +369,8 @@
       </do_if>
       <!-- for coordinated boost - wait a split-second so everyone can add himself to the group if there is no movement first -->
       <do_else>
+<set_value name="this.$namereplacement.$scriptcmd" exact="'cac.move.boost wait 369'"/>
+<signal_objects object="this.container" param="'Object Name Updated'"/>
         <wait min="100ms" max="200ms"/>
       </do_else>
       
@@ -372,6 +380,8 @@
         <remove_from_group group="$leader_preparegroup" object="this.ship"/>
         <do_while value="$leader_preparegroup.count">
           <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Waiting for followers to be ready\nPreparegroup: %3 ( %4 Members )'.[this.name,this.container.knownname,$leader_preparegroup,$leader_preparegroup.count]"/>
+<set_value name="this.$namereplacement.$scriptcmd" exact="'cac.move.boost wait 381'"/>
+<signal_objects object="this.container" param="'Object Name Updated'"/>
           <wait max="1min" resume="true">
             <interrupt>
               <conditions>
@@ -395,6 +405,8 @@
       <do_else>
         <remove_from_group group="$leader_preparegroup" object="this.ship"/>
         <signal_objects object="$leader" param="'preparegroup shrunk'"/>
+<set_value name="this.$namereplacement.$scriptcmd" exact="'cac.move.boost wait 405'"/>
+<signal_objects object="this.container" param="'Object Name Updated'"/>
         <wait resume="true">
           <interrupt>
             <conditions>
@@ -433,14 +445,20 @@
       
       <set_avoid_collisions object="this.ship" bigobjects="false" smallobjects="false"/>
       <do_if value="not ( this.race == race.xenon or this.race == race.drone)" comment="Computer Races sync the Start perfectly, and a bit earlier than non-computer Races">
+<set_value name="this.$namereplacement.$scriptcmd" exact="'cac.move.boost wait 446'"/>
+<signal_objects object="this.container" param="'Object Name Updated'"/>
         <wait min="100ms" max="2s" profile="inversebell" sinceversion="30" comment="to de-perfect-sync Ships in Group Boosts"/>
       </do_if>
+<set_value name="this.$namereplacement.$scriptcmd" exact="'cac.move.boost move_to 452'"/>
+<signal_objects object="this.container" param="'Object Name Updated'"/>
       <move_to object="this.ship" destination="$targetzone" uselocalhighways="false" forceposition="false" travel="true" abortpath="$abortpath">
         <position value="$targetpos" />
         <interrupt_after_time time="100ms"/>
       </move_to>
       <set_value name="$abortpath" exact="false"/>
       <do_while value="( not $arriving_at? ) and this.ship.numwaypoints">
+<set_value name="this.$namereplacement.$scriptcmd" exact="'cac.move.boost wait 456'"/>
+<signal_objects object="this.container" param="'Object Name Updated'"/>
         <wait resume="true">
           <interrupt>
             <conditions>
@@ -471,12 +489,16 @@
       <do_if value="@$temp_object.exists">
         <destroy_object object="$temp_object" explosion="false"/>
       </do_if>
+<set_value name="this.$namereplacement.$scriptcmd" exact="'cac.move.boost wait 488'"/>
+<signal_objects object="this.container" param="'Object Name Updated'"/>
       <wait min="$arriving_at - player.age - 5s" max="$arriving_at - player.age - 2s" sinceversion="30" chance="$arriving_at? *100" resume="true"/>
       <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Boost movement done, distance to boost target pos: %3, Blocking Group: %4'.[this.name,this.container.knownname,this.ship.distanceto.{$targetpos},$leader_preparegroup]"/>
       <signal_objects object="this.ship" param="'travel completed'"/>
       <!-- We have Arrived - As Follower make sure we are really in $targetzone before Continuing to avoid running Scripts which dont handle the outstanding Zone Transition -->
       <do_if value="$leader.exists">
         <do_while value="this.ship.zone != $targetzone and this.ship.numwaypoints">
+<set_value name="this.$namereplacement.$scriptcmd" exact="'cac.move.boost wait 496'"/>
+<signal_objects object="this.container" param="'Object Name Updated'"/>
           <wait sinceversion="30" resume="true">
             <interrupt>
               <conditions>
@@ -492,6 +514,8 @@
         <signal_objects object="$leader" param="'preparegroup shrunk'"/>
         <do_while value="$leader_preparegroup.count">
           <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Waiting for followers and leader to Arrive\nBlocking Group: %3 ( %4 Members )'.[this.name,this.container.knownname,$leader_preparegroup,$leader_preparegroup.count]"/>
+<set_value name="this.$namereplacement.$scriptcmd" exact="'cac.move.boost wait 513'"/>
+<signal_objects object="this.container" param="'Object Name Updated'"/>
           <wait max="1min" sinceversion="30" resume="true">
             <interrupt>
               <conditions>
@@ -504,6 +528,8 @@
       <!--As Leader wait till all Followers are there, too before progressing -->
       <do_else>
         <do_if value="this.zone != $targetzone and this.ship.numwaypoints">
+<set_value name="this.$namereplacement.$scriptcmd" exact="'cac.move.boost wait 527'"/>
+<signal_objects object="this.container" param="'Object Name Updated'"/>
           <wait sinceversion="30" resume="true">
             <interrupt>
               <conditions>
@@ -519,6 +545,8 @@
         <signal_objects object="this.ship" param="'preparegroup shrunk'"/>
         <do_while value="$leader_preparegroup.count">
           <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Waiting for followers to be to Arrive\nBlocking Group: %3 ( %4 Members )'.[this.name,this.container.knownname,$leader_preparegroup,$leader_preparegroup.count]"/>
+<set_value name="this.$namereplacement.$scriptcmd" exact="'cac.move.boost wait 544'"/>
+<signal_objects object="this.container" param="'Object Name Updated'"/>
           <wait max="1min" resume="true">
             <interrupt>
               <conditions>
