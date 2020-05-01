@@ -131,6 +131,8 @@ with a given Rotation or Orientation
         <create_group groupname="$leader_preparegroup"/>
       </do_else>
       <signal_objects object="this.ship" param="'travel normal prep'" param2="[ if $leader then $leader else this.ship , $zone, $safepos,$rotation]" param3="$leader_preparegroup"/>
+<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.to.pos wait 134'"/>
+<signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
       <wait max="100ms"/>
       <wait max="100ms"/>
       <!-- this Part is currently unused and untested - will be used at a leter Date -->
@@ -186,11 +188,15 @@ with a given Rotation or Orientation
         </do_else>
       </do_if-->
       <do_if value="not $rotation">
+<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.to.pos move_to 191'"/>
+<signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
         <move_to object="this.ship" destination="$zone" forceposition="$forceendpos" abortpath="this.$mayabortpath?" finishonapproach="true">
           <position value="$safepos"/>
         </move_to>
       </do_if>
       <do_else>
+<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.to.pos move_to 198'"/>
+<signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
         <move_to object="this.ship" destination="$zone" forceposition="$forceendpos" forcerotation="$forceendpos" abortpath="this.$mayabortpath?" finishonapproach="true">
           <position value="$safepos"/>
           <rotation value="$rotation"/>
@@ -200,6 +206,8 @@ with a given Rotation or Orientation
       
       
       <do_if value="$forceendpos and this.ship.numwaypoints">
+<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.to.pos wait 205'"/>
+<signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
         <wait sinceversion="30">
           <interrupt>
             <conditions>
@@ -215,6 +223,8 @@ with a given Rotation or Orientation
         <remove_from_group group="$leader_preparegroup" object="this.ship"/>
         <do_while value="$leader_preparegroup.count">
           <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Waiting for followers to be to Arrivey\nBlocking Group: %3 ( %4 Members )'.[this.name,this.container.name,$leader_preparegroup,$leader_preparegroup.count]"/>
+<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.to.pos wait 222'"/>
+<signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
           <wait max="1min">
             <interrupt>
               <conditions>
@@ -230,6 +240,8 @@ with a given Rotation or Orientation
         <do_if value="$waitforleader">
           <do_while value="$leader_preparegroup.count">
             <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Waiting for followers and leader to Arrive\nBlocking Group: %3 ( %4 Members )'.[this.name,this.container.name,$leader_preparegroup,$leader_preparegroup.count]"/>
+<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.to.pos wait 239'"/>
+<signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
             <wait max="1min" sinceversion="30">
               <interrupt>
                 <conditions>
