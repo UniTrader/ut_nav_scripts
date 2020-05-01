@@ -13,6 +13,8 @@
           <actions>
             <do_if value="not player.entity.$unformatted_names?">
               <set_value name="player.entity.$unformatted_names" exact="table[]"/>
+            </do_if>
+            <do_if value="not player.entity.$namereplacement?">
               <set_value name="player.entity.$namereplacement" exact="table[]"/>
             </do_if>
             <do_all exact="10" counter="$i">
@@ -35,6 +37,7 @@
               </create_ship>
               <set_value name="player.entity.$unformatted_names.{$Testship}" exact="$i + ' $scriptcmd'"/>
               <set_value name="player.entity.$namereplacement.{$Testship}" exact="table[]"/>
+              <debug_text filter="general" text="player.entity.$unformatted_names.{$Testship}"/>
               <signal_cue_instantly cue="md.UT_CAC_Object_Name_Managment.NameUpdate_Initialize" param="$Testship"/>
               <set_object_name object="$Testship" name="'TEST ' + $i"/>
             </do_all>
