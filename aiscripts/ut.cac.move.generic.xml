@@ -293,14 +293,14 @@
       <set_value name="this.$destination" exact="$destination" comment="announce our Destinatio to Followers to ease Navigation"/>
       <!-- Set Script Expressions for Advanced Renaming -->
       <do_if value="@readtext.{5554302}.{1} != '=ReadText5554302-1=' and this.ship.owner == faction.player">
-        <do_if value="not this.$namereplacement?">
-          <set_value name="this.$namereplacement" exact="table[]"/>
+        <do_if value="not player.entity.$namereplacement.{this.ship}?">
+          <set_value name="player.entity.$namereplacement.{this.ship}" exact="table[]"/>
         </do_if>
         <do_if value="$destination.isclass.{[class.ship,class.station]}">
-          <set_value name="this.$namereplacement.$destination" exact="$destination.zone.knownname"/>
+          <set_value name="player.entity.$namereplacement.{this.ship}.$destination" exact="$destination.zone.knownname"/>
         </do_if>
         <do_else>
-          <set_value name="this.$namereplacement.$destination" exact="$targetspace.name"/>
+          <set_value name="player.entity.$namereplacement.{this.ship}.$destination" exact="$targetspace.name"/>
         </do_else>
         <signal_objects object="this.container" param="'Object Name Updated'" delay="100ms"/>
       </do_if>
@@ -321,7 +321,7 @@
         <do_elseif value="$endintargetspace">
           <do_if value="$destination.pilot.$waypoint? and $destination.zone != this.zone">
             <debug_text filter="general" chance="@this.$debug * 100" text="'%1	%2	Is already in the right Zone - Waiting for Target to arrive there, too'.[this.name,this.container.name]"/>
-<set_value name="this.$namereplacement.$scriptcmd" exact="'cac.move.generic wait 324'"/>
+<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" exact="'cac.move.generic wait 324'"/>
 <signal_objects object="this.container" param="'Object Name Updated'"/>
             <wait>
               <interrupt>
@@ -524,7 +524,7 @@
               </do_if>
               <do_if value="not this.ship.hascontext.{this.$waypoint}">
                 <debug_text filter="error" text="'Jump Failed! Destination: %1 / %2 Current Sector/Zone: %3 / %4 - restarting'.[@this.$waypoint.sector.knownname,this.$waypoint.name,this.sector.knownname,this.zone.knownname]"/>
-<set_value name="this.$namereplacement.$scriptcmd" exact="'cac.move.generic wait 525'"/>
+<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" exact="'cac.move.generic wait 525'"/>
 <signal_objects object="this.container" param="'Object Name Updated'"/>
                 <wait exact="1min"/>
                 <resume label="start"/>
@@ -543,7 +543,7 @@
               </run_script>
               <do_if value="not this.ship.hascontext.{this.$waypoint.sector}">
                 <debug_text filter="error" text="'Move Gate - Jump Failed! Destination: %1 / %2 Current Sector/Zone: %3 / %4 - restarting'.[@this.$waypoint.sector.knownname,this.$waypoint.name,this.sector.knownname,this.zone.knownname]"/>
-<set_value name="this.$namereplacement.$scriptcmd" exact="'cac.move.generic wait 546'"/>
+<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" exact="'cac.move.generic wait 546'"/>
 <signal_objects object="this.container" param="'Object Name Updated'"/>
                 <wait exact="1min"/>
                 <resume label="start"/>
@@ -562,7 +562,7 @@
               <do_if value="not this.ship.hascontext.{this.$waypoint.zone}">
                 <debug_text filter="error" text="'Move Gate - Boost Failed! Destination: %1 / %2 / %3 Current Sector/Zone: %4 / %5 // distance to destination: %6 - restarting'.[@this.$waypoint.sector.knownname,@this.$waypoint.zone.knownname,this.$waypoint.name,this.sector.knownname,this.zone.knownname,this.ship.distanceto.{this.$waypoint}]"/>
                 <do_if value="this.ship.distanceto.{this.$waypoint} gt 10km">
-<set_value name="this.$namereplacement.$scriptcmd" exact="'cac.move.generic wait 565'"/>
+<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" exact="'cac.move.generic wait 565'"/>
 <signal_objects object="this.container" param="'Object Name Updated'"/>
                   <wait exact="1min"/>
                   <resume label="start"/>
@@ -578,7 +578,7 @@
             </run_script>
             <do_if value="not this.ship.hascontext.{this.$waypoint.destination}">
               <debug_text filter="error" text="'Move Gate itself Failed! Destination: %s / %s / %s Current Sector/Zone: %s / %s - restarting'.[@this.$waypoint.sector.knownname,@this.$waypoint.zone.knownname,this.$waypoint.knownname,this.sector.knownname,this.zone.knownname]"/>
-<set_value name="this.$namereplacement.$scriptcmd" exact="'cac.move.generic wait 581'"/>
+<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" exact="'cac.move.generic wait 581'"/>
 <signal_objects object="this.container" param="'Object Name Updated'"/>
               <wait exact="1min"/>
               <resume label="start"/>
@@ -595,7 +595,7 @@
               </run_script>
               <do_if value="not this.ship.hascontext.{this.$waypoint.sector}">
                 <debug_text filter="error" text="'Move Zone - Jump Failed! Destination: %1 / %2 Current Sector/Zone: %3 / %4 - restarting'.[@this.$waypoint.sector.knownname,this.$waypoint.name,this.sector.knownname,this.zone.knownname]"/>
-<set_value name="this.$namereplacement.$scriptcmd" exact="'cac.move.generic wait 598'"/>
+<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" exact="'cac.move.generic wait 598'"/>
 <signal_objects object="this.container" param="'Object Name Updated'"/>
                 <wait exact="1min"/>
                 <resume label="start"/>
@@ -623,7 +623,7 @@
         </do_while>
         <debug_text filter="error" text="'%1	%2	This Part should NEVER be reached!!! last waypoint: %3, destination: %4 - Waiting and Restarting'.[this.name,this.container.knownname,this.$waypoint.knownname,$destination.knownname]"/>
         <play_sound object="player.entity" sound="'cockpit_alert'"/>
-<set_value name="this.$namereplacement.$scriptcmd" exact="'cac.move.generic wait 625'"/>
+<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" exact="'cac.move.generic wait 625'"/>
 <signal_objects object="this.container" param="'Object Name Updated'"/>
         <wait exact="1min"/>
         <resume label="start"/>
@@ -661,7 +661,7 @@
       <remove_value name="this.$destination"/>
       
       <do_while value="not ( $destination.hascontext.{$targetspace} or $destination == $targetspace )">
-<set_value name="this.$namereplacement.$scriptcmd" exact="'cac.move.generic wait 663'"/>
+<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" exact="'cac.move.generic wait 663'"/>
 <signal_objects object="this.container" param="'Object Name Updated'"/>
         <wait sinceversion="30">
           <interrupt>

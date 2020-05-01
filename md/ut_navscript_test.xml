@@ -33,7 +33,7 @@
                 <safepos object="player.container" radius="5km"/>
               </create_ship>
               <set_value name="player.entity.$unformatted_names.{$Testship}" exact="$i + ' $scriptcmd'"/>
-              <set_value name="$Testship.pilot.$namereplacement" exact="table[]"/>
+              <set_value name="player.entity.$namereplacement.{$Testship}" exact="table[]"/>
               <signal_cue_instantly cue="md.UT_CAC_Object_Name_Managment.NameUpdate_Initialize" param="$Testship"/>
               <set_object_name object="$Testship" name="'TEST ' + $i"/>
             </do_all>
