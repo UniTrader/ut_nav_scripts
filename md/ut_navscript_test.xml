@@ -13,6 +13,7 @@
           <actions>
             <do_if value="not player.entity.$unformatted_names?">
               <set_value name="player.entity.$unformatted_names" exact="table[]"/>
+              <set_value name="player.entity.$namereplacement." exact="table[]"/>
             </do_if>
             <do_all exact="10" counter="$i">
               <set_value name="$level" exact="$i"/>
