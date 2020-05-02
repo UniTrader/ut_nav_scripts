@@ -142,10 +142,10 @@
           <remove_value name="global.$gate_queue.{$gate}.{1}.{$i}"/>
           <!-- also re-adjust queue Position -->
           <set_value name="$queue_position" operation="subtract"/>
-      <do_if value="player.entity.$namereplacement.{this.ship}?">
-        <set_value name="player.entity.$namereplacement.{this.ship}.$queue_pos" exact="(if $queue_position lt 10 then '00' else if $queue_position lt 100 then '0' else '' ) + $queue_position"/>
-        <signal_objects object="this.ship" param="'Object Name Updated'"/>
-      </do_if>
+          <do_if value="player.entity.$namereplacement.{this.ship}?">
+            <set_value name="player.entity.$namereplacement.{this.ship}.$queue_pos" exact="(if $queue_position lt 10 then '00' else if $queue_position lt 100 then '0' else '' ) + $queue_position"/>
+            <signal_objects object="this.ship" param="'Object Name Updated'"/>
+          </do_if>
         </do_else>
       </do_all>
       <do_if value="global.$gate_queue.{$gate}.{1}.{1}.pilot.commandaction.param == $gate" comment="if the leading Ship is currently flying into the Gate it doesnt need is full length reserved because one half will be behind the Gate at the target pos">
@@ -159,6 +159,35 @@
       <do_else>
         <set_value name="$rotation" exact="$gate.rotation"/>
       </do_else>
+      <do_if value="$lineOffsetZ gt 20km and this.ship.distanceto.{$gate} + 5km lt $lineOffsetZ">
+        <!-- Not sorting into Queue proper yet, rahter follow the queue back to the end-->
+        <is_in_quadrant object="$gate" target="this.ship" right="true" result="$right"/>
+        <is_in_quadrant object="$gate" target="this.ship" left="true" result="$left"/>
+        <do_if value="$right">
+          <transform_position name="$approachposition" refposition="$gate.position" refrotation="$gate.rotation" >
+            <position x="$LineOffsetX + 10km" y="$LineOffsetY" z="$queue_distance + $LineOffsetZ"/>
+          </transform_position>
+        </do_if>
+        <do_elseif value="$left">
+          <transform_position name="$approachposition" refposition="$gate.position" refrotation="$gate.rotation" >
+            <position x="$LineOffsetX - 10km" y="$LineOffsetY" z="$queue_distance + $LineOffsetZ"/>
+          </transform_position>
+        </do_elseif>
+        <do_else>
+          <transform_position name="$approachposition" refposition="$gate.position" refrotation="$gate.rotation" >
+            <position x="$LineOffsetX" y="$LineOffsetY - 5km" z="$queue_distance + $LineOffsetZ"/>
+          </transform_position>
+        </do_else>
+        <remove_value name="$right"/>
+        <remove_value name="$left"/>
+<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.gate move_to 183'"/>
+<signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
+        <set_to_default_flight_control_model object="this.ship"/>
+        <move_to object="this.ship" destination="$gate.zone" forceposition="false" forcerotation="false" finishonapproach="true" abortpath="not $continuepath">
+          <position value="$approachposition" />
+          <rotation value="$gate.rotation"/>
+        </move_to>
+      </do_if>
       <transform_position name="$position" refposition="$gate.position" refrotation="$gate.rotation" >
         <position x="$LineOffsetX" y="$LineOffsetY" z="$queue_distance + $LineOffsetZ"/>
       </transform_position>
@@ -167,8 +196,11 @@
         </create_orientation-->
       <!--get_safe_pos result="$safeposition" allowyaxis="true" zone="$gate.zone" value="$position" radius="this.ship.size" ignored="$ignoredobject"/-->
       <!-- move to position in queue/prep pos -->
-      
-<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.gate move_to 167'"/>
+      <do_if value="this.ship.distanceto.{$position} gt 20km and this.ship.distanceto.{$gate} lt 20km">
+        <get_safe_pos result="$position"  >
+        </get_safe_pos>
+      </do_if>
+<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.gate move_to 203'"/>
 <signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
       <set_flight_control_model object="this.ship" flightcontrolmodel="flightcontrolmodel.linear" chance="$continuepath * 100"/>
       <move_to object="this.ship" destination="$gate.zone" forceposition="false" forcerotation="false" finishonapproach="true" abortpath="not $continuepath">
@@ -208,7 +240,7 @@
       </do_elseif>
       <do_else>
         <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Reached Wait Pos and Ship in front is closer than we - waiting\nOther Ship: %3; Distance: %4 Our Distance: %5'.[this.knownname,this.container.knownname,global.$gate_queue.{$gate}.{1}.{$queue_position - 1}.name,global.$gate_queue.{$gate}.{1}.{$queue_position - 1}.distanceto.{$gate},this.ship.distanceto.{$gate}]"/>
-<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.gate wait 208'"/>
+<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.gate wait 243'"/>
 <signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
         <wait max="5min" comment="just in case the Signal doesnt trigger properly">
         <interrupt>
@@ -236,7 +268,7 @@
       <request_gate ship="this.ship" gate="if true then $gate else 'request 1'" result="$success" />
       <set_value name="$RequestingTimeout" min="player.age + 2min" max="player.age + 5min"/>
       <do_while value="global.$gate_queue.{$gate}.{1}.indexof.{this.ship} gt 1 and not $success">
-<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.gate wait 236'"/>
+<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.gate wait 271'"/>
 <signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
         <set_to_default_flight_control_model object="this.ship"/>
         <wait min="3s" max="8s" comment="aggresive gate polling, but only one Ship at the same time.">
@@ -273,7 +305,7 @@
           </transform_position>
           <set_value name="$rotation" exact="$gate.rotation.inverse"/>
           <set_command_action commandaction="commandaction.flyingto" param="$gate"/>
-<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.gate move_to 266'"/>
+<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.gate move_to 308'"/>
 <signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
           <move_to object="this.ship" destination="$gate.zone" forceposition="true" forcerotation="true" finishonapproach="false" abortpath="not $continuepath" commandaction="false">
             <position value="$position" />
@@ -295,7 +327,7 @@
           </move_to>
         </do_if>
         <do_if value="$moveintogate">
-<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.gate move_gate 288'"/>
+<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.gate move_gate 330'"/>
 <signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
           <move_gate object="this.ship" gate="if true then $gate else 'pass 1'" abortpath="false">
             <interrupt>
@@ -322,7 +354,7 @@
         </do_if>
       </do_if>
       <do_else comment="Enter Highwayentrygate">
-<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.gate move_to 315'"/>
+<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.gate move_to 357'"/>
 <signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
         <move_to object="this.ship" destination="$gate.destination" uselocalhighways="false" abortpath="false" forcesteering="false" forceposition="false" travel="false">
           <interrupt>
@@ -349,7 +381,7 @@
         </move_to>
       </do_else>
       <do_if value="$moveintogate">
-<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.gate wait 347'"/>
+<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.gate wait 384'"/>
 <signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
         <wait>
           <interrupt>
@@ -412,7 +444,7 @@
           <set_value name="$ignoredobject" exact="this.ship"/>
         <!--/do_else-->
         <get_safe_pos result="$safeposition" allowyaxis="true" zone="this.zone" value="$position" radius="this.ship.size" ignored="$ignoredobject" min="this.ship.size*2"/>
-<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.gate move_gate 403'"/>
+<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.gate move_gate 447'"/>
 <signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
         <move_to object="this.ship" destination="this.zone" ><!-- forcesteering="true" finishonapproach="true" boost="this.ship.pilot.skill.navigation ge 3" usehighways="false"-->
           <position value="$safeposition"/>
@@ -421,7 +453,7 @@
         <do_if value="this.ship.attention ge attention.visible">
           <set_flight_control_model object="this.ship" flightcontrolmodel="flightcontrolmodel.linear"/>
         </do_if>
-<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.gate wait 420'"/>
+<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.gate wait 456'"/>
 <signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
         <wait exact="20s"/>
       </do_if>
@@ -434,7 +466,7 @@
       <!-- wait till everyone in Group has passed the Gate (unregistered from Group) -->
       <do_if value="not $leader">
         <do_while value="$passage_group.count">
-<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.gate wait 433'"/>
+<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.gate wait 469'"/>
 <signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
           <wait max="1min" comment="fallback: re-check regulary">
             <interrupt>
@@ -448,7 +480,7 @@
       <do_else>
         <signal_objects object="$leader" param="'preparegroup shrunk'"/>
         <do_while value="$passage_group.count">
-<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.gate wait 448'"/>
+<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.gate wait 483'"/>
 <signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
           <wait max="1min" comment="fallback: re-check regulary">
             <interrupt>
