@@ -30,6 +30,7 @@
       <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Script started with Params:\n$gate: %3 ; $cleargate: %4 $formationlist: %5'.[this.name,this.container.name,$gate,$cleargate,@$formationlist]"/>
       
       <label name="start"/>
+      <set_to_default_flight_control_model object="this.ship"/>
       
       <!-- then check if the Input and Situation is Valid  -->
       <do_if value="not $gate.exists or not ( $gate.isclass.gate or $gate.isclass.highwayentrygate )">
@@ -123,6 +124,7 @@
         </transform_position>
 <set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.gate move_to 122'"/>
 <signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
+      <set_to_default_flight_control_model object="this.ship"/>
         <move_to object="this.ship" destination="this.ship.zone" forceposition="false" forcerotation="false" finishonapproach="true" abortpath="true">
           <position value="$position" />
           <rotation value="this.ship.rotation.inverse"/>
@@ -168,6 +170,7 @@
       
 <set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.gate move_to 167'"/>
 <signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
+      <set_flight_control_model object="this.ship" flightcontrolmodel="flightcontrolmodel.linear" chance="$continuepath * 100"/>
       <move_to object="this.ship" destination="$gate.zone" forceposition="false" forcerotation="false" finishonapproach="true" abortpath="not $continuepath">
         <position value="$position" />
         <rotation value="$rotation"/>
@@ -235,6 +238,7 @@
       <do_while value="global.$gate_queue.{$gate}.{1}.indexof.{this.ship} gt 1 and not $success">
 <set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.gate wait 236'"/>
 <signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
+        <set_to_default_flight_control_model object="this.ship"/>
         <wait min="3s" max="8s" comment="aggresive gate polling, but only one Ship at the same time.">
           <interrupt>
             <conditions>
