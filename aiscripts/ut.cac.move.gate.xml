@@ -196,10 +196,6 @@
         </create_orientation-->
       <!--get_safe_pos result="$safeposition" allowyaxis="true" zone="$gate.zone" value="$position" radius="this.ship.size" ignored="$ignoredobject"/-->
       <!-- move to position in queue/prep pos -->
-      <do_if value="this.ship.distanceto.{$position} gt 20km and this.ship.distanceto.{$gate} lt 20km">
-        <get_safe_pos result="$position"  >
-        </get_safe_pos>
-      </do_if>
 <set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.gate move_to 203'"/>
 <signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
       <set_flight_control_model object="this.ship" flightcontrolmodel="flightcontrolmodel.linear" chance="$continuepath * 100"/>
