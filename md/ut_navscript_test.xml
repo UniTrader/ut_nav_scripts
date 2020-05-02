@@ -39,7 +39,7 @@
               </create_ship>
               <set_value name="player.entity.$namereplacement.{$Testship}" exact="table[]"/>
               <set_value name="player.entity.$namereplacement.{$Testship}.$scriptcmd" exact="'Initialized'"/>
-              <signal_objects object="player.galaxy" param="'Object Name Updated'" param2="[$Testship,$Testship]" param3="(if $i lt 10 then '00' else if $i lt 100 then '0' else '') + $i + ' $scriptcmd'"/>
+              <signal_objects object="player.galaxy" param="'Object Name Updated'" param2="[$Testship,$Testship]" param3="(if $i lt 10 then '00' else if $i lt 100 then '0' else '') + $i + ' $scriptcmd $queue_pos'"/>
             </do_all>
           </actions>
         </cue>
