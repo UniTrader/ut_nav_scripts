@@ -687,6 +687,8 @@
       </do_if>
       
       <label name="finish"/>
+<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.generic ended'"/>
+<signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
       <!-- Track Experience Progress: Add time needed for Navigation to XP Progress 
       <do_if value="this.$ut_cac.$experience.{skilltype.navigation}? and $nav_start_time?">
         <set_value name="this.$ut_cac.$experience.{skilltype.navigation}" operation="add" exact="player.age - $nav_start_time"/>-->
