@@ -70,10 +70,10 @@
       <!-- Planned feature: multiple Approach Paths - Define the Lists for target offsets here -->
       <set_value name="$OffsetList" exact="[position.[0m,0m,-1m]]"/>
       
-      <!-- Set the offset from the queue line to make it look less robotic -->
-      <set_value name="$LineOffsetX" min="0 - this.ship.width / 2" max="this.ship.width / 2"/>
-      <set_value name="$LineOffsetY" min="0 - this.ship.length / 8" max="this.ship.length / 8"/>
-      <set_value name="$LineOffsetZ" min="0 - this.ship.height / 2" max="this.ship.height / 2"/>
+      <!-- Set the offset angle from the queue line to make it look less robotic -->
+      <set_value name="$LineOffsetYaw" min="-20deg" max="20deg" profile="inversebell"/>
+      <set_value name="$LineOffsetPitch" min="-10deg" max="10deg" profile="inversebell"/>
+      <set_value name="$queuelinerotation" exact="rotation.[$LineOffsetYaw,$LineOffsetPitch,0deg]"/>
       
       <!-- check if global Var for Gate Passage exists and create if necesary -->
       <!-- Note: the Table must always have a first entry which is reserved for the Ship currently flying into the Gate - set to null if currently no Ship is passing. -->
@@ -119,9 +119,7 @@
       
       <do_if value="not $queue_position">
         <debug_text filter="error" text="'%1 %2 Not in Gate Queue - Turning around and Restarting!'.[this.name,this.container.name]"/>
-        <transform_position name="$position" refposition="this.ship.position" refrotation="this.ship.rotation" >
-          <position x="$LineOffsetX * 10" y="$LineOffsetY * 10" z="$LineOffsetZ * 10m"/>
-        </transform_position>
+        <get_safe_pos result="$position" object="this.ship" directionobject="this.ship" direction="quadrant.right" angle="90deg" zone="this.ship.zone"/>
 <set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.gate move_to 122'"/>
 <signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
       <set_to_default_flight_control_model object="this.ship"/>
@@ -154,43 +152,16 @@
       <set_value name="$queue_distance" operation="subtract" exact="this.ship.size * 0.6" comment="current Ship only needs to be acounted for in half"/>
       <do_if value="$gate.isclass.gate" comment="approach Jump Gates from behind, therefore negative value (and Highway Entry Gates from the front)">
         <set_value name="$queue_distance" exact="$queue_distance * -1"/>
-        <set_value name="$rotation" exact="$gate.rotation.inverse"/>
       </do_if>
-      <do_else>
-        <set_value name="$rotation" exact="$gate.rotation"/>
-      </do_else>
-      <do_if value="$lineOffsetZ gt 20km and this.ship.distanceto.{$gate} + 5km lt $lineOffsetZ">
-        <!-- Not sorting into Queue proper yet, rahter follow the queue back to the end-->
-        <is_in_quadrant object="$gate" target="this.ship" right="true" result="$right"/>
-        <is_in_quadrant object="$gate" target="this.ship" left="true" result="$left"/>
-        <do_if value="$right">
-          <transform_position name="$approachposition" refposition="$gate.position" refrotation="$gate.rotation" >
-            <position x="$LineOffsetX + 10km" y="$LineOffsetY" z="$queue_distance + $LineOffsetZ"/>
-          </transform_position>
-        </do_if>
-        <do_elseif value="$left">
-          <transform_position name="$approachposition" refposition="$gate.position" refrotation="$gate.rotation" >
-            <position x="$LineOffsetX - 10km" y="$LineOffsetY" z="$queue_distance + $LineOffsetZ"/>
-          </transform_position>
-        </do_elseif>
-        <do_else>
-          <transform_position name="$approachposition" refposition="$gate.position" refrotation="$gate.rotation" >
-            <position x="$LineOffsetX" y="$LineOffsetY - 5km" z="$queue_distance + $LineOffsetZ"/>
-          </transform_position>
-        </do_else>
-        <remove_value name="$right"/>
-        <remove_value name="$left"/>
-<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.gate move_to 183'"/>
-<signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
-        <set_to_default_flight_control_model object="this.ship"/>
-        <move_to object="this.ship" destination="$gate.zone" forceposition="false" forcerotation="false" finishonapproach="true" abortpath="not $continuepath">
-          <position value="$approachposition" />
-          <rotation value="$gate.rotation"/>
-        </move_to>
-      </do_if>
+      <transform_position name="$position" refposition="position.[0,0,0]" refrotation="$queuelinerotation">
+        <position x="0" y="0" z="$queue_distance"/>
+        </transform_position>
       <transform_position name="$position" refposition="$gate.position" refrotation="$gate.rotation" >
-        <position x="$LineOffsetX" y="$LineOffsetY" z="$queue_distance + $LineOffsetZ"/>
+        <position value="$position"/>
       </transform_position>
+      <create_orientation name="$rotation" refobject="$gate" orientation="look_at">
+        <position value="$position"/>
+      </create_orientation>
       <!--create_orientation name="$rotation" orientation="look_at"  refobject="$gate">
           <position value="$position"/>
         </create_orientation-->
@@ -296,15 +267,12 @@
       <label name="pass gate GO"/>
       <do_if value="$gate.isclass.gate" comment="Enter Jumpgate">
         <do_if value="this.ship.attention gt attention.visible">
-          <transform_position name="$position" refposition="$gate.position" refrotation="$gate.rotation" >
-            <position x="$LineOffsetX" y="$LineOffsetY" z="this.ship.length * 0.45"/>
-          </transform_position>
           <set_value name="$rotation" exact="$gate.rotation.inverse"/>
           <set_command_action commandaction="commandaction.flyingto" param="$gate"/>
 <set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.gate move_to 308'"/>
 <signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
           <move_to object="this.ship" destination="$gate.zone" forceposition="true" forcerotation="true" finishonapproach="false" abortpath="not $continuepath" commandaction="false">
-            <position value="$position" />
+            <position value="gate.position" />
             <rotation value="$rotation"/>
             <interrupt>
               <conditions>
