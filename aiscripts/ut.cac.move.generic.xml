@@ -559,7 +559,7 @@
                 <position x="0m" y="5km" z="[@global.$gate_queue.{this.$waypoint}.count * 3km,15km].max*( if this.$waypoint.isclass.gate then -1 else 1 )"/>
               </transform_position>
               <transform_position name="$targetpos" refposition="this.$waypoint.zone.position" refrotation="this.$waypoint.zone.rotation">
-                <position value="$position"/>
+                <position value="$targetpos"/>
               </transform_position>
               <run_script name="'ut.cac.move.boost'">
                 <param name="destination" value="this.$waypoint.sector"/>
