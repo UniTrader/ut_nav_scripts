@@ -469,9 +469,9 @@
             </conditions>
             <actions>
               <do_if value="event.name == 'event_object_approaching_waypoint'">
-                <do_if value="this.ship.distanceto.{$targetpos} lt 10km">
+                <!--do_if value="this.ship.distanceto.{$targetpos} lt 10km">
                   <set_value name="$arriving_at" exact="event.param2 + player.age"/>
-                </do_if>
+                </do_if-->
                 <!-- preperation for future Usage: Save current Speed to a Global Var so we can use this to get Ships with similiar Boost Speed -->
                 <do_if value="not global.$ship_boost_speed?">
                   <set_value name="global.$ship_boost_speed" exact="table[]"/>
@@ -489,9 +489,9 @@
       <do_if value="@$temp_object.exists">
         <destroy_object object="$temp_object" explosion="false"/>
       </do_if>
-<set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.boost wait 488'"/>
+<!--set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.boost wait 488'"/>
 <signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
-      <wait min="$arriving_at - player.age - 5s" max="$arriving_at - player.age - 2s" sinceversion="30" chance="$arriving_at? *100" resume="true"/>
+      <wait min="$arriving_at - player.age - 5s" max="$arriving_at - player.age - 2s" sinceversion="30" chance="$arriving_at? *100" resume="true"/-->
       <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Boost movement done, distance to boost target pos: %3, Blocking Group: %4'.[this.name,this.container.knownname,this.ship.distanceto.{$targetpos},$leader_preparegroup]"/>
       <signal_objects object="this.ship" param="'travel completed'"/>
       <!-- We have Arrived - As Follower make sure we are really in $targetzone before Continuing to avoid running Scripts which dont handle the outstanding Zone Transition -->
