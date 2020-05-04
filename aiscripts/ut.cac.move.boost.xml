@@ -465,6 +465,8 @@
               <check_any>
                <event_object_approaching_waypoint object="this.ship"/><!-- lastwaypoint="true" -->
                 <event_object_arrived_at_waypoint object="this.ship"/><!-- lastwaypoint="true" -->
+                <event_boost_stopped object="this.ship"/>
+                <check_value value="this.ship.distanceto.{$targetpos}" max="10km"/>
               </check_any>
             </conditions>
             <actions>
