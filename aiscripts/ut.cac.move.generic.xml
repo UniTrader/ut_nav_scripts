@@ -565,7 +565,7 @@
                 <param name="destination" value="this.$waypoint.sector"/>
                 <param name="position" value="$position" comment="relative to destination! (including its rotation)"/>
               </run_script>
-              <do_if value="this.ship.distanceto.this.$waypoint.sector,$position] gt 15km">
+              <do_if value="this.ship.distanceto.[this.$waypoint.sector,$position] gt 15km">
                 <debug_text filter="error" text="'Move Gate - Boost Failed! Destination: %1 / %2 / %3 Current Sector/Zone: %4 / %5 // distance to destination: %6 - restarting'.[@this.$waypoint.sector.knownname,@this.$waypoint.zone.knownname,this.$waypoint.name,this.sector.knownname,this.zone.knownname,this.ship.distanceto.{this.$waypoint}]"/>
                 <do_if value="this.ship.distanceto.{this.$waypoint} gt 30km">
 <set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.generic wait 565'"/>
