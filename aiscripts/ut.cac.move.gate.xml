@@ -268,6 +268,7 @@
           <set_command_action commandaction="commandaction.flyingto" param="$gate"/>
 <set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.gate move_to 308'"/>
 <signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
+          <set_avoid_collisions object="this.ship" bigobjects="false" smallobjects="false" comment="disable collision avoidance while in queue to avoid other ships pushing us out and delaying everything"/>
           <move_to object="this.ship" destination="$gate.zone" forceposition="true" forcerotation="true" finishonapproach="false" abortpath="not $continuepath" commandaction="false" travel="true">
             <position value="gate.position" />
             <rotation value="$rotation"/>
