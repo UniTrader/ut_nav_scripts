@@ -555,9 +555,22 @@
           <!-- ToDo: Move this to Gate Passage and properly account for Target Pos? -->
             <do_if value="this.zone != this.$waypoint.zone or this.ship.distanceto.{this.$waypoint} gt 7km">
               <debug_text filter="general" chance="@this.$debug * 100" text="'%1	%2	Boosting near to %3 for gate passage'.[this.name,this.container.knownname,this.$waypoint.knownname]"/>
-              <get_safe_pos result="$targetpos" zone="this.$waypoint.zone" object="this.$waypoint" x="0m" y="5km" z="[@global.$gate_queue.{this.$waypoint}.count * 3km,30km].max*( if this.$waypoint.isclass.gate then -1 else 1 )"/>
+              <is_in_quadrant result="$right" object="this.$waypoint" target="this.ship" right="true"/>
+              <is_in_quadrant result="$left" object="this.$waypoint" target="this.ship" left="true"/>
+              <is_in_quadrant result="$up" object="this.$waypoint" target="this.ship" up="true"/>
+              <is_in_quadrant result="$down" object="this.$waypoint" target="this.ship" down="true"/>
+              <set_value name="$queue_size" exact="@global.$gate_queue.{this.$waypoint}.count"/>
+              <set_value name="$targetpos" exact="position.[
+              if $right and $left then 0m else if $right then $queue_size * 1,5km,15km].max else $queue_size * 3km,30km].max * -1,
+              if $up and $down then 0m else if $up then $queue_size * 1,5km,15km].max else $queue_size * 3km,30km].max * -1,
+              $queue_size * 3km,30km].max* ( if this.$waypoint.isclass.gate then -1 else )"/>
+              <remove_value name="$right"/>
+              <remove_value name="$left"/>
+              <remove_value name="$up"/>
+              <remove_value name="$down"/>
+              <remove_value name="$queue_size"/>
               <run_script name="'ut.cac.move.boost'">
-                <param name="destination" value="this.$waypoint.zone"/>
+                <param name="destination" value="this.$waypoint"/>
                 <param name="position" value="$targetpos" comment="relative to destination! (including its rotation)"/>
               </run_script>
               <do_if value="this.ship.distanceto.[this.$waypoint,$targetpos] gt 15km">
