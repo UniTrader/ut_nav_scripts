@@ -555,7 +555,7 @@
           <!-- ToDo: Move this to Gate Passage and properly account for Target Pos? -->
             <do_if value="this.zone != this.$waypoint.zone or this.ship.distanceto.{this.$waypoint} gt 7km">
               <debug_text filter="general" chance="@this.$debug * 100" text="'%1	%2	Boosting near to %3 for gate passage'.[this.name,this.container.knownname,this.$waypoint.knownname]"/>
-              <set_value name="$targetpos" exact="position.[0m,5km,[@global.$gate_queue.{this.$waypoint}.count * 3km,30km].max*( if this.$waypoint.isclass.gate then -1 else 1 )"/>
+              <get_safe_pos result="$targetpos" zone="this.$waypoint.zone" object="this.$waypoint" x="0m" y="5km" z="[@global.$gate_queue.{this.$waypoint}.count * 3km,30km].max*( if this.$waypoint.isclass.gate then -1 else 1 )"/>
               <run_script name="'ut.cac.move.boost'">
                 <param name="destination" value="this.$waypoint"/>
                 <param name="position" value="$targetpos" comment="relative to destination! (including its rotation)"/>
