@@ -71,8 +71,8 @@
       <set_value name="$OffsetList" exact="[position.[0m,0m,-1m]]"/>
       
       <!-- Set the offset angle from the queue line to make it look less robotic -->
-      <set_value name="$LineOffsetYaw" min="-20deg" max="20deg" profile="inversebell"/>
-      <set_value name="$LineOffsetPitch" min="-10deg" max="10deg" profile="inversebell"/>
+      <set_value name="$LineOffsetYaw" min="-20deg" max="20deg"/><!-- profile="inversebell" -->
+      <set_value name="$LineOffsetPitch" min="-10deg" max="10deg"/><!-- profile="inversebell" -->
       <set_value name="$queuelinerotation" exact="rotation.[$LineOffsetYaw,$LineOffsetPitch,0deg]"/>
       
       <!-- check if global Var for Gate Passage exists and create if necesary -->
