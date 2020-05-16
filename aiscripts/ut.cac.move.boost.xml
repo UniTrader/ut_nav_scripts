@@ -155,54 +155,36 @@
         
         <do_if value="$leader_startposition">
           <!-- ToDo: base Start Position on Position in Formation if applicable -->
-          <get_safe_pos result="$startpos" zone="$leader.zone" value="$leader_startposition" radius="this.ship.size * 2" min="$leader.size * 2"/>
+          <get_safe_pos result="$startpos" zone="$leader.zone" value="$leader_startposition" radius="this.ship.size * 2"/>
           <set_value name="$startrot" exact="$leader_startrotation"/>
         </do_if>
         <do_else>
-          <get_zone_exit_pos zone="this.zone" destination="$targetzone" position="$startpos" rotation="$startrot" radius="this.ship.size * 2" >
-            <position object="this.ship" max="10km"/>
-          </get_zone_exit_pos>
-          
-          <do_if value="this.ship.distanceto.{$startpos} gt 7km">
-            <get_zone_exit_pos zone="this.zone" destination="$targetzone" position="$startpos_check" rotation="$startrot" radius="this.ship.size * 2" >
-              <position space="this.ship.zone" x="this.ship.position.x+3km" y="this.ship.position.y +5km"  z="this.ship.position.z+3km"/>
-            </get_zone_exit_pos>
-            <do_if value="this.ship.distanceto.{$startpos} gt this.ship.distanceto.{$startpos_check}">
-              <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Using alternative Startpos because its closer (Y + 1 case)\nDistance before: %3 Distance after: %4'.[this.name,this.container.knownname,this.ship.distanceto.{$startpos},this.ship.distanceto.{$startpos_check}]"/>
-              <set_value name="$startpos" exact="$startpos_check"/>
-            </do_if>
-            
-            <do_if value="this.ship.distanceto.{$startpos} gt 7km">
-              <get_zone_exit_pos zone="this.zone" destination="$targetzone" position="$startpos_check" rotation="$startrot" radius="this.ship.size * 2" >
-                <position space="this.ship.zone" x="this.ship.position.x+3km" y="this.ship.position.y -5km"  z="this.ship.position.z-3km"/>
-              </get_zone_exit_pos>
-              <do_if value="this.ship.distanceto.{$startpos} gt this.ship.distanceto.{$startpos_check}">
-                <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Using alternative Startpos because its closer (Y - 1 case)\nDistance before: %3 Distance after: %4'.[this.name,this.container.knownname,this.ship.distanceto.{$startpos},this.ship.distanceto.{$startpos_check}]"/>
-                <set_value name="$startpos" exact="$startpos_check"/>
-                
-                <do_if value="this.ship.distanceto.{$startpos} gt 7km">
-                  <get_zone_exit_pos zone="this.zone" destination="$targetzone" position="$startpos_check" rotation="$startrot" radius="this.ship.size * 2" >
-                    <position space="this.ship.zone" x="this.ship.position.x-3km" y="this.ship.position.y +5km"  z="this.ship.position.z-3km"/>
-                  </get_zone_exit_pos>
-                  <do_if value="this.ship.distanceto.{$startpos} gt this.ship.distanceto.{$startpos_check}">
-                    <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Using alternative Startpos because its closer (Y + 2 case)\nDistance before: %3 Distance after: %4'.[this.name,this.container.knownname,this.ship.distanceto.{$startpos},this.ship.distanceto.{$startpos_check}]"/>
-                    <set_value name="$startpos" exact="$startpos_check"/>
-                  </do_if>
-                  
-                  <do_if value="this.ship.distanceto.{$startpos} gt 7km">
-                    <get_zone_exit_pos zone="this.zone" destination="$targetzone" position="$startpos_check" rotation="$startrot" radius="this.ship.size * 2" >
-                      <position space="this.ship.zone" x="this.ship.position.x-3km" y="this.ship.position.y -5km"  z="this.ship.position.z+3km"/>
-                    </get_zone_exit_pos>
-                    <do_if value="this.ship.distanceto.{$startpos} gt this.ship.distanceto.{$startpos_check}">
-                      <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Using alternative Startpos because its closer (Y - 2 case)\nDistance before: %3 Distance after: %4'.[this.name,this.container.knownname,this.ship.distanceto.{$startpos},this.ship.distanceto.{$startpos_check}]"/>
-                      <set_value name="$startpos" exact="$startpos_check"/>
-                    </do_if>
-                  </do_if>
-                </do_if>
-              </do_if>
-            </do_if>
+          <get_safe_pos result="$startpos" zone="this.ship.zone" object="this.ship" radius="this.ship.size * 2" directionobject="$targetzone"/>
+          <create_orientation name="$startrot" orientation="look_at" refobject="$targetzone">
+            <position value="$startpos" space="this.ship.zone"/>
+          </create_orientation>
+          <find_station name="$avoid" space="this.ship.cluster">
+            <match_distance max="30km"/>
+            <match_is_in_view_of space="this.ship.zone" x="$startpos.x" y="$startpos.y" z="$startpos.z" yaw="$startrot.yaw" pitch="$startrot.pitch" vertical="10deg" horizontal="10deg"/>
+          </find_station>
+          <do_if value="$avoid">
+            <!-- Transform Position to get position on line from start to destination closest to the Station (doesnt need to be exact) -->
+            <transform_position name="$inter_pos" refposition="$startpos" refrotation="$startrot">
+              <position x="0m" y="0m" z="this.ship.distanceto.{$avoid}"/>
+            </transform_position>
+            <!-- get orientation to look away from that Position to the Station-->
+            <create_orientation name="$inter_rot" orientation="look_away" refobject="$avoid">
+              <position value="$inter_pos" space="this.ship.zone"/>
+            </create_orientation>
+            <!-- Transform Start position to move ( $avoid.size - $avoid.distanceto.$intermediatepos ) away from the orignal pos -->
+            <transform_position name="$startpos" refposition="$startpos" refrotation="$inter_rot">
+              <position x="0m" y="0m" z="$avoid.size - $avoid.discanceto.{this.ship.zone,$inter_pos}"/>
+            </transform_position>
+            <!-- Safepos again, but no secondary checks (directionobject is this.ship) -->
+            <get_safe_pos result="$startpos" zone="this.ship.zone" value="$startpos" radius="this.ship.size * 2" directionobject="$targetzone"/>
+            <remove_value name="$inter_pos"/>
+            <remove_value name="$inter_rot"/>
           </do_if>
-          
         </do_else>
         <!--do_if value="$startrot.pitch gt 45deg">
           <set_value name="$startrot" exact="rotation.[$startrot.yaw,45deg,$startrot.roll]"/>
@@ -222,20 +204,6 @@
         <do_elseif value="this.ship.distanceto.{$startpos} lt this.ship.size">
           <set_value name="$startpos" exact="this.ship.position" />
         </do_elseif>
-        <!-- HACK for FoO - AL Gate (Exit) - just boost immediately -->
-        <!--do_elseif value="this.zone.macro.ismacro.{'Cluster_T_Sector01_Zone001_macro'} and this.ship.distanceto.{$startpos} gt 10km">
-          <remove_value name="$startpos"/>
-          <remove_value name="$startrot"/>
-          <set_value name="$abortpath" exact="true"/>
-        </do_elseif-->
-        
-        <!-- figure out an arrival position in the target zone -->
-          <!-- HACK for FoO - AL Gate - ignore the Big Rock there (coordinate checks are for Escorts/Followers which are only given Zone Coordinates as Target)-->
-        <!--do_if value="$targetzone.macro.ismacro.{'Cluster_T_Sector01_Zone001_macro'} and ( $destination.isclass.gate or ( $position.x gt 30km and $position.z lt -20km and $position.y gt -10km and $position.y lt 10km ) )">
-          <find_object name="$ignoredobject" space="$targetzone" macro="macro.landmarks_unique_the_mace_macro"/>
-          <get_safe_pos result="$targetpos" allowyaxis="true" zone="$targetzone" value="$position" min="2km" max="5km" radius="this.ship.size * 2" ignored="$ignoredobject"/>
-        </do_if>
-        <do_else-->
           <get_zone_exit_pos zone="$targetzone" destination="this.ship" position="$targetpos" radius="this.ship.size * 2" >
             <position object="$targetzone" value="$position"/>
           </get_zone_exit_pos>
