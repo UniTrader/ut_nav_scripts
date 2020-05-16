@@ -563,7 +563,7 @@
               <set_value name="$targetpos" exact="position.[
               if $right and $left then 0m else if $right then $queue_size * 1,5km,15km].max else $queue_size * 3km,30km].max * -1,
               if $up and $down then 0m else if $up then $queue_size * 1,5km,15km].max else $queue_size * 3km,30km].max * -1,
-              $queue_size * 3km,30km].max* ( if this.$waypoint.isclass.gate then -1 else )"/>
+              $queue_size * 3km,30km].max* ( if this.$waypoint.isclass.gate then -1 else 1)"/>
               <remove_value name="$right"/>
               <remove_value name="$left"/>
               <remove_value name="$up"/>
