@@ -168,6 +168,18 @@
       <!-- move to position in queue/prep pos -->
 <set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.gate move_to 203'"/>
 <signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
+      
+      <!-- Use Linear FCM if possible because it reacts faster to Movement Commands (only for Movement straight ahead) -->
+      <check_object object="$gate" result="$linear_possible">
+        <match_is_in_view_of object="this.ship" vertical="1deg" horizontal="1deg"/>
+      </check_object>
+      <do_if value="$linear_possible">
+        <set_flight_control_model object="this.ship" flightcontrolmodel="flightcontrolmodel.linear"/>
+      </do_if>
+      <do_else>
+        <set_to_default_flight_control_model object="this.ship"/>
+      </do_else>
+      <remove_value name="$linear_possible"/>
       <move_to object="this.ship" destination="$gate.zone" forceposition="false" forcerotation="false" finishonapproach="true" abortpath="not $continuepath" travel="true">
         <position value="$position" />
         <rotation value="$rotation"/>
@@ -179,6 +191,7 @@
             </check_any>
           </conditions>
           <actions>
+            <set_to_default_flight_control_model object="this.ship"/>
             <do_if value="event.object == this.ship">
               <set_avoid_collisions object="this.ship" bigobjects="true" smallobjects="true" comment="re-enable Collision avoidance since we are no longer in queue"/>
               <set_value name="$continuepath" exact="false" comment="disable soft-advancing queue because we just got kicked back"/>
