@@ -164,7 +164,7 @@
             <position value="$startpos" space="this.ship.zone"/>
           </create_orientation>
           <find_station name="$avoid" space="this.ship.cluster">
-            <match_distance max="30km"/>
+            <match_distance max="30km" space="this.ship.zone" value="$startpos"/>
             <match_is_in_view_of space="this.ship.zone" x="$startpos.x" y="$startpos.y" z="$startpos.z" yaw="$startrot.yaw" pitch="$startrot.pitch" vertical="10deg" horizontal="10deg"/>
           </find_station>
           <do_if value="$avoid">
@@ -178,7 +178,7 @@
             </create_orientation>
             <!-- Transform Start position to move ( $avoid.size - $avoid.distanceto.$intermediatepos ) away from the orignal pos -->
             <transform_position name="$startpos" refposition="$startpos" refrotation="$inter_rot">
-              <position x="0m" y="0m" z="$avoid.size - $avoid.discanceto.{this.ship.zone,$inter_pos}"/>
+              <position x="0m" y="0m" z="$avoid.size - $avoid.discanceto.[this.ship.zone,$inter_pos]"/>
             </transform_position>
             <!-- Safepos again, but no secondary checks (directionobject is this.ship) -->
             <get_safe_pos result="$startpos" zone="this.ship.zone" value="$startpos" radius="this.ship.size * 2" directionobject="$targetzone"/>
