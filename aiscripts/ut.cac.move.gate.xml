@@ -171,7 +171,7 @@
       
       <!-- Use Linear FCM if possible because it reacts faster to Movement Commands (only for Movement straight ahead) -->
       <check_object object="$gate" result="$linear_possible">
-        <match_is_in_view_of object="this.ship" vertical="1deg" horizontal="1deg"/>
+        <match_is_in_view_of object="this.ship" vertical="3deg" horizontal="3deg"/>
       </check_object>
       <do_if value="$linear_possible and this.ship.distanceto.{$gate} gt $gate.distanceto.[$gate,$position]">
         <set_flight_control_model object="this.ship" flightcontrolmodel="flightcontrolmodel.linear"/>
