@@ -175,6 +175,7 @@
       </check_object-->
       <do_if value="$continuepath == 2 and this.ship.distanceto.{$gate} gt $gate.distanceto.[$gate,$position]">
         <set_flight_control_model object="this.ship" flightcontrolmodel="flightcontrolmodel.linear"/>
+        <set_value name="$continuepath" exact="0"/>
       </do_if>
       <do_else>
         <set_to_default_flight_control_model object="this.ship"/>
