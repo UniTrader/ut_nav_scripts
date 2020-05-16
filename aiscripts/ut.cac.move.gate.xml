@@ -203,6 +203,7 @@
           </actions>
         </interrupt>
       </move_to>
+      <set_to_default_flight_control_model object="this.ship"/>
       <set_value name="$continuepath" exact="2" comment="re-enable soft-advancing queue and also set it persistent"/>
       <set_avoid_collisions object="this.ship" bigobjects="false" smallobjects="false" comment="disable collision avoidance while in queue to avoid other ships pushing us out and delaying everything"/>
       <do_if value="$queue_position == 1">
