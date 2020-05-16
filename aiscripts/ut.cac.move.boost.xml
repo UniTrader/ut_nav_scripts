@@ -419,7 +419,7 @@
       </do_if>
 <set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.boost move_to 452'"/>
 <signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
-      <move_to object="this.ship" destination="$targetzone" uselocalhighways="false" forceposition="false" travel="true" abortpath="$abortpath">
+      <move_to object="this.ship" destination="$targetzone" uselocalhighways="false" forceposition="false" travel="true" boost="true" abortpath="$abortpath">
         <position value="$targetpos" />
         <interrupt_after_time time="100ms"/>
       </move_to>
