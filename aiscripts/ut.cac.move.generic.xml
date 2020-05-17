@@ -624,7 +624,7 @@
             <debug_text filter="general" chance="@this.$debug * 100" text="'%1	%2	We have Destination Context in %3'.[this.name,this.container.knownname,this.$waypoint.knownname]"/>
             <!-- we have reached the Target Space (which is a Sector or Cluster) - Exit -->
             <debug_to_file name="'sucesslog.txt'" directory="'navscripts'" text="
-'%s	%s	%s	%s	arrived in targetspace from %s // %s to %s // %s // %s (actual location: %s // %s )'.[player.age,player.age - $logvalues.{1}, global.$navscripts_active.count, this.knownname, this.ship.knownname, $logvalues.{2}.sector.knownname, $logvalues.{2}.cluster.knownname, @$logvalues.{3}.knownname, @$logvalues.{3}.sector.knownname, @$logvalues.{3}.cluster.knownname, this.sector.knownname, this.cluster.knownname]"/>
+'%s	%s	%s	%s	arrived in targetspace from %s // %s to %s // %s // %s (actual location: %s // %s )'.[player.age,player.age - $logvalues.{1}, global.$navscripts_active.count, this.knownname, this.ship.knownname, @$logvalues.{2}.sector.knownname, @$logvalues.{2}.cluster.knownname, @$logvalues.{3}.knownname, @$logvalues.{3}.sector.knownname, @$logvalues.{3}.cluster.knownname, this.sector.knownname, this.cluster.knownname]"/>
             <remove_from_group group="global.$navscripts_active" object="this.ship"/>
             <return/>
           </do_if>
