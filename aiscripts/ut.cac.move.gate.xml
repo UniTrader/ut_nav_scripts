@@ -113,7 +113,7 @@
       <label name="fly to prep pos"/>
       <set_value name="$queue_position" exact="global.$gate_queue.{$gate}.{1}.indexof.{this.ship}"/>
       <do_if value="player.entity.$namereplacement.{this.ship}?">
-        <set_value name="player.entity.$namereplacement.{this.ship}.$queue_pos" exact="(if $queue_position lt 10 then '00' else if $queue_position lt 100 then '0' else '' ) + $queue_position"/>
+        <set_value name="player.entity.$namereplacement.{this.ship}.$queue_pos" exact="(if $queue_position lt 10 then '00' else if $queue_position lt 100 then '0' else '' ) + $queue_position + ' ' + this.ship.numwaypoints"/>
         <signal_objects object="this.ship" param="'Object Name Updated'"/>
       </do_if>
       
@@ -140,7 +140,7 @@
           <!-- also re-adjust queue Position -->
           <set_value name="$queue_position" operation="subtract"/>
           <do_if value="player.entity.$namereplacement.{this.ship}?">
-            <set_value name="player.entity.$namereplacement.{this.ship}.$queue_pos" exact="(if $queue_position lt 10 then '00' else if $queue_position lt 100 then '0' else '' ) + $queue_position"/>
+            <set_value name="player.entity.$namereplacement.{this.ship}.$queue_pos" exact="(if $queue_position lt 10 then '00' else if $queue_position lt 100 then '0' else '' ) + $queue_position + ' ' + this.ship.numwaypoints"/>
             <signal_objects object="this.ship" param="'Object Name Updated'"/>
           </do_if>
         </do_else>
