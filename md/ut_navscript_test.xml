@@ -46,11 +46,11 @@
         <cue name="PlayerTarget" instantiate="true" checkinterval="1s">
           <actions>
             <do_if value="player.target.exists">
-              <show_notification timeout="1s" text="[
-@player.entity.$namereplacement.{player.target}.$queue_pos,@player.target.numwaypoints,
-@player.entity.$namereplacement.{player.target}.$scriptcmd,'right midup',
-'left middown','right middown',
-'left down','right down',]"/>
+              <remove_help all="true"/>
+              <show_help silent="true" custom="'%1 %2 %3'.[
+@player.entity.$namereplacement.{player.target}.$queue_pos,
+@player.target.numwaypoints,
+@player.entity.$namereplacement.{player.target}.$scriptcmd]"/>
             </do_if>
           </actions>
         </cue>
