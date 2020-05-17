@@ -181,7 +181,7 @@
         <set_to_default_flight_control_model object="this.ship"/>
       </do_else>
       <!--remove_value name="$linear_possible"/-->
-      <move_to object="this.ship" destination="$gate.zone" forceposition="false" forcerotation="false" finishonapproach="true" abortpath="(not $continuepath) and (this.ship.numwaypoints gt 2)" travel="true">
+      <move_to object="this.ship" destination="$gate.zone" forceposition="false" forcerotation="false" finishonapproach="true" abortpath="(not $continuepath) or (this.ship.numwaypoints gt 2)" travel="true">
         <position value="$position" />
         <rotation value="$rotation"/>
         <interrupt>
