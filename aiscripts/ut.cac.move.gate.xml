@@ -386,6 +386,7 @@
       <do_if value="global.$gate_queue.{$gate}.{1}.{1}? and global.$gate_queue.{$gate}.{1}.{1} == this.ship">
         <remove_value name="global.$gate_queue.{$gate}.{1}.{1}"/>
       </do_if>
+      <do_elseif value="global.$gate_queue.{$gate}.{1}.indexof.{this.ship} == 0" comment="got probably removed by a follower - just ignore that case"/>
       <do_else>
         <debug_text filter="error" text="'%1 %2 Just passed the Gate and wanted to clear queue, but our Position was not 1 but %3'.[this.name,this.container.name,global.$gate_queue.{$gate}.{1}.indexof.{this.ship}]"/>
         <remove_value name="global.$gate_queue.{$gate}.{1}.{global.$gate_queue.{$gate}.{1}.indexof.{this.ship}}"/>
