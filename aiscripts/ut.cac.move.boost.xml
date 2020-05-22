@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
-<aiscript name="ut.cac.move.boost" version="30" priority="10" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://utnas/~unitrader/XRebirthxsds/aiscripts.xsd">
+<aiscript name="ut.cac.move.boost" priority="10" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://utnas/~unitrader/XRebirthxsds/aiscripts.xsd">
   <!--
 
  rewritten from scratch by UniTrader
@@ -31,13 +31,6 @@
       </actions>
     </handler>
   </interrupts>
-  <patch sinceversion="30">
-    <do_if value="$followers_preparing?">
-      <set_value name="$leader_preparegroup" exact="$followers_preparing"/>
-      <remove_value name="$followers_preparing"/>
-    </do_if>
-    <set_value name="$abortpath" exact="false"/>
-  </patch>
   <attention min="unknown">
     <actions>
       <label name="init"/>
@@ -165,7 +158,7 @@
           </create_orientation>
           <find_station name="$avoid" space="this.ship.cluster">
             <match_distance max="30km" space="this.ship.zone" value="$startpos"/>
-            <match_is_in_view_of space="this.ship.zone" x="$startpos.x" y="$startpos.y" z="$startpos.z" yaw="$startrot.yaw" pitch="$startrot.pitch" vertical="10deg" horizontal="10deg"/>
+            <match_is_in_view_of space="this.ship.zone" x="$startpos.x" y="$startpos.y" z="$startpos.z" yaw="$startrot.yaw" pitch="$startrot.pitch" vertical="20deg" horizontal="20deg"/>
           </find_station>
           <do_if value="$avoid">
             <!-- Transform Position to get position on line from start to destination closest to the Station (doesnt need to be exact) -->
@@ -303,7 +296,7 @@
         <do_if value="$leader_preparegroup.count and this.ship.numwaypoints" comment="to sync Boosting in Groups, but also allow smooth transition for single boosting">
 <set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.boost wait 333'"/>
 <signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
-          <wait sinceversion="30" resume="true">
+          <wait resume="true">
             <interrupt>
               <conditions>
                 <event_object_arrived_at_waypoint object="this.ship"/><!-- lastwaypoint="true" -->
@@ -314,7 +307,7 @@
         <do_elseif value="this.ship.numwaypoints">
 <set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.boost wait 345'"/>
 <signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
-          <wait sinceversion="30" resume="true">
+          <wait resume="true">
             <interrupt>
               <conditions>
                 <check_any>
@@ -415,7 +408,7 @@
       <do_if value="not ( this.race == race.xenon or this.race == race.drone)" comment="Computer Races sync the Start perfectly, and a bit earlier than non-computer Races">
 <set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.boost wait 446'"/>
 <signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
-        <wait min="100ms" max="2s" profile="inversebell" sinceversion="30" comment="to de-perfect-sync Ships in Group Boosts"/>
+        <wait min="100ms" max="2s" profile="inversebell" comment="to de-perfect-sync Ships in Group Boosts"/>
       </do_if>
 <set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.boost move_to 452'"/>
 <signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
@@ -470,7 +463,7 @@
         <do_while value="this.ship.zone != $targetzone and this.ship.numwaypoints">
 <set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.boost wait 496'"/>
 <signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
-          <wait sinceversion="30" resume="true">
+          <wait resume="true">
             <interrupt>
               <conditions>
                 <check_any>
@@ -487,7 +480,7 @@
           <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Waiting for followers and leader to Arrive\nBlocking Group: %3 ( %4 Members )'.[this.name,this.container.knownname,$leader_preparegroup,$leader_preparegroup.count]"/>
 <set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.boost wait 513'"/>
 <signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
-          <wait max="1min" sinceversion="30" resume="true">
+          <wait max="1min" resume="true">
             <interrupt>
               <conditions>
                 <event_object_signalled object="$leader" param="'preparegroup shrunk'"/>
@@ -501,7 +494,7 @@
         <do_if value="this.zone != $targetzone and this.ship.numwaypoints">
 <set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.boost wait 527'"/>
 <signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
-          <wait sinceversion="30" resume="true">
+          <wait resume="true">
             <interrupt>
               <conditions>
                 <check_any>
