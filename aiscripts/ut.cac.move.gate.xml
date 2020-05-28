@@ -161,6 +161,7 @@
       <create_orientation name="$rotation" refobject="$gate" orientation="look_at">
         <position value="$position"/>
       </create_orientation>
+      <debug_to_file name="'ori_log'" text="'Orientation Log move.gate 164: Result:%1\nrefobject=%2 orientation=look_at position value=%3'.[$rotation,$gate,$position]" />
       <!--create_orientation name="$rotation" orientation="look_at"  refobject="$gate">
           <position value="$position"/>
         </create_orientation-->
@@ -321,6 +322,7 @@
                 <create_orientation name="$rotation" orientation="look_at"  refobject="$gate">
                    <position value="this.ship.position"/>
                 </create_orientation>
+                <debug_to_file name="'ori_log'" text="'Orientation Log move.gate 325:: Result:%1\nrefobject=%2 orientation=look_at position value=%3'.[$rotation,$gate,this.ship.position]" />
                 <warp object="this.ship" zone="this.zone">
                   <rotation value="$rotation"/>
                   <position object="this.ship"/>
@@ -349,6 +351,7 @@
               <create_orientation name="$rotation" orientation="look_at"  refobject="$gate">
                  <position value="this.ship.position"/>
               </create_orientation>
+              <debug_to_file name="'ori_log'" text="'Orientation Log move.gate 354: Result:%1\nrefobject=%2 orientation=look_at position value=%3'.[$rotation,$gate,this.ship.position]" />
               <warp object="this.ship" zone="this.zone">
                 <rotation value="$rotation"/>
                 <position object="this.ship"/>
