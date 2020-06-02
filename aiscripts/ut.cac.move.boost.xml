@@ -156,7 +156,7 @@
           <create_orientation name="$startrot" orientation="look_at" refobject="$targetzone">
             <position value="$startpos" space="this.ship.zone"/>
           </create_orientation>
-          <debug_to_file name="'ori_log'" text="'Orientation Log move.boost 159: Result:%1\nrefobject=%2 orientation=look_at position value=%3 space=%4'.[$rotation,$targetzone,$startpos,this.ship.zone]" />
+          <debug_to_file name="'ori_log'" text="'Orientation Log move.boost 159: Result:%1\nrefobject=%2 orientation=look_at position value=%3 space=%4'.[$startrot,$targetzone,$startpos,this.ship.zone]" />
           <find_station name="$avoid" space="this.ship.cluster">
             <match_distance max="30km" space="this.ship.zone" value="$startpos"/>
             <match_is_in_view_of space="this.ship.zone" x="$startpos.x" y="$startpos.y" z="$startpos.z" yaw="$startrot.yaw" pitch="$startrot.pitch" vertical="20deg" horizontal="20deg"/>
@@ -170,7 +170,7 @@
             <create_orientation name="$inter_rot" orientation="look_away" refobject="$avoid">
               <position value="$inter_pos" space="this.ship.zone"/>
             </create_orientation>
-          <debug_to_file name="'ori_log'" text="'Orientation Log move.boost 170: Result:%1\nrefobject=%2 orientation=look_away position value=%3 space=%4'.[$rotation,$avoid,$inter_pos,this.ship.zone]" />
+          <debug_to_file name="'ori_log'" text="'Orientation Log move.boost 170: Result:%1\nrefobject=%2 orientation=look_away position value=%3 space=%4'.[$inter_rot,$avoid,$inter_pos,this.ship.zone]" />
             <!-- Transform Start position to move ( $avoid.size - $avoid.distanceto.$intermediatepos ) away from the orignal pos -->
             <transform_position name="$startpos" refposition="$startpos" refrotation="$inter_rot">
               <position x="0m" y="0m" z="$avoid.size - $avoid.discanceto.[this.ship.zone,$inter_pos]"/>
@@ -240,7 +240,7 @@
           <create_orientation name="$startrot" orientation="look_at" refposition="$targetpos">
             <position value="$startpos" />
           </create_orientation>
-          <debug_to_file name="'ori_log'" text="'Orientation Log move.boost 243: Result:%1\nrefposition=%2 orientation=look_at position value=%3'.[$rotation,$targetpos,$startpos]" />
+          <debug_to_file name="'ori_log'" text="'Orientation Log move.boost 243: Result:%1\nrefposition=%2 orientation=look_at position value=%3'.[$startrot,$targetpos,$startpos]" />
           
           <!-- HACK for FoO - AL Gate (Exit) - just boost immediately -->
           <!--do_if value="this.zone.macro.ismacro.{'Cluster_T_Sector01_Zone001_macro'} and this.ship.distanceto.{$startpos} gt 10km">
