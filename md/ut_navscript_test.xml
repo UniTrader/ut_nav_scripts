@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<mdscript xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="UT_Navscript_Test" xsi:noNamespaceSchemaLocation="http://utnas/~unitrader/XRebirthxsds/md.xsd">
+  <cues>
+    <cue name="Init">
+      <actions>
+        <create_group groupname="$Testships"/>
+      </actions>
+      <cues>
+        <cue name="SpawnTestShips" checktime="10s" checkinterval="5s">
+          <conditions>
+            <cue_is_complete cue="md.Setup.Start"/>
+          </conditions>
+          <actions>
+            <do_if value="not player.entity.$unformatted_names?">
+              <set_value name="player.entity.$unformatted_names" exact="table[]"/>
+              <debug_text filter="general" text="'Created unformatted names var '"/>
+            </do_if>
+            <do_if value="not player.entity.$namereplacement?">
+              <set_value name="player.entity.$namereplacement" exact="table[]"/>
+              <debug_text filter="general" text="'Created namereplacement var '"/>
+            </do_if>
+            <do_all exact="100" counter="$i">
+              <set_value name="$level" exact="$i"/>
+              <do_while value="$level gt 3">
+                <set_value name="$level" exact="3" operation="subtract"/>
+              </do_while>
+              <create_ship name="$Testship" zone="player.zone" macro="macro.ship_arg_xl_carrier_01_b_macro">
+                <owner exact="faction.player"/>
+                <pilot macro="character_boron_generic_01_macro">
+                  <owner exact=" faction.player"/>
+                  <skills>
+                    <skill type="boarding" exact="15"/>
+                    <skill type="engineering" exact="15"/>
+                    <skill type="management" exact="15"/>
+                    <skill type="morale" exact="15"/>
+                  </skills>
+                </pilot>
+                <safepos object="player.container" radius="5km"/>
+              </create_ship>
+              <set_value name="player.entity.$namereplacement.{$Testship}" exact="table[]"/>
+              <set_value name="player.entity.$namereplacement.{$Testship}.$scriptcmd" exact="'Initialized'"/>
+              <signal_objects object="player.galaxy" param="'Object Name Updated'" param2="[$Testship,$Testship]" param3="(if $i lt 10 then '00' else if $i lt 100 then '0' else '') + $i + ' $scriptcmd $queue_pos'"/>
+            </do_all>
+          </actions>
+        </cue>
+        <cue name="PlayerTarget" instantiate="true" checkinterval="1s">
+          <actions>
+            <do_if value="player.target.exists">
+              <remove_help all="true"/>
+              <show_help silent="true" custom="'%1 %2 %3'.[
+@player.entity.$namereplacement.{player.target}.$queue_pos,
+@player.target.numwaypoints,
+@player.entity.$namereplacement.{player.target}.$scriptcmd]"/>
+            </do_if>
+          </actions>
+        </cue>
+      </cues>
+    </cue>
+  </cues>
+</mdscript>

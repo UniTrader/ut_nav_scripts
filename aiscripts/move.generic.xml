@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<diff xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://utnas/~unitrader/XRebirthxsds/aiscripts-diff.xsd">
+  <add sel="/aiscript/interrupts">
+    <handler>
+      <conditions>
+        <event_object_signalled object="this" param="'run alternative script'"/>
+        <check_value value="this.ship.iscapitalship"/>
+      </conditions>
+      <actions>
+        <run_interrupt_script name="'ut.cac.move.generic'" resume="start">
+          <param name="destination" value="$destination" comment="can be a space or an object in a zone. Providing Sector and Cluster will attempt to find the nearest zone"/>
+          <param name="position" value="$position" comment="position is treated as an offset to destination. Default: safe position on [0,0,0] of destination"/>
+          <param name="rotation" value="$rotation" comment="rotation the ship should have - overridden by lookat"/>
+          <param name="lookat" value="$lookat" comment="position the ship should point to - overrides rotation"/>
+          <param name="endintargetspace" value="$endintargetzone" comment="complete this script if we have the correct Space context, no matter where (may be Cluster, Sector or Zone, will resolve to Zone if an Object is the destination)"/>
+          <!--
+        <param name="noboost" default="false" type="internal" text="{1041, 10077}" comment="No boosting. set true to prevent ships boosting"/>
+        <param name="disablecollisionavoidance" type="internal" default="false" text="{1041, 10028}" comment="Disable collision avoidance. HACK - disable collision-avoidance for this ship"/>
+        <param name="abortpath" default="true" type="internal" text="{1041, 10000}" comment="Abort path. disable aborting existing path"/>
+        <param name="forcesteering" default="false" type="internal" text="{1041, 10154}" comment="Force steering. force steering flight control model"/>-->
+        </run_interrupt_script>
+      </actions>
+    </handler>
+  </add>
+  <add sel="/aiscript/attention/actions/label[@name='start']" pos="before">
+    <signal_objects object="this" param="'run alternative script'"/>
+  </add>
+</diff>
