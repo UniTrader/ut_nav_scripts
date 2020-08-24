@@ -1,9 +1,0 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<diff xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://utnas/~unitrader/XRebirthxsds/aiscripts-diff.xsd">
-  <add sel="/aiscript/interrupts">
-    <handler ref="ut_cac_follow_signalling"/>
-  </add> 
-  <add sel="/aiscript/init">
-    <set_value name="$object" exact="$target"/>
-  </add>
-</diff>
