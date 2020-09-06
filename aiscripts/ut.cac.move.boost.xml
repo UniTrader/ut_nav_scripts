@@ -56,41 +56,50 @@
         </do_if>
       </do_if>
       
-      <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Script started with Params:\n$destination: %3 , $position: %4 , $leader: %5 , $leader_preparegroup: %6'.[this.name,this.container.knownname,$destination.knownname,$position,$leader,$leader_preparegroup]"/>
+      <debug_to_file directory="'ut_navscripts'" name="this.ship" output="true" chance="@this.$debug * 100" text="'%1 %2 Script started with Params:\n$destination: %3 , $position: %4 , $leader: %5 , $leader_preparegroup: %6'.[this.name,this.container.knownname,$destination.knownname,$position,$leader,$leader_preparegroup]"/>
       
       <!-- =========== -->
       <!-- Validate Input -->
       <!-- =========== -->
       <do_if value="not $destination.exists">
         <debug_text filter="error" text="'%1 %2 Destination does not exist. Aborting!'.[this.name,this.container.knownname]" />
+        <debug_to_file directory="'ut_navscripts'" name="this.ship" chance="@this.$debug * 100" text="'%1 %2 Destination does not exist. Aborting!'.[this.name,this.container.knownname]" />
         <return/>
       </do_if>
       <do_elseif value="$destination.isclass.cluster or $destination.isclass.galaxy">
         <debug_text filter="error" text="'%1 %2 Destination is a Cluster or Galaxy. Aborting!'.[this.name,this.container.knownname]" />
+        <debug_to_file directory="'ut_navscripts'" name="this.ship" chance="@this.$debug * 100" text="'%1 %2 Destination is a Cluster or Galaxy. Aborting!'.[this.name,this.container.knownname]" />
         <return/>
       </do_elseif>
       <do_if value="$destination == this.zone and ( ( not $position ) or this.ship.distanceto.{$position} lt 5km )">
         <debug_text filter="general" text="'%1 %2 Already in the right Zone and close to Target Position - so why boosting?'.[this.name,this.container.knownname]"/><!-- chance="@this.$debug * 100"-->
+        <debug_to_file directory="'ut_navscripts'" name="this.ship" chance="@this.$debug * 100" text="'%1 %2 Already in the right Zone and close to Target Position - so why boosting?'.[this.name,this.container.knownname]"/>
         <return/>
       </do_if>
       <do_if value="not $leader and $leader_preparegroup">
         <debug_text filter="error" text="'%1 %2 Preparegroup provided but no Boost Leader - removing preparegroup %3'.[this.name,this.container.knownname,$leader_preparegroup]" />
+        <debug_to_file directory="'ut_navscripts'" name="this.ship" chance="@this.$debug * 100" text="'%1 %2 Preparegroup provided but no Boost Leader - removing preparegroup %3'.[this.name,this.container.knownname,$leader_preparegroup]" />
         <debug_text filter="general" text="'Ship: %1 Name: %2 Zone:%3 Job: %4'.[this.ship,this.ship.knownname,this.ship.zone.knownname,this.ship.job]" />
+        <debug_to_file directory="'ut_navscripts'" name="this.ship" chance="@this.$debug * 100" text="'Ship: %1 Name: %2 Zone:%3 Job: %4'.[this.ship,this.ship.knownname,this.ship.zone.knownname,this.ship.job]" />
         <do_all exact="$leader_preparegroup.count" counter="$i">
           <debug_text filter="general" text="'Object: %1 Name: %2 Zone:%3 Job: %4'.[$leader_preparegroup.{$i},$leader_preparegroup.{$i}.knownname,$leader_preparegroup.{$i}.zone.knownname,$leader_preparegroup.{$i}.job]" />
+          <debug_to_file directory="'ut_navscripts'" name="this.ship" chance="@this.$debug * 100" text="'Object: %1 Name: %2 Zone:%3 Job: %4'.[$leader_preparegroup.{$i},$leader_preparegroup.{$i}.knownname,$leader_preparegroup.{$i}.zone.knownname,$leader_preparegroup.{$i}.job]" />
         </do_all>
         <set_value name="$leader_preparegroup" exact="null"/>
       </do_if>
       <do_if value="$leader and not $leader_preparegroup">
         <debug_text filter="error" text="'%1 %2 Leader provided but Prepare Group missing - removing leader %3'.[this.name,this.container.knownname, $leader]" />
+        <debug_to_file directory="'ut_navscripts'" name="this.ship" chance="@this.$debug * 100" text="'%1 %2 Leader provided but Prepare Group missing - removing leader %3'.[this.name,this.container.knownname, $leader]" />
         <set_value name="$leader" exact="null"/>
       </do_if>
       <do_if value="$leader.exists and $leader.sector != this.sector">
         <debug_text filter="error" text="'%1 %2 Leader is in diffrent Sector than we are. Aborting! Leader sector: %3 Our Sector: %4'.[this.name,this.container.knownname,$leader.sector.knownname,this.sector.kownname]" />
+        <debug_to_file directory="'ut_navscripts'" name="this.ship" chance="@this.$debug * 100" text="'%1 %2 Leader is in diffrent Sector than we are. Aborting! Leader sector: %3 Our Sector: %4'.[this.name,this.container.knownname,$leader.sector.knownname,this.sector.kownname]" />
         <return/>
       </do_if>
       <do_if value="$leader.exists and $leader.zone != this.zone">
         <debug_text filter="error" text="'%1 %2 Leader is in diffrent Zone than we are. Aborting for now! Leader Zone: %3 Our Zone: %4'.[this.name,this.container.knownname,$leader.zone.knownname,this.zone.kownname]" />
+        <debug_to_file directory="'ut_navscripts'" name="this.ship" chance="@this.$debug * 100" text="'%1 %2 Leader is in diffrent Zone than we are. Aborting for now! Leader Zone: %3 Our Zone: %4'.[this.name,this.container.knownname,$leader.zone.knownname,this.zone.kownname]" />
         <return/>
       </do_if>
       
@@ -100,7 +109,7 @@
       
       <!-- check if we *CAN* Boost -->
       <do_if value="this.ship.travel.available">
-        <debug_text filter="general" text="'%1 %2 Ship travel engine not available currently. Flight from %3(%4) to %5(%6) might take longer than planned'.[this.name,this.container.knownname , this.zone.knownname, this.sector.knownname, @$destination.zone.knownname, $destination.sector.knownname]" chance="@this.$debug * 100"/>
+        <debug_to_file directory="'ut_navscripts'" name="this.ship" chance="@this.$debug * 100" text="'%1 %2 Ship travel engine not available currently. Flight from %3(%4) to %5(%6) might take longer than planned'.[this.name,this.container.knownname , this.zone.knownname, this.sector.knownname, @$destination.zone.knownname, $destination.sector.knownname]"/>
       </do_if>
       
       <!-- set Value to interrupt continonous movement on certain ocassions -->
@@ -203,7 +212,7 @@
             <position object="$targetzone" value="$position"/>
           </get_zone_exit_pos>
         <!--/do_else-->
-        <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Calculated Params for IS-Boost:\nstartpos: %3 startrot: %4\ntargetzone:%5 targetpos: %6 position: %7 Targetpos Distance to Destination: %8'.[this.name,this.container.knownname,@$startpos,@$startrot,$targetzone.knownname,$targetpos,$position,@$destination.distanceto.{$targetpos}]"/>
+        <debug_to_file directory="'ut_navscripts'" name="this.ship" output="true" chance="@this.$debug * 100" text="'%1 %2 Calculated Params for IS-Boost:\nstartpos: %3 startrot: %4\ntargetzone:%5 targetpos: %6 position: %7 Targetpos Distance to Destination: %8'.[this.name,this.container.knownname,@$startpos,@$startrot,$targetzone.knownname,$targetpos,$position,@$destination.distanceto.{$targetpos}]"/>
       </do_if>
       <do_else>
         <!-- InZone-Boost - move a bit in Direction of the Target to align (if not already) - and Boost to nearby it -->
@@ -252,18 +261,21 @@
         
         <do_if value="$startpos? and ( this.ship.distanceto.{$startpos} gt this.ship.distanceto.{$position} )">
           <debug_text filter="general" text="'%1 %2 Distance to Start Pos ( %3 ) greater than Distance to Target ( %4 ) - aborting'.[this.name,this.container.knownname,this.ship.distanceto.{$startpos},this.ship.distanceto.{$position} ]"/><!-- chance="@this.$debug * 100"-->
+          <debug_to_file directory="'ut_navscripts'" name="this.ship" chance="@this.$debug * 100" text="'%1 %2 Distance to Start Pos ( %3 ) greater than Distance to Target ( %4 ) - aborting'.[this.name,this.container.knownname,this.ship.distanceto.{$startpos},this.ship.distanceto.{$position} ]"/>
           <return/>
         </do_if>
         <do_if value="$targetpos? and ( this.ship.distanceto.{$targetpos} gt this.ship.distanceto.{$position} * 1.2 )">
           <debug_text filter="general" text="'%1 %2 Distance to Target Pos  (%3 ) greater than Distance to Target ( %4 ) - aborting'.[this.name,this.container.knownname,this.ship.distanceto.{$targetpos},this.ship.distanceto.{$position}]"/><!-- chance="@this.$debug * 100"-->
+          <debug_to_file directory="'ut_navscripts'" name="this.ship" chance="@this.$debug * 100" text="'%1 %2 Distance to Target Pos  (%3 ) greater than Distance to Target ( %4 ) - aborting'.[this.name,this.container.knownname,this.ship.distanceto.{$targetpos},this.ship.distanceto.{$position}]"/>
           <return/>
         </do_if>
         <do_if value="$startpos? and $targetpos? and ( this.ship.distanceto.{$startpos} + $targetpos.distanceto.{$position} ) gt $startpos.distanceto.{$targetpos}">
           <debug_text filter="general" text="'%1 %2 Distance flown in Slow Mode (%3 ) greater than Distance to Target ( %4 ) - aborting'.[this.name,this.container.knownname,this.ship.distanceto.{$startpos} + $targetpos.distanceto.{$position},$startpos.distanceto.{$targetpos}]"/><!-- chance="@this.$debug * 100"-->
+          <debug_to_file directory="'ut_navscripts'" name="this.ship" chance="@this.$debug * 100" text="'%1 %2 Distance flown in Slow Mode (%3 ) greater than Distance to Target ( %4 ) - aborting'.[this.name,this.container.knownname,this.ship.distanceto.{$startpos} + $targetpos.distanceto.{$position},$startpos.distanceto.{$targetpos}]"/>
           <return/>
         </do_if>
         
-        <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Calculated Params for IZ-Boost:\nstartpos: %3 startrot: %4\ntargetzone:%5 targetpos: %6 position: %7  Targetpos Distance to Destination: %8'.[this.name,this.container.knownname,@$startpos,@$startrot,$targetzone.knownname,$targetpos,$position,$destination.distanceto.{$targetpos}]"/>
+        <debug_to_file directory="'ut_navscripts'" name="this.ship" output="true" chance="@this.$debug * 100" text="'%1 %2 Calculated Params for IZ-Boost:\nstartpos: %3 startrot: %4\ntargetzone:%5 targetpos: %6 position: %7  Targetpos Distance to Destination: %8'.[this.name,this.container.knownname,@$startpos,@$startrot,$targetzone.knownname,$targetpos,$position,$destination.distanceto.{$targetpos}]"/>
       </do_else>
       
       <!-- ================= -->
@@ -288,7 +300,7 @@
       
       <!-- move to prep pos, BOOST, and end -->
       <do_if value="$startpos?">
-        <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Moving to Start Position'.[this.name,this.container.knownname]"/>
+        <debug_to_file directory="'ut_navscripts'" name="this.ship" output="true" chance="@this.$debug * 100" text="'%1 %2 Moving to Start Position'.[this.name,this.container.knownname]"/>
 <set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.boost move_to 328'"/>
 <signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
         <move_to object="this.ship" destination="this.zone" forceposition="false" forcerotation="true" forcesteering="this.ship.distanceto.{$startpos} lt 100m" finishonapproach="true" abortpath="this.$mayabortpath?">
@@ -338,12 +350,12 @@
         <wait min="100ms" max="200ms"/>
       </do_else>
       
-      <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Boost Preparegroup: %3 ( %4 Members )'.[this.name,this.container.knownname,$leader_preparegroup,$leader_preparegroup.count]"/>
+      <debug_to_file directory="'ut_navscripts'" name="this.ship" output="true" chance="@this.$debug * 100" text="'%1 %2 Boost Preparegroup: %3 ( %4 Members )'.[this.name,this.container.knownname,$leader_preparegroup,$leader_preparegroup.count]"/>
       <!-- We are in position - As Leader wait till all Followers are ready and give the Start Signal -->
       <do_if value="not $leader.exists">
         <remove_from_group group="$leader_preparegroup" object="this.ship"/>
         <do_while value="$leader_preparegroup.count">
-          <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Waiting for followers to be ready\nPreparegroup: %3 ( %4 Members )'.[this.name,this.container.knownname,$leader_preparegroup,$leader_preparegroup.count]"/>
+          <debug_to_file directory="'ut_navscripts'" name="this.ship" output="true" chance="@this.$debug * 100" text="'%1 %2 Waiting for followers to be ready\nPreparegroup: %3 ( %4 Members )'.[this.name,this.container.knownname,$leader_preparegroup,$leader_preparegroup.count]"/>
 <set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.boost wait 381'"/>
 <signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
           <wait max="1min" resume="true">
@@ -358,6 +370,7 @@
                 <do_if value="event.name == 'event_object_changed_zone'">
                   <!-- what the hell? the someone in the prep group has flown away or jumped without telling anyone - Kick him out of Group! -->
                   <debug_text filter="error" text="'%1 %2 What the Hell? Follower %3 switched Zones or Jumped without telling anyone! - Dont wait for that ******'.[this.name,this.container.knownname,event.object.knownname]"/>
+                  <debug_to_file directory="'ut_navscripts'" name="this.ship" chance="@this.$debug * 100" text="'%1 %2 What the Hell? Follower %3 switched Zones or Jumped without telling anyone! - Dont wait for that ******'.[this.name,this.container.knownname,event.object.knownname]"/>
                   <remove_from_group group="$leader_preparegroup" object="event.object"/>
                 </do_if>
               </actions>
@@ -383,11 +396,13 @@
               <do_if value="event.name == 'event_object_changed_zone'">
                 <!-- what the hell? the leader has flown away or jumped without telling anyone - Abort! -->
                 <debug_text filter="error" text="'%1 %2 What the Hell? Boost Leader %3 switched Zones or Jumped without telling anyone! - Aborting'.[this.name,this.container.knownname,$leader.knownname]"/>
+                <debug_to_file directory="'ut_navscripts'" name="this.ship" chance="@this.$debug * 100" text="'%1 %2 What the Hell? Boost Leader %3 switched Zones or Jumped without telling anyone! - Aborting'.[this.name,this.container.knownname,$leader.knownname]"/>
                 <return/>
               </do_if>
               <do_if value="event.param2.{2} != $destination">
                 <!-- what the hell? the leader boosts to a diffrent place than announcee - Abort! -->
                 <debug_text filter="error" text="'%1 %2 What the Hell? Boost Leader %3 Boosts to a diffrent Place than initially announced! - Aborting'.[this.name,this.container.knownname,$leader.knownname]"/>
+                <debug_to_file directory="'ut_navscripts'" name="this.ship" chance="@this.$debug * 100" text="'%1 %2 What the Hell? Boost Leader %3 Boosts to a diffrent Place than initially announced! - Aborting'.[this.name,this.container.knownname,$leader.knownname]"/>
                 <return/>
               </do_if>
             </actions>
@@ -401,7 +416,7 @@
       <signal_objects object="this.ship" param="'travel boost start'" param2="[ if $leader then $leader else this.ship ,  $targetzone , $targetpos , @$startpos ]" param3="$leader_preparegroup"/>
       <add_to_group object="this.ship" groupname="$leader_preparegroup"/>
       
-      <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 START BOOST!\nBlocking Group: %3'.[this.name,this.container.knownname,$leader_preparegroup]"/>
+      <debug_to_file directory="'ut_navscripts'" name="this.ship" output="true" chance="@this.$debug * 100" text="'%1 %2 START BOOST!\nBlocking Group: %3'.[this.name,this.container.knownname,$leader_preparegroup]"/>
       <do_if value="this.ship == player.ship">
       <!-- cache Assets of destination if player is on board to make transition smooth -->
         <precache_hint zone="$targetzone"/>
@@ -459,7 +474,7 @@
 <!--set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.boost wait 488'"/>
 <signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
       <wait min="$arriving_at - player.age - 5s" max="$arriving_at - player.age - 2s" sinceversion="30" chance="$arriving_at? *100" resume="true"/-->
-      <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Boost movement done, distance to boost target pos: %3, Blocking Group: %4'.[this.name,this.container.knownname,this.ship.distanceto.{$targetpos},$leader_preparegroup]"/>
+      <debug_to_file directory="'ut_navscripts'" name="this.ship" output="true" chance="@this.$debug * 100" text="'%1 %2 Boost movement done, distance to boost target pos: %3, Blocking Group: %4'.[this.name,this.container.knownname,this.ship.distanceto.{$targetpos},$leader_preparegroup]"/>
       <signal_objects object="this.ship" param="'travel completed'"/>
       <!-- We have Arrived - As Follower make sure we are really in $targetzone before Continuing to avoid running Scripts which dont handle the outstanding Zone Transition -->
       <do_if value="$leader.exists">
@@ -480,7 +495,7 @@
         <remove_from_group group="$leader_preparegroup" object="this.ship"/>
         <signal_objects object="$leader" param="'preparegroup shrunk'"/>
         <do_while value="$leader_preparegroup.count">
-          <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Waiting for followers and leader to Arrive\nBlocking Group: %3 ( %4 Members )'.[this.name,this.container.knownname,$leader_preparegroup,$leader_preparegroup.count]"/>
+          <debug_to_file directory="'ut_navscripts'" name="this.ship" output="true" chance="@this.$debug * 100" text="'%1 %2 Waiting for followers and leader to Arrive\nBlocking Group: %3 ( %4 Members )'.[this.name,this.container.knownname,$leader_preparegroup,$leader_preparegroup.count]"/>
 <set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.boost wait 513'"/>
 <signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
           <wait max="1min" resume="true">
@@ -511,7 +526,7 @@
         <remove_from_group group="$leader_preparegroup" object="this.ship"/>
         <signal_objects object="this.ship" param="'preparegroup shrunk'"/>
         <do_while value="$leader_preparegroup.count">
-          <debug_text filter="general" chance="@this.$debug * 100" text="'%1 %2 Waiting for followers to be to Arrive\nBlocking Group: %3 ( %4 Members )'.[this.name,this.container.knownname,$leader_preparegroup,$leader_preparegroup.count]"/>
+          <debug_to_file directory="'ut_navscripts'" name="this.ship" output="true" chance="@this.$debug * 100" text="'%1 %2 Waiting for followers to be to Arrive\nBlocking Group: %3 ( %4 Members )'.[this.name,this.container.knownname,$leader_preparegroup,$leader_preparegroup.count]"/>
 <set_value name="player.entity.$namereplacement.{this.ship}.$scriptcmd" chance="this.isplayerowned *100" exact="'cac.move.boost wait 544'"/>
 <signal_objects object="this.container" param="'Object Name Updated'" chance="this.isplayerowned *100"/>
           <wait max="1min" resume="true">
