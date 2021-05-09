@@ -1,0 +1,168 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<aiscript xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="ut.lib.path" priority="10" xsi:noNamespaceSchemaLocation="http://utnas/~unitrader/XRebirthxsds/aiscripts.xsd">
+  <!--
+
+ rewritten from scratch by UniTrader
+  
+=> Parameter start is the start object
+=> Parameter destination is the Destination object
+ToDo: Extend both so you can also use Spaces here
+
+=> Parameter greylisttable is a Table with the penalties for certain passed Spaces
+ -> Index is either a Sector or a faction (Value of sector has priority if both match)
+ -> Value is how big the penalty is:
+   > up to 100.000 it is a multiplier to the Distance passed
+   > above 100.000 it is a flat addition in m to the path length
+   > values below 1.0 (including 0.0 and negative ones) are also possible and make a path more likely to be used if encountered, even if its actually worse distance wise
+   > value null (not 0.0!) mark an entry as Blacklisted (will be skipped during search) - Not recommended to use since it might get ships stuck if there is no other route available. use a really high penalty value like 10000 instead.
+   
+=> Parameter warningmulti is the minimum multi encountered in the final path to send a warning to the Player that the Ship intends to pass a listed Sector because there is no alternative, to remedy the Stuation manually
+ -> NOT YET IMPLEMENTED!!!
+
+=> Parameter rangesearch returns a sorted list of all Sectors reachable within a certain raw distance (taking the greylist into account) - destination is the origin of that search, start is ignored in that case
+ -> NOT YET IMPLEMENTED!!!
+
+
+=> In anticipation of Jump Beacons you can jump to from anywhere the search direction is inverted and would stop at any jump beacon if found before the Start point
+  -->
+  <params>
+    <param name="start" comment="Start of the Path Search, might be a Zone or Object (Planned: Clusters and Sectors too, meaning all their exit gates start at 0)"/>
+    <param name="destination" comment="Destination of the Path Search, same types as above (Planned: Origin for the Distance Search too)"/>
+    <param name="greylisttable" default="table[]" comment="table of greylist weights with index being a faction or a space (space has prio over faction), and the value is a multiplier (0-100000) or a flat value added (above that)"/>
+    <param name="warningmulti" default="if this.isplayerowned then 50 else null" comment="Minimum Multiplicator Value to encounter to make a Notification to the Player that the Path is possibly Dangerous"/>
+    <!--param name="rangesearch" default="false" comment="Search for all Spaces in a certain Range from the Destination instead (value determines Distance; not planning on implementing this yet)"/-->
+  </params>
+  <interrupts>
+  </interrupts>
+  <actions> 
+      
+    <!-- Initialize Values -->
+    <set_value name="$Evaluated_table" exact="table[]"/>
+    <set_value name="$Path_table" exact="table[{$destination}=null]"/>
+    <!-- We start in the destination sector searching a reverse path to the Start (to make implementation of Jump Beacons easier later)-->
+    <set_value name="$Check_table" exact="table[{$destination}=0m]"/>
+    
+    
+    <do_while value="$Check_table.keys.count">
+      <!-- Check lowest cost waypoint deeper -->
+      <set_value name="$current_waypoint" exact="$Check_table.keys.sorted.{1}"/>
+      <!-- If current waypoint is the start - we are done -->
+      <do_if value="$current_waypoint == $start">
+        <break/>
+      </do_if>
+      <!-- Search current Space for connection/Entry points -->
+      <!--find_gate name="$EntryPoints" space="$current_sector" multiple="true"/>-->
+      <find_object name="$EntryPoints" space="$current_waypoint.sector" multiple="true">
+        <match_any>
+          <match class="class.highwayexitgate"/>
+          <match class="class.gate" active="true"/>
+          <!--match class="class.anomaly"/-->
+        </match_any>
+      </find_object>
+      
+      <!-- remove current waypoint from result if it appeared there (no need to go back) -->
+      <do_if value="$EntryPoints.indexof.{$current_waypoint}">
+        <remove_value name="$EntryPoints.{$EntryPoints.indexof.{$current_waypoint}}"/>
+      </do_if>
+      
+      <!-- If we are in the start sector - add start to the List, so we can encounter it for the guaranteed shortest path in a later cycle-->
+      <do_if value="$current_waypoint.sector == $start.sector">
+        <append_to_list name="$EntryPoints" exact="$start"/>
+      </do_if>
+      
+      <do_for_each in="$EntryPoints">
+        <!-- Get Waypoints and Distance for the found paths, include greylist penalties -->
+        <set_value name="$distance" exact="$current_waypoint.distanceto.{loop.element} + $Check_table.{$current_waypoint}"/>
+        <do_if value="$greylisttable.{$current_waypoint}?">
+          <do_if value="$greylisttable.{$current_waypoint} gt 100000">
+            <set_value name="$distance" operation="add" exact="$greylisttable.{$current_waypoint}"/>
+          </do_if>
+          <do_else>
+            <set_value name="$distance" exact="$distance * $greylisttable.{$current_waypoint}"/>
+          </do_else>
+        </do_if>
+        <do_elseif value="$greylisttable.{$current_waypoint.owner}?">
+          <do_if value="$greylisttable.{$current_waypoint.owner} gt 100000">
+            <set_value name="$distance" operation="add" exact="$greylisttable.{$current_waypoint.owner}"/>
+          </do_if>
+          <do_else>
+            <set_value name="$distance" exact="$distance * $greylisttable.{$current_waypoint.owner}"/>
+          </do_else>
+        </do_elseif>
+        
+        <do_if value="loop.element.isclass.gate">
+          <set_value name="$prev_waypoint" exact="loop.element.exit"/>
+        </do_if>
+        <do_elseif value="loop.element.isclass.highwayexitgate">
+          <do_if value="loop.element.highway.islocalhighway">
+            <continue/>
+          </do_if>
+          <set_value name="$prev_waypoint" exact="loop.element.entry"/>
+        </do_elseif>
+        <do_elseif value="loop.element == $start">
+          <set_value name="$prev_waypoint" exact="loop.element"/>
+        </do_elseif>
+        <do_else>
+          <debug_text filter="error" text="'PATH SEARCH: Possible Waypoint %1 is of unknown type - skipping'.[loop.element.knownname]"/>
+          <continue/>
+        </do_else>
+        
+        <!-- Check for Blacklisted Sectors -->
+        <do_if value="$greylisttable.{$prev_waypoint}? and $greylisttable.{$prev_waypoint} == null or $greylisttable.{$prev_waypoint.owner}? and $greylisttable.{$prev_waypoint.owner} == null">
+          <set_value name="$encountered_blacklisted_space"/>
+          <continue/>
+        </do_if>
+        
+        <!-- Check if we already have found a path and compare if our new path is better -->
+        <do_if value="$Evaluated_table.{$prev_waypoint}?">
+          <do_if value="$Evaluated_table.{$prev_waypoint} gt $distance">
+            <remove_value name="$Evaluated_table.{$prev_waypoint}"/>
+            <set_value name="$Check_table.{$prev_waypoint}" exact="$distance"/>
+            <set_value name="$Path_table.{$prev_waypoint}" exact="$current_waypoint"/>
+          </do_if>
+        </do_if>
+        <do_elseif value="$Check_table.{$prev_waypoint}?">
+          <do_if value="$Check_table.{$prev_waypoint} gt $distance">
+            <set_value name="$Check_table.{$prev_waypoint}" exact="$distance"/>
+            <set_value name="$Path_table.{$prev_waypoint}" exact="$current_waypoint"/>
+          </do_if>
+        </do_elseif>
+        <do_else>
+          <set_value name="$Check_table.{$prev_waypoint}" exact="$distance"/>
+          <set_value name="$Path_table.{$prev_waypoint}" exact="$current_waypoint"/>
+        </do_else>
+        <set_value name="$Evaluated_table.{$current_waypoint}" exact="$Check_table.{$current_waypoint}"/>
+      </do_for_each>
+      <remove_value name="$Check_table.{$current_waypoint}"/>
+      </do_while>
+      
+      <!-- Check if we found a Path and return it-->
+      <do_if value="$current_waypoint == $start">
+        <set_value name="$retval" exact="[$current_waypoint]"/>
+        <set_value name="$distance" exact="0m"/>
+        <set_value name="$greylist_warning" exact="[]"/>
+        <do_while value="$current_waypoint != $destination">
+          <do_if value="$warningmulti == null"/>
+          <do_elseif value="@$greylisttable.{$current_waypoint.sector} ge $warningmulti">
+            <append_to_list name="$greylist_warning" exact="$current_waypoint.sector"/>
+          </do_elseif>
+          <do_elseif value="@$greylisttable.{$current_waypoint.sector.owner} ge $warningmulti">
+            <append_to_list name="$greylist_warning" exact="$current_waypoint.sector"/>
+          </do_elseif>
+          <set_value name="$distance" operation="add" exact="if $current_waypoint.exit? then $current_waypoint.exit.distanceto.{$Path_table.{$current_waypoint}} else $current_waypoint.distanceto.{$Path_table.{$current_waypoint}}"/>
+          <set_value name="$current_waypoint" exact="$Path_table.{$current_waypoint}"/>
+          <append_to_list name="$retval" exact="$current_waypoint"/>
+        </do_while>
+        <return value="$retval">
+          <retval name="greylist_warning" value="$greylist_warning"/>
+        </return>
+      </do_if>
+      <do_else>
+        <debug_text filter="error" text="'PATH SEARCH: No Path found from %1 in %2 to %3 in %4 !! (blacklisted space: %5 ) - returning null !!!!'.[$start.knownname,$start.sector.knownname,$destination.knownname,$destination.sector.knownname,@$encountered_blacklisted_space]"/>
+        <return value="null"/>
+        <set_value name="$retval" exact="null"/>
+      </do_else>
+  </actions>
+  <on_abort>
+  </on_abort>
+</aiscript>

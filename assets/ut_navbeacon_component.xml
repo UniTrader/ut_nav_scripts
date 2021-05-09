@@ -1,0 +1,98 @@
+﻿<?xml version="1.0"?>
+<components>
+	<component name="ut_navbeacon_component" class="navbeacon">
+		<source geometry="assets\environments\deco\env_deco_nav_beacon_t10_data"/>
+		<layers>
+			<layer>
+				<waypoints/>
+				<lights>
+					<omni name="XU Omni001" shadow="0" r="169" g="230" b="201" range="500" shadowrange="500" lighteffect="1" lenseffect="light_pos_green" trigger="1" intensity="0" specularintensity="1">
+						<animations>
+							<animation name="mode_inactive" start="1" end="1"/>
+							<animation name="mode_activating" start="1" end="20"/>
+							<animation name="mode_active" start="20" end="130"/>
+							<animation name="mode_deactivating" start="130" end="150"/>
+						</animations>
+						<lightanimations>
+							<lightanimation name="intensity" controller="linear_float">
+								<key frame="0" value="0"/>
+								<key frame="20" value="0"/>
+								<key frame="115" value="0"/>
+								<key frame="116" value="2.5"/>
+								<key frame="118" value="0"/>
+								<key frame="130" value="0"/>
+							</lightanimation>
+						</lightanimations>
+						<offset>
+							<position x="0" y="5.487744" z="-9.278776E-07"/>
+							<quaternion qx="0.7071068" qy="-0" qz="-0" qw="-0.7071068"/>
+						</offset>
+					</omni>
+				</lights>
+			</layer>
+		</layers>
+		<connections>
+			<connection name="container" tags="contents" value="0"/>
+			<connection name="position" tags="position" value="1"/>
+			<connection name="space" tags="navbeacon">
+				<offset/>
+			</connection>
+			<connection name="Connection01" tags="part animation noshadowcaster  nocollision">
+				<offset>
+					<position x="0" y="8.780456E-02" z="0"/>
+				</offset>
+				<animations>
+					<animation name="mode_inactive" start="1" end="1"/>
+					<animation name="mode_activating" start="1" end="20"/>
+					<animation name="mode_active" start="20" end="130"/>
+					<animation name="mode_deactivating" start="130" end="150"/>
+				</animations>
+				<parts>
+					<part name="anim_main">
+						<lods>
+							<lod index="0">
+								<materials>
+									<material id="1" ref="generic.generic_p1_hullpattern"/>
+								</materials>
+							</lod>
+						</lods>
+						<size>
+							<max x="1.83691" y="2.047538" z="1.83691"/>
+							<center x="0" y="5.008292E-02" z="0"/>
+						</size>
+						<size_raw>
+							<max x="1.83691" y="2.047538" z="1.83691"/>
+							<center x="0" y="5.008292E-02" z="0"/>
+						</size_raw>
+					</part>
+				</parts>
+				<waypoints/>
+			</connection>
+			<connection name="Connection02" tags="part detail_xs iklink nocollision " parent="anim_main">
+				<parts>
+					<part name="detail_xs_antenna">
+						<lods>
+							<lod index="0">
+								<materials>
+									<material id="1" ref="generic.generic_p1_hullpattern"/>
+									<material id="2" ref="effects.gradient_white"/>
+								</materials>
+							</lod>
+						</lods>
+						<size>
+							<max x="2.064749" y="10.34111" z="2.064749"/>
+							<center x="2.384186E-07" y="2.384186E-07" z="2.384186E-07"/>
+						</size>
+						<size_raw>
+							<max x="1.506452" y="4.57403" z="1.506452"/>
+							<center x="5.960464E-08" y="0" z="1.192093E-07"/>
+						</size_raw>
+					</part>
+				</parts>
+			</connection>
+			<connection name="con_pickup" tags="pickup ">
+				<offset/>
+			</connection>
+		</connections>
+	</component>
+</components>

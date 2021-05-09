@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<aiscript name="ut.cac.limpet.experiment" priority="10" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://utnas/~unitrader/XRebirthxsds/aiscripts.xsd">
+  <order name="'Limpet Formation Experiment'" id="LimpetTest" category="navigation">
+    <params>
+      <param name="Formationleader" type="object" text="'Formationleader'" required="true">
+        <input_param name="class" value="[class.ship_m, class.ship_l, class.ship_xl]"/>
+      </param>
+    </params>
+  </order>
+  <interrupts>
+  </interrupts>
+  <attention min="unknown">
+    <actions>
+      <label name="start"/>
+      <!-- Calculate relative Formation Position -->
+      <!-- for now 75% of leader height above him -->
+      <set_value name="$relative_position" exact="position.[$Formationleader.length * ( [ 0.75 , -0,75 ].random ),$Formationleader.height * ( [ 0.75 , -0,75 ].random ),$Formationleader.width * ( [ 0.75 , -0,75 ].random )]"/>
+      <!-- Signal to others that we go into Limpet Formation -->
+      <!-- ToDo, first confirm it actually works -->
+      
+      <!-- Move to it -->
+      <move_to object="this.ship" destination="$Formationleader" relativemovement="true">
+        <position value="$relative_position" object="$Formationleader"/>
+      </move_to>
+      <!-- confirm we are close to our target position -->
+      <do_if value="this.ship.distanceto.[$Formationleader,$relative_position] gt 50m">
+        <!-- not close enough - retry -->
+        <resume label="start"/>
+      </do_if>
+      
+      <!-- Log a few Values for reference -->
+      <set_value name="$log" exact="'LOG DAMAGEVALUES\nattack big;attack small;dps all dps pri;dps sec;dps las;dps mis;dps tur'"/>
+      <get_attackstrength result="$attackstrength_big" object="this.ship" target="$Formationleader"/>
+      <get_attackstrength result="$attackstrength_small" object="this.ship" target="this.ship"/>
+      <set_value name="$log" exact="$log + '\n%s;%s;%s;%s;%s;%s;%s;%s'.[
+      $attackstrength_big,
+      $attackstrength_small,
+      this.ship.dps.all,
+      this.ship.dps.primary,
+      this.ship.dps.secondary,
+      this.ship.dps.lasers.all,
+      this.ship.dps.missiles.all,
+      this.ship.dps.turrets
+      ]"/>
+      <get_attackstrength result="$attackstrength_big" object="$Formationleader" target="$Formationleader"/>
+      <get_attackstrength result="$attackstrength_small" object="$Formationleader" target="this.ship"/>
+      <set_value name="$log" exact="$log + '\n%s;%s;%s;%s;%s;%s;%s;%s'.[
+      $attackstrength_big,
+      $attackstrength_small,
+      $Formationleader.dps.all,
+      $Formationleader.dps.primary,
+      $Formationleader.dps.secondary,
+      $Formationleader.dps.lasers.all,
+      $Formationleader.dps.missiles.all,
+      $Formationleader.dps.turrets
+      ]"/>
+      <!-- Attach -->
+      <warp object="this.ship" zone="$Formationleader.zone">
+        <position value="$relative_position" object="$Formationleader" space="$Formationleader.zone"/>
+		    <rotation value="$Formationleader.rotation"/>
+      </warp>
+      <attach_object_to_target object="this.ship" target="$Formationleader" keepoffset="true"/>
+      <clear_collision_filter object="this.ship"/>
+      
+      <get_attackstrength result="$attackstrength_big" object="$Formationleader" target="$Formationleader"/>
+      <get_attackstrength result="$attackstrength_small" object="$Formationleader" target="this.ship"/>
+      <set_value name="$log" exact="$log + '\n%s;%s;%s;%s;%s;%s;%s;%s'.[
+      $attackstrength_big,
+      $attackstrength_small,
+      $Formationleader.dps.all,
+      $Formationleader.dps.primary,
+      $Formationleader.dps.secondary,
+      $Formationleader.dps.lasers.all,
+      $Formationleader.dps.missiles.all,
+      $Formationleader.dps.turrets
+      ]"/>
+      <debug_text filter="general" text="$log"/>
+      <!-- Wait for event/reason to detach -->
+      <wait exact="1h">
+        <interrupt>
+          <conditions>
+            <check_any>
+              <event_object_attacked object="this.ship"/>
+              <event_object_collided object="this.ship"/>
+            </check_any>
+          </conditions>
+        </interrupt>
+      </wait>
+      <!-- Detach -->
+      <!-- disconnect_from_trade_location ship="this.ship"/ Doesnt work for small raft -->
+      <!-- disengage_construction_vessel object="this.ship"/ Seems Unlikely - for reference only -->
+      <!--attach_object_to_target object="this.ship" target="this.zone" keepoffset="true"/ Seems unlikely but test later -->
+      <!--restore_object object="this.ship"/ Very unlikely -->
+      <!-- undock ship="this.ship"/ Threw an Error -->
+      <warp object="this.ship" zone="this.zone">
+        <position object="this.ship" space="this.zone"/>
+      </warp>
+      <!--move_undocking object="this.ship" dock="$Formationleader"/-->
+      <!-- End Script -->
+    </actions>
+  </attention>
+  <on_abort>
+    <!-- fast detach code -->
+  </on_abort>
+</aiscript>

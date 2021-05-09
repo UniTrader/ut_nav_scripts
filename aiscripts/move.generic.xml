@@ -7,7 +7,7 @@
         <check_value value="this.ship.iscapitalship"/>
       </conditions>
       <actions>
-        <run_interrupt_script name="'ut.cac.move.generic'" resume="start">
+        <run_interrupt_script name="'ut.move.generic'" resume="start">
           <param name="destination" value="$destination" comment="can be a space or an object in a zone. Providing Sector and Cluster will attempt to find the nearest zone"/>
           <param name="position" value="$position" comment="position is treated as an offset to destination. Default: safe position on [0,0,0] of destination"/>
           <param name="rotation" value="$rotation" comment="rotation the ship should have - overridden by lookat"/>

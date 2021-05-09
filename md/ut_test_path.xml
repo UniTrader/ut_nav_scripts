@@ -1,0 +1,191 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<mdscript name="UT_test_path" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://utnas/~unitrader/XRebirthxsds/md.xsd">
+  <cues>
+    <cue name="Root">
+      <cues>
+        <cue name="Path_test" checkinterval="1s" checktime="10s" instantiate="true">
+          <actions>
+            <!-- Parameters for the Script -->
+            <find_ship name="$start" space="player.galaxy"/>
+            <find_object name="$destination" space="player.galaxy"/>
+            <set_value name="$greylisttable" exact="table[]"/>
+            <set_value name="$warningmulti" exact="null"/>
+            <!-- End Parameters -->
+            <set_value name="$logvalue" exact="'trying to find path from %1 in %2 to %3 in %4'.[$start.knownname,$start.sector.knownname,$destination.knownname,$destination.sector.knownname]"/>
+            <get_global_path component="$retval" multiple="true" uselocalhighways="false">
+              <start object="$start"/>
+              <end object="$destination"/>
+            </get_global_path>
+            <do_all exact="$retval.count" counter="$i" reverse="true">
+              <do_if value="$i == 1"/>
+              <do_elseif value="$i == $retval.count"/>
+              <do_elseif value="$retval.{$i}.isclass.highwayexitgate">
+                <remove_value name="$retval.{$i}"/>
+              </do_elseif>
+              <do_elseif value="$retval.{$i}.isclass.zone">
+                <remove_value name="$retval.{$i}"/>
+              </do_elseif>
+              <do_elseif value="$retval.{$i}.isclass.gate and $retval.{$i}.exit == $retval.{$i-1}">
+                <remove_value name="$retval.{$i}"/>
+              </do_elseif>
+            </do_all>
+            <set_value name="$distance" exact="0m"/>
+            <do_all exact="$retval.count" counter="$i">
+              <do_if value="$i == 1"/>
+              <do_else>
+                <set_value name="$distance" operation="add" exact="if $retval.{$i-1}.exit? then $retval.{$i-1}.exit.distanceto.{$retval.{$i}} else $retval.{$i-1}.distanceto.{$retval.{$i}}"/>
+              </do_else>
+            </do_all>
+            <include_actions ref="Log_lib"/>
+            <set_value name="$logvalue" exact="$logvalue + '\n' + $retval.count + '/' + $distance + $logentry"/>
+            <remove_value name="$retval"/>
+            <include_actions ref="Path_lib"/>
+            <include_actions ref="Log_lib"/>
+            <set_value name="$logvalue" exact="$logvalue + '\n' + $retval.count + '/' + $distance + $logentry"/>
+            <set_value name="$logvalue" exact="$logvalue + '\n##########################################################################################'"/>
+            <debug_to_file name="'Path_test.txt'" directory="'navscripts'" text="$logvalue"/>
+          </actions>
+        </cue>
+      </cues>
+    </cue>
+    <library name="Log_lib">
+      <actions>
+        <set_value name="$logentry" exact="''"/>
+        <do_for_each in="$retval">
+          <set_value name="$logentry" exact="$logentry + ' // ' + loop.element.knownname + '/'+ loop.element.sector.knownname"/>
+        </do_for_each>
+      </actions>
+    </library>
+    <library name="Path_lib">
+      <actions>
+      
+    <!-- Initialize Values -->
+    <set_value name="$Evaluated_table" exact="table[]"/>
+    <set_value name="$Path_table" exact="table[{$destination}=null]"/>
+    <!-- We start in the destination sector searching a reverse path to the Start (to make implementation of Jump Beacons easier later)-->
+    <set_value name="$Check_table" exact="table[{$destination}=0m]"/>
+    
+    
+    <do_while value="$Check_table.keys.count">
+      <!-- Check lowest cost waypoint deeper -->
+      <set_value name="$current_waypoint" exact="$Check_table.keys.sorted.{1}"/>
+      <!-- If current waypoint is the start - we are done -->
+      <do_if value="$current_waypoint == $start">
+        <break/>
+      </do_if>
+      <!-- Search current Space for connection/Entry points -->
+      <!--find_gate name="$EntryPoints" space="$current_sector" multiple="true"/>-->
+      <find_object name="$EntryPoints" space="$current_waypoint.sector" multiple="true">
+        <match_any>
+          <match class="class.highwayexitgate"/>
+          <match class="class.gate" active="true"/>
+          <!--match class="class.anomaly"/-->
+        </match_any>
+      </find_object>
+      
+      <!-- remove current waypoint from result if it appeared there (no need to go back) -->
+      <do_if value="$EntryPoints.indexof.{$current_waypoint}">
+        <remove_value name="$EntryPoints.{$EntryPoints.indexof.{$current_waypoint}}"/>
+      </do_if>
+      
+      <!-- If we are in the start sector - add start to the List, so we can encounter it for the guaranteed shortest path in a later cycle-->
+      <do_if value="$current_waypoint.sector == $start.sector">
+        <append_to_list name="$EntryPoints" exact="$start"/>
+      </do_if>
+      
+      <do_for_each in="$EntryPoints">
+        <!-- Get Waypoints and Distance for the found paths, include greylist penalties -->
+        <set_value name="$distance" exact="$current_waypoint.distanceto.{loop.element} + $Check_table.{$current_waypoint}"/>
+        <do_if value="$greylisttable.{$current_waypoint}?">
+          <do_if value="$greylisttable.{$current_waypoint} gt 100000">
+            <set_value name="$distance" operation="add" exact="$greylisttable.{$current_waypoint}"/>
+          </do_if>
+          <do_else>
+            <set_value name="$distance" exact="$distance * $greylisttable.{$current_waypoint}"/>
+          </do_else>
+        </do_if>
+        <do_elseif value="$greylisttable.{$current_waypoint.owner}?">
+          <do_if value="$greylisttable.{$current_waypoint.owner} gt 100000">
+            <set_value name="$distance" operation="add" exact="$greylisttable.{$current_waypoint.owner}"/>
+          </do_if>
+          <do_else>
+            <set_value name="$distance" exact="$distance * $greylisttable.{$current_waypoint.owner}"/>
+          </do_else>
+        </do_elseif>
+        
+        <do_if value="loop.element.isclass.gate">
+          <set_value name="$prev_waypoint" exact="loop.element.exit"/>
+        </do_if>
+        <do_elseif value="loop.element.isclass.highwayexitgate">
+          <do_if value="loop.element.highway.islocalhighway">
+            <continue/>
+          </do_if>
+          <set_value name="$prev_waypoint" exact="loop.element.entry"/>
+        </do_elseif>
+        <do_elseif value="loop.element == $start">
+          <set_value name="$prev_waypoint" exact="loop.element"/>
+        </do_elseif>
+        <do_else>
+          <debug_text filter="error" text="'PATH SEARCH: Possible Waypoint %1 is of unknown type - skipping'.[loop.element.knownname]"/>
+          <continue/>
+        </do_else>
+        
+        <!-- Check for Blacklisted Sectors -->
+        <do_if value="$greylisttable.{$prev_waypoint}? and $greylisttable.{$prev_waypoint} == null or $greylisttable.{$prev_waypoint.owner}? and $greylisttable.{$prev_waypoint.owner} == null">
+          <set_value name="$encountered_blacklisted_space"/>
+          <continue/>
+        </do_if>
+        
+        <!-- Check if we already have found a path and compare if our new path is better -->
+        <do_if value="$Evaluated_table.{$prev_waypoint}?">
+          <do_if value="$Evaluated_table.{$prev_waypoint} gt $distance">
+            <remove_value name="$Evaluated_table.{$prev_waypoint}"/>
+            <set_value name="$Check_table.{$prev_waypoint}" exact="$distance"/>
+            <set_value name="$Path_table.{$prev_waypoint}" exact="$current_waypoint"/>
+          </do_if>
+        </do_if>
+        <do_elseif value="$Check_table.{$prev_waypoint}?">
+          <do_if value="$Check_table.{$prev_waypoint} gt $distance">
+            <set_value name="$Check_table.{$prev_waypoint}" exact="$distance"/>
+            <set_value name="$Path_table.{$prev_waypoint}" exact="$current_waypoint"/>
+          </do_if>
+        </do_elseif>
+        <do_else>
+          <set_value name="$Check_table.{$prev_waypoint}" exact="$distance"/>
+          <set_value name="$Path_table.{$prev_waypoint}" exact="$current_waypoint"/>
+        </do_else>
+        <set_value name="$Evaluated_table.{$current_waypoint}" exact="$Check_table.{$current_waypoint}"/>
+      </do_for_each>
+      <remove_value name="$Check_table.{$current_waypoint}"/>
+      </do_while>
+      
+      <!-- Check if we found a Path and return it-->
+      <do_if value="$current_waypoint == $start">
+        <set_value name="$retval" exact="[$current_waypoint]"/>
+        <set_value name="$distance" exact="0m"/>
+        <set_value name="$greylist_warning" exact="[]"/>
+        <do_while value="$current_waypoint != $destination">
+          <do_if value="$warningmulti == null"/>
+          <do_elseif value="@$greylisttable.{$current_waypoint.sector} ge $warningmulti">
+            <append_to_list name="$greylist_warning" exact="$current_waypoint.sector"/>
+          </do_elseif>
+          <do_elseif value="@$greylisttable.{$current_waypoint.sector.owner} ge $warningmulti">
+            <append_to_list name="$greylist_warning" exact="$current_waypoint.sector"/>
+          </do_elseif>
+          <set_value name="$distance" operation="add" exact="if $current_waypoint.exit? then $current_waypoint.exit.distanceto.{$Path_table.{$current_waypoint}} else $current_waypoint.distanceto.{$Path_table.{$current_waypoint}}"/>
+          <set_value name="$current_waypoint" exact="$Path_table.{$current_waypoint}"/>
+          <append_to_list name="$retval" exact="$current_waypoint"/>
+        </do_while>
+        <!--return value="$retval">
+          <retval name="greylist_warning" value="$greylist_warning"/>
+        </return-->
+      </do_if>
+      <do_else>
+        <debug_text filter="error" text="'PATH SEARCH: No Path found from %1 in %2 to %3 in %4 !! (blacklisted space: %5 ) - returning null !!!!'.[$start.knownname,$start.sector.knownname,$destination.knownname,$destination.sector.knownname,@$encountered_blacklisted_space]"/>
+        <!--return value="null"/-->
+        <set_value name="$retval" exact="null"/>
+      </do_else>
+      </actions>
+      </library>
+  </cues>
+</mdscript>

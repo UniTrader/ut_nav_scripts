@@ -54,6 +54,52 @@
             </do_if>
           </actions>
         </cue>
+        <cue name="PathVisuInstance" instantiate="true" namespace="this">
+          <conditions>
+            <event_cue_signalled/>
+          </conditions>
+          <actions>
+            <set_value name="$Ship" exact="event.param"/>
+            <create_group groupname="$beacons"/>
+          </actions>
+          <cues>
+            <cue name="Cleanup">
+              <conditions>
+                <event_object_destroyed object="$Ship"/>
+              </conditions>
+              <actions>
+                <destroy_group group="$beacons" explosion="false"/>
+              </actions>
+            </cue>
+            <cue name="UpdatePath" checkinterval="10s" instantiate="true">
+              <actions>
+                <set_value name="$targetpos" exact="$Ship.pilot.destinationpos"/>
+                <create_orientation name="$rotation" orientation="look_at" refposition="$targetpos">
+                  <position object="$Ship"/>
+                </create_orientation>
+                <set_value name="$beacondistance" exact="if $Ship == player.target then 100m else 500m"/>
+                <set_value name="$beaconcount" exact="($Ship.distanceto.{$targetpos} / $beacondistance )i"/>
+                <do_all exact="$beaconcount" counter="$i" reverse="false">
+                  <transform_position name="$beaconpos" refposition="$Ship.position" refrotation="$rotation">
+                    <position x="0m" y="0m" z="$i * $beacondistance"/>
+                  </transform_position>
+                  <do_if value="$beacons.count le $i">
+                    <warp object="$beacons.{$i}" zone="$ship.zone">
+                      <position value="$beaconpos"/>
+                    </warp>
+                  </do_if>
+                  <do_else>
+                    <create_object groupname="$beacons" macro="macro.ut_navbeacon_macro" zone="$ship.zone">
+                      <position value="$beaconpos"/>
+                    </create_object>
+                  </do_else>
+                  <disable_collision_response object="$beacons.{$i}"/>
+                  <disable_collisions_between object="$beacons.{$i}"/>
+                </do_all>
+              </actions>
+            </cue>
+          </cues>
+        </cue>
       </cues>
     </cue>
   </cues>

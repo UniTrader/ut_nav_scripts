@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Exported by: Michael (192.168.3.81) at 14.11.2018_18-34-02-->
+<macros>
+  <macro name="ut_navbeacon_macro" class="navbeacon" alias="env_deco_nav_beacon_t1_macro">
+    <component ref="ut_navbeacon_component"/>
+    <properties>
+      <identification name="{20201,20801}" description="{20201,20802}" deployable="0"/>
+      <hull max="150000"/>
+      <effects>
+      </effects>
+    </properties>
+  </macro>
+</macros>

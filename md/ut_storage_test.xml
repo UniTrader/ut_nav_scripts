@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<mdscript xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="UT_Storage_Test" xsi:noNamespaceSchemaLocation="http://utnas/~unitrader/XRebirthxsds/md.xsd">
+  <cues>
+    <cue name="Init">
+      <actions>
+      </actions>
+      <cues>
+        <cue name="LogStorageUsage" instantiate="true">
+          <conditions>
+            <event_object_changed_object object="player.entity"/>
+            <check_value value="event.param.isclass.station"/>
+          </conditions>
+          <actions>
+            <set_value name="$station" exact="event.param"/>
+            <set_value name="$wares" exact="lookup.ware.list"/>
+            <set_value name="$resultstring" exact="''"/>
+            <set_value name="$totalvolume" exact="0"/>
+            <set_value name="$containervolume" exact="0"/>
+            <set_value name="$liquidvolume" exact="0"/>
+            <set_value name="$solidvolume" exact="0"/>
+            <do_for_each in="$wares" name="$ware">
+              <do_if value="
+$station.cargo.{$ware}.exists or 
+$station.cargo.{$ware}.target or 
+$station.products.{$ware}.exists or 
+$station.products.{$ware}.intermediate or 
+$station.resources.{$ware}.intermediate or 
+$station.resources.{$ware}.primary or 
+$station.resources.{$ware}.secondary or 
+$station.supplyresources.{$ware}.exists or 
+$station.tradewares.{$ware}.exists">
+                <set_value name="$offerbuy" exact="0"/>
+                <set_value name="$offerbuy_desired" exact="0"/>
+                <set_value name="$offersell" exact="0"/>
+                <set_value name="$offersell_desired" exact="0"/>
+                <find_buy_offer result="$offers" excludeempty="false" excludemissions="true" multiple="true" buyer="$station" wares="$ware"/>
+                <do_for_each in="$offers" name="$offer">
+                  <set_value name="$offerbuy" operation="add" exact="$offer.amount"/>
+                  <set_value name="$offerbuy_desired" operation="add" exact="$offer.desiredamount"/>
+                </do_for_each>
+                <get_ware_reservation result="$reserved_buy" object="$station" type="buy" ware="$ware"/>
+                <find_sell_offer result="$offers" excludeempty="false" excludemissions="true" multiple="true" seller="$station" wares="$ware"/>
+                <do_for_each in="$offers" name="$offer">
+                  <set_value name="$offersell" operation="add" exact="$offer.amount"/>
+                  <set_value name="$offersell_desired" operation="add" exact="$offer.desiredamount"/>
+                </do_for_each>
+                <get_ware_reservation result="$reserved_sell" object="$station" type="sell" ware="$ware"/>
+                <set_value name="$resultstring" exact="'%s\n%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s'.[
+$resultstring,
+$ware.id,
+$ware.name,
+$station.cargo.{$ware}.target,
+$ware.volume,
+$station.cargo.{$ware}.target*$ware.volume,
+$station.cargo.{$ware}.count,
+$station.products.{$ware}.exists,
+$station.products.{$ware}.intermediate,
+$station.resources.{$ware}.intermediate, 
+$station.resources.{$ware}.primary,
+$station.resources.{$ware}.secondary,
+$station.supplyresources.{$ware}.exists,
+$station.tradewares.{$ware}.exists,
+$offerbuy,
+$offerbuy_desired,
+$reserved_buy,
+$offersell,
+$offersell_desired,
+$reserved_sell
+]"/>
+                <set_value name="$totalvolume" operation="add" exact="$station.cargo.{$ware}.target*$ware.volume"/>
+                <do_if value="$ware.transporttag == tag.container">
+                  <set_value name="$containervolume" operation="add" exact="$station.cargo.{$ware}.target*$ware.volume"/>
+                </do_if>
+                <do_if value="$ware.transporttag == tag.liquid">
+                  <set_value name="$liquidvolume" operation="add" exact="$station.cargo.{$ware}.target*$ware.volume"/>
+                </do_if>
+                <do_if value="$ware.transporttag == tag.solid">
+                  <set_value name="$solidvolume" operation="add" exact="$station.cargo.{$ware}.target*$ware.volume"/>
+                </do_if>
+              </do_if>
+            </do_for_each>
+            <set_value name="$resultstring" exact="'Storage used: %sm³ / %sm³ (diff:%s);Container:  %sm³ / %sm³ (diff:%s);Liquid: %sm³ / %sm³ (diff:%s);Solid:%sm³ / %sm³ (diff:%s)\n'.[$totalvolume,$station.cargo.free.all,$totalvolume-$station.cargo.free.all,
+            $containervolume,$station.cargo.free.container,$containervolume-$station.cargo.free.container,
+            $liquidvolume,$station.cargo.free.liquid,$liquidvolume-$station.cargo.free.liquid,
+            $solidvolume,$station.cargo.free.solid,$solidvolume-$station.cargo.free.solid] +
+'ware id;ware name;targetamount;volume;targetvolume;amount in cargo;is product;is intermediate product;is intermediate ressource;is primary ressource;is secondary ressource;is supply ressource;is tradeware;offeramount buy;desired buy;reserved buy;offeramount sell;desired sell;reserved sell'+ $resultstring"/>
+            <debug_to_file name="$station.knownname + '.csv'" text="$resultstring" append="false"/>
+          </actions>
+        </cue>
+      </cues>
+    </cue>
+  </cues>
+</mdscript>

@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<aiscript xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="ut.move.generic" version="30" priority="2" xsi:noNamespaceSchemaLocation="http://utnas/~unitrader/XRebirthxsds/aiscripts.xsd">
+  <!--
+
+ rewritten from scratch by UniTrader
+  
+  Generic routine for moving to a specific location.
+  Will get the Path and call the relevant scripts for each movement Step.
+  Will also start from the beginning if Target Object switched Zone Context to follow it until both are in the same Zone
+  But will terminate if $destination is reached (no cheap follow mode, just getting there)
+  No Movement done here directly, all is in a specific sub-script pere movement type (Gate passage, Jump, Boost, normal/exact
+
+  -->
+  <params>
+    <param name="destination" comment="can be a space or an object in a zone. Providing Sector and Cluster will attempt to find the nearest zone"/>
+    <param name="position" default="null" comment="position is treated as an offset to destination. Default: safe position on [0,0,0] of destination"/>
+    <param name="rotation" default="null" comment="rotation the ship should have - overridden by lookat"/>
+    <param name="lookat" default="null" comment="position the ship should point to - overrides rotation"/>
+    <param name="gotogate" default="null" comment="Dont go through the Jump/Highway gate to its datination, but just near the Gate itself"/>
+    <param name="endintargetspace" default="false" comment="complete this script if we have the correct Space context, no matter where (may be Cluster, Sector or Zone, will resolve to Zone if an Object is the destination)"/>
+    <!--param name="exitonneworder" default="false" comment="Exit immediately when receiving a new Order. If set to a Number of 2 or greater this is the Number of Orders the this.{$orderlist} has to contain before aborting (since 1 is always this Script)"/-->
+  </params>
+  <interrupts>
+ </interrupts>
+  <init>
+  </init>
+  <attention min="unknown">
+    <actions>
+      <!-- Initialize Stuff, validate Input -->
+      <debug_to_file directory="'ut_navscripts'" name="this.ship+''" output="true" chance="@this.$debug * 100" text="'%1 %2 Script started with Params:\n$destination: %3 , $position: %4 , $rotation: %5 , $lookat: %6  , $endintargetspace: %7'.[this.name,this.container.knownname,$destination.knownname,$position,$rotation,$lookat,$endintargetspace]"/>
+      
+      <set_value name="$bigship" exact="this.ship.isclass.ship_xl or this.ship.isclass.ship_l"/>
+      
+      <set_value name="$logvalues" exact="[player.age, this.ship.zone, $destination]"/>
+      
+      
+      <do_if value="not $destination.exists">
+        <debug_to_file directory="'ut_navscripts'" name="this.ship+''" output="false" chance="@this.$debug * 100" text="'%1	%2	Destination does not exist - aborting'.[this.name,this.container.name]"/>
+        <debug_text filter="error" text="'%1	%2	Destination does not exist - aborting'.[this.name,this.container.name]"/>
+        <return/>
+      </do_if>
+      <!-- First step: Calculate and Filter Path (currently using Vanilla functions, will later use an own sub-script to do that ) -->
+      <!-- Second step: Follow Path till in the correct Sector -->
+      <!-- Third Step: Get as close as wanted to the destination and return -->
+    </actions>
+  </attention>
+  <on_abort>
+  </on_abort>
+</aiscript>
